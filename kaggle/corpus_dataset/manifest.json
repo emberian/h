@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "format": "contiguous token IDs; EOS after every document; causal labels are next-token shift",
+  "dtype": "little-endian uint16",
+  "tokenizer": "tiiuae/Falcon-H1-Tiny-90M-Base",
+  "vocab_size": 32768,
+  "eos_token_id": 11,
+  "source_manifest_sha256": "6a059742543cde4822f95605e8f0f42e1e89bbad829a95e27234d59a2fc8b7ae",
+  "splits": {
+    "train": {
+      "path": "train.bin",
+      "documents": 4837,
+      "tokens_including_eos": 374405212,
+      "bytes": 748810424,
+      "sha256": "fdaa8b8514b006942e410f7044d5e9da8be852089f7380e5d05eff5b3573f124",
+      "source_token_count_mismatches": 0,
+      "complete_sequences": {
+        "256": 1462520,
+        "512": 731260,
+        "1024": 365630
+      }
+    },
+    "validation": {
+      "path": "validation.bin",
+      "documents": 31,
+      "tokens_including_eos": 2380464,
+      "bytes": 4760928,
+      "sha256": "07bce22a3de6101d4d946d1592a500c30a3790afffdecb8da6bd99777b985928",
+      "source_token_count_mismatches": 0,
+      "complete_sequences": {
+        "256": 9298,
+        "512": 4649,
+        "1024": 2324
+      }
+    }
+  }
+}

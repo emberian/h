@@ -1,0 +1,7 @@
+{
+  "title": "H Ghost Curated Falcon Token Corpus",
+  "id": "emberian64/hghost-curated-tokens-v1",
+  "subtitle": "Public deduplicated uint16 train and validation streams for Falcon-H1",
+  "description": "Public curated token streams only; no raw source text or source-document paths are included. Exact and conservative near duplicates are removed, severe extraction corruption and the credential dump are excluded, and source-document provenance remains local. The manifests record tokenizer identity, EOS placement, counts, hashes, and split construction. Source-document licensing is mixed or unknown.",
+  "licenses": [{"name": "unknown"}]
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "sealed": true,
+  "files": {
+    "train.bin": {
+      "bytes": 748810424,
+      "sha256": "fdaa8b8514b006942e410f7044d5e9da8be852089f7380e5d05eff5b3573f124"
+    },
+    "validation.bin": {
+      "bytes": 4760928,
+      "sha256": "07bce22a3de6101d4d946d1592a500c30a3790afffdecb8da6bd99777b985928"
+    },
+    "manifest.json": {
+      "bytes": 1114,
+      "sha256": "b599dc950a80be9f29b79f555efe3fc91462d6304d42ffe635dec2e7e2adbeb6"
+    },
+    "validation-report.json": {
+      "bytes": 1264,
+      "sha256": "03d6dc51737035223dbd09c4256652e4c25b64f474c8239e07aafeef85aa7ff5"
+    }
+  },
+  "dataset_manifest_sha256": "6a059742543cde4822f95605e8f0f42e1e89bbad829a95e27234d59a2fc8b7ae",
+  "selected_documents": 4868,
+  "train_tokens_including_eos": 374405212,
+  "validation_tokens_including_eos": 2380464
+}

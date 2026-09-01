@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "ok": true,
+  "dataset_manifest_sha256": "6a059742543cde4822f95605e8f0f42e1e89bbad829a95e27234d59a2fc8b7ae",
+  "tokenizer": "tiiuae/Falcon-H1-Tiny-90M-Base",
+  "vocab_size": 32768,
+  "eos_token_id": 11,
+  "selected_documents": 4868,
+  "excluded_documents": 5,
+  "duplicate_documents": 339,
+  "cross_split_content_hash_overlap": 0,
+  "splits": {
+    "train": {
+      "documents": 4837,
+      "source_tokens": 374400375,
+      "dataset_source_tokens": 374400375,
+      "tokenized_source_tokens": 374400375,
+      "source_token_count_mismatches": 0,
+      "eos_tokens": 4837,
+      "tokens_including_eos": 374405212,
+      "bytes": 748810424,
+      "sha256": "fdaa8b8514b006942e410f7044d5e9da8be852089f7380e5d05eff5b3573f124",
+      "minimum_token_id": 11,
+      "maximum_token_id": 32767
+    },
+    "validation": {
+      "documents": 31,
+      "source_tokens": 2380433,
+      "dataset_source_tokens": 2380433,
+      "tokenized_source_tokens": 2380433,
+      "source_token_count_mismatches": 0,
+      "eos_tokens": 31,
+      "tokens_including_eos": 2380464,
+      "bytes": 4760928,
+      "sha256": "07bce22a3de6101d4d946d1592a500c30a3790afffdecb8da6bd99777b985928",
+      "minimum_token_id": 11,
+      "maximum_token_id": 32767
+    }
+  }
+}

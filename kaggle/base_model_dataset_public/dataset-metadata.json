@@ -1,0 +1,7 @@
+{
+  "title": "Falcon-H1 Tiny 90M Base for H Ghost",
+  "id": "emberian64/hghost-falcon-h1-90m-base-public",
+  "subtitle": "Pinned unmodified TII checkpoint with JAX parity fixtures",
+  "description": "Public, unmodified tiiuae/Falcon-H1-Tiny-90M-Base checkpoint pinned at revision 7994372e93b62822ae25f8bfb19f653649cea3a3, plus deterministic JAX parity fixtures. Use and redistribution are governed by the Falcon-LLM License and Acceptable Use Policy included in this dataset and linked from the upstream model card.",
+  "licenses": [{"name": "other"}]
+}

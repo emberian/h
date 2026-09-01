@@ -1,0 +1,36 @@
+{
+  "date": "2026-09-01",
+  "host": "persvati",
+  "model": "tiiuae/Falcon-H1-Tiny-90M-Base",
+  "mode": "BF16 LoRA adapters and compute; frozen BF16 base",
+  "lora_rank": 16,
+  "lora_alpha": 32,
+  "target_modules": [
+    "gate_proj",
+    "up_proj",
+    "down_proj",
+    "in_proj",
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj"
+  ],
+  "trainable_parameters": 3597312,
+  "parameters_including_lora": 94728384,
+  "uninterrupted_adapter_sha256": "c242333edae337fc7f779428e119e6ae8f5a446bcce8c28d9d8df64aa1788d50",
+  "resumed_adapter_sha256": "c242333edae337fc7f779428e119e6ae8f5a446bcce8c28d9d8df64aa1788d50",
+  "byte_identical_resume": true,
+  "steady_state_throughput": {
+    "sequence_length": 512,
+    "measured_steps": 9,
+    "minimum_tokens_per_second": 129.72,
+    "maximum_tokens_per_second": 137.1,
+    "representative_tokens_per_second": 135.5,
+    "approximate_days_for_300m_tokens": 25.62
+  },
+  "checkpoint_bytes": {
+    "adapter_model_safetensors": 7246104,
+    "optimizer_pt": 14711907
+  },
+  "compatibility_note": "PEFT 0.20 rejects Falcon-H1 Mamba out_proj and conv1d; those modules remain frozen."
+}

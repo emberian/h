@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hghost"
+version = "0.1.0"
+description = "Corpus preparation and training tools for the h.fg-goose.online Falcon-H1 ghost"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy>=2,<3",
+  "tokenizers>=0.21,<1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10"]
+ocr = ["ocrmypdf>=17,<18"]
+
+[project.scripts]
+hghost-census = "hghost.census:main"
+hghost-extract = "hghost.extract:main"
+hghost-build = "hghost.build_dataset:main"
+hghost-audit = "hghost.quality:main"
+hghost-ocr = "hghost.ocr:main"
+hghost-paddle-ocr = "hghost.paddle_ocr:main"
+hghost-review-ocr = "hghost.review_ocr:main"
+hghost-tokenize = "hghost.tokenize_dataset:main"
+hghost-train-tokenizer = "hghost.train_tokenizer:main"
+hghost-validate = "hghost.validate_dataset:main"
+hghost-seal = "hghost.seal_corpus:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hghost"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

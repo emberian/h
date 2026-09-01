@@ -1,0 +1,42 @@
+{
+  "date": "2026-09-01",
+  "host": "hbox",
+  "model": "tiiuae/Falcon-H1-Tiny-90M-Base",
+  "parameters": 91131072,
+  "mode": "native BF16 parameters and AdamW state; BF16 compute",
+  "gradient_checkpointing": false,
+  "sequence_length": 512,
+  "tokens_per_step": 512,
+  "steps": 2,
+  "step_1": {
+    "loss": 12.333770751953125,
+    "gradient_norm": 178.0,
+    "tokens_per_second": 281.67662234350297
+  },
+  "step_2_uninterrupted": {
+    "loss": 12.393842697143555,
+    "gradient_norm": 179.0,
+    "validation_loss": 15.027311325073242,
+    "learning_rate": 0.00006
+  },
+  "step_2_resumed": {
+    "loss": 12.393842697143555,
+    "gradient_norm": 179.0,
+    "validation_loss": 15.027311325073242,
+    "tokens_per_second": 271.3214844804955
+  },
+  "uninterrupted_model_sha256": "e06e2ceed6484be8d32a40204e9f36483acb8745eab42ba7f65901903f27f1f6",
+  "resumed_model_sha256": "e06e2ceed6484be8d32a40204e9f36483acb8745eab42ba7f65901903f27f1f6",
+  "byte_identical_resume": true,
+  "steady_state_throughput": {
+    "sequence_length": 512,
+    "measured_steps": 9,
+    "minimum_tokens_per_second": 484.672821305762,
+    "maximum_tokens_per_second": 486.3745965576447,
+    "approximate_days_for_300m_tokens": 7.14
+  },
+  "checkpoint_bytes": {
+    "model_safetensors": 182304120,
+    "optimizer_pt": 364841961
+  }
+}

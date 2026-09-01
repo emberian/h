@@ -1,0 +1,20 @@
+{
+  "id": "emberian64/h-ghost-falcon-h1-cpt",
+  "title": "H Ghost Falcon H1 CPT",
+  "code_file": "run.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "false",
+  "enable_gpu": "false",
+  "enable_tpu": "true",
+  "enable_internet": "false",
+  "machine_shape": "TpuV5E8",
+  "dataset_sources": [
+    "emberian64/hghost-jax-code-public",
+    "emberian64/hghost-falcon-h1-90m-base-public",
+    "emberian64/hghost-curated-tokens-v1"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}

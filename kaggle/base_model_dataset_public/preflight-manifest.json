@@ -1,0 +1,34 @@
+{
+  "model": "tiiuae/Falcon-H1-Tiny-90M-Base",
+  "revision": "7994372e93b62822ae25f8bfb19f653649cea3a3",
+  "parameter_count": 91131072,
+  "files": {
+    "model.safetensors": {
+      "bytes": 182304120,
+      "sha256": "ee1d547c2d78df42a52afd55b23459301ca21126851b82e0900f1e313dbcf5ef"
+    },
+    "h1jax-parity-tokens.npy": {
+      "bytes": 160,
+      "sha256": "c41953cd99a2b42ed2972d183071edb3aa9631dbb5b0f67bb039314fce8f1504"
+    },
+    "h1jax-torch-reference.npz": {
+      "bytes": 1048842,
+      "sha256": "46a85f9437f7984ef72dfc7ec2ed3fc574dd2172b5ebb6a5e233246b70397e61"
+    },
+    "h1jax-parity-tokens-129.npy": {
+      "bytes": 644,
+      "sha256": "0ecc1fe28da71bab5936f17eb97e9d4de63234bf681ce9b2c3b3506196414b6a"
+    },
+    "h1jax-torch-reference-129.npz": {
+      "bytes": 16908554,
+      "sha256": "674c60f716b7af1a0718b6f5ec76afd4176fb3ff7362b862b003e4d9fea07ef0"
+    }
+  },
+  "float32_parity": {
+    "shape": [1, 129, 32768],
+    "max_absolute_error": 0.0001201629638671875,
+    "mean_absolute_error": 0.000005007103936804924,
+    "atol": 0.0002,
+    "rtol": 0.0002
+  }
+}

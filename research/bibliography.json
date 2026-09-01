@@ -1,0 +1,190 @@
+{
+  "generated_on": "2026-09-01",
+  "entries": [
+    {
+      "id": "2507.22448",
+      "title": "Falcon-H1: A Family of Hybrid-Head Language Models Redefining Efficiency and Performance",
+      "year": 2025,
+      "category": "mainline",
+      "url": "https://arxiv.org/abs/2507.22448",
+      "local_pdf": "papers/falcon_h1_2507.22448.pdf"
+    },
+    {
+      "id": "2606.06888",
+      "title": "Data-Constrained Language Model Pretraining: Improved Regularization and Scaling Laws",
+      "year": 2026,
+      "category": "finite-data",
+      "url": "https://arxiv.org/abs/2606.06888",
+      "local_pdf": "papers/masked_input_regularization_2606.06888.pdf"
+    },
+    {
+      "id": "2604.19740",
+      "title": "Generalization at the Edge of Stability",
+      "year": 2026,
+      "category": "learning-mechanics",
+      "url": "https://arxiv.org/abs/2604.19740",
+      "local_pdf": "papers/generalization_edge_of_stability_2604.19740.pdf"
+    },
+    {
+      "id": "2502.19002",
+      "title": "The Sharpness Disparity Principle in Transformers for Accelerating Language Model Pre-Training",
+      "year": 2025,
+      "category": "learning-mechanics",
+      "url": "https://arxiv.org/abs/2502.19002",
+      "local_pdf": "papers/sharpness_disparity_2502.19002.pdf"
+    },
+    {
+      "id": "2605.02105",
+      "title": "Sharpness-Aware Pretraining Mitigates Catastrophic Forgetting",
+      "year": 2026,
+      "category": "learning-mechanics",
+      "url": "https://arxiv.org/abs/2605.02105",
+      "local_pdf": "papers/sharpness_aware_pretraining_2605.02105.pdf"
+    },
+    {
+      "id": "2604.13627",
+      "title": "(How) Learning Rates Regulate Catastrophic Overtraining",
+      "year": 2026,
+      "category": "learning-mechanics",
+      "url": "https://arxiv.org/abs/2604.13627",
+      "local_pdf": "papers/learning_rates_catastrophic_overtraining_2604.13627.pdf"
+    },
+    {
+      "id": "2507.21509",
+      "title": "Persona Vectors: Monitoring and Controlling Character Traits in Language Models",
+      "year": 2025,
+      "category": "steering",
+      "url": "https://arxiv.org/abs/2507.21509",
+      "local_pdf": "papers/persona_vectors_2507.21509.pdf"
+    },
+    {
+      "id": "2509.06608",
+      "title": "Small Vectors, Big Effects: A Mechanistic Study of RL-Induced Reasoning via Steering Vectors",
+      "year": 2025,
+      "category": "steering",
+      "url": "https://arxiv.org/abs/2509.06608",
+      "local_pdf": "papers/rl_trained_steering_vectors_2509.06608.pdf"
+    },
+    {
+      "id": "2603.21396",
+      "title": "Mechanisms of Introspective Awareness",
+      "year": 2026,
+      "category": "internal-state-monitoring",
+      "url": "https://arxiv.org/abs/2603.21396",
+      "local_pdf": "papers/introspective_awareness_2603.21396.pdf"
+    },
+    {
+      "id": "2605.26242",
+      "title": "Can LLMs Introspect? A Reality Check",
+      "year": 2026,
+      "category": "internal-state-monitoring",
+      "url": "https://arxiv.org/abs/2605.26242",
+      "local_pdf": "papers/introspection_reality_check_2605.26242.pdf"
+    },
+    {
+      "id": "2604.21106",
+      "title": "How Much Is One Recurrence Worth? Iso-Depth Scaling Laws for Looped Language Models",
+      "year": 2026,
+      "category": "recurrence",
+      "url": "https://arxiv.org/abs/2604.21106",
+      "local_pdf": "papers/recurrence_equivalence_2604.21106.pdf"
+    },
+    {
+      "id": "2608.18230",
+      "title": "Allocating Recurrent Compute in Looped Language Models",
+      "year": 2026,
+      "category": "recurrence",
+      "url": "https://arxiv.org/abs/2608.18230",
+      "local_pdf": "papers/mixerloop_2608.18230.pdf"
+    },
+    {
+      "id": "2608.15062",
+      "title": "Gated Recurrent Transformers: Expressive Depth through Recurrent Modulation",
+      "year": 2026,
+      "category": "recurrence",
+      "url": "https://arxiv.org/abs/2608.15062",
+      "local_pdf": "papers/gated_recurrent_transformers_2608.15062.pdf"
+    },
+    {
+      "id": "2409.07431",
+      "title": "Synthetic Continued Pretraining",
+      "year": 2024,
+      "category": "synthetic-data",
+      "url": "https://arxiv.org/abs/2409.07431",
+      "local_pdf": "papers/synthetic_cpt_entigraph_2409.07431.pdf"
+    },
+    {
+      "id": "2406.14491",
+      "title": "Instruction Pre-Training: Language Models are Supervised Multitask Learners",
+      "year": 2024,
+      "category": "synthetic-data",
+      "url": "https://arxiv.org/abs/2406.14491",
+      "local_pdf": "papers/instruction_pretraining_2406.14491.pdf"
+    },
+    {
+      "id": "2608.03796",
+      "title": "Efficient Knowledge Distillation for LLMs: Offline Top-K Logits and a Fused Chunked KL Loss",
+      "year": 2026,
+      "category": "distillation",
+      "url": "https://arxiv.org/abs/2608.03796",
+      "local_pdf": "papers/offline_topk_distillation_2608.03796.pdf"
+    },
+    {
+      "id": "2602.04649",
+      "title": "Outcome Accuracy is Not Enough: Aligning the Reasoning Process of Reward Models",
+      "year": 2026,
+      "category": "reward-modeling",
+      "url": "https://arxiv.org/abs/2602.04649",
+      "local_pdf": "papers/rationale_consistency_2602.04649.pdf"
+    },
+    {
+      "id": "2605.01188",
+      "title": "Compute Optimal Tokenization",
+      "year": 2026,
+      "category": "tokenization",
+      "url": "https://arxiv.org/abs/2605.01188",
+      "local_pdf": "papers/compute_optimal_tokenization_2605.01188.pdf"
+    },
+    {
+      "id": "2504.05299",
+      "title": "SmolVLM: Redefining small and efficient multimodal models",
+      "year": 2025,
+      "category": "visual-grounding",
+      "url": "https://arxiv.org/abs/2504.05299",
+      "local_pdf": "papers/smolvlm_2504.05299.pdf"
+    },
+    {
+      "id": "2109.10246",
+      "title": "Does Vision-and-Language Pretraining Improve Lexical Grounding?",
+      "year": 2021,
+      "category": "visual-grounding",
+      "url": "https://arxiv.org/abs/2109.10246",
+      "local_pdf": "papers/visual_language_lexical_grounding_2109.10246.pdf"
+    },
+    {
+      "id": "2103.13942",
+      "title": "Visual Grounding Strategies for Text-Only Natural Language Processing",
+      "year": 2021,
+      "category": "visual-grounding",
+      "url": "https://arxiv.org/abs/2103.13942",
+      "local_pdf": "papers/visual_grounding_text_only_nlp_2103.13942.pdf"
+    },
+    {
+      "id": "openai-weight-sparse-2025",
+      "title": "Weight-sparse transformers have interpretable circuits",
+      "year": 2025,
+      "category": "interpretability",
+      "url": "https://cdn.openai.com/pdf/41df8f28-d4ef-43e9-aed2-823f9393e470/circuit-sparsity-paper.pdf",
+      "local_pdf": "papers/weight_sparse_transformers_openai_2025.pdf"
+    },
+    {
+      "id": "clairnets-local",
+      "title": "GLaDOS canonical local implementation and research notes",
+      "year": 2026,
+      "category": "neurosymbolic-organ",
+      "url": "https://github.com/emberian/clairnets",
+      "local_source": "/Users/ember/dev/clairnets/GLADOS.md",
+      "inspected_commit": "ffe2faef5e0c29a78e711c7f97c13d97435ad9be"
+    }
+  ]
+}

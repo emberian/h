@@ -1,0 +1,32 @@
+{
+  "joint_model_training": false,
+  "reason": "Stock frameworks cannot form one native Metal/MLX plus ROCm process group, and measured Wi-Fi gradient synchronization is much slower than solo training.",
+  "primary_candidates": [
+    {
+      "host": "nextop.local",
+      "role": "primary full-weight MLX trainer",
+      "status": "verified on synthetic tokens; real-data gate remains"
+    },
+    {
+      "host": "Kaggle TPU v5e-8",
+      "role": "candidate primary full-weight PyTorch/XLA trainer",
+      "status": "requires real-token compile/throughput gate"
+    }
+  ],
+  "independent_workers": [
+    {
+      "host": "hbox",
+      "roles": ["short PyTorch controls", "Transformers evaluation", "checkpoint checks"]
+    },
+    {
+      "host": "persvati",
+      "roles": ["data validation", "tokenization", "evaluation shards", "short controls"]
+    },
+    {
+      "host": "Kaggle T4",
+      "roles": ["independent FP16 trials", "evaluation shards", "checkpoint selection"]
+    }
+  ],
+  "exact_parallel_operation": "Shard validation data, emit additive NLL/token-count partials, and aggregate them with aggregate_eval.py.",
+  "not_joint_training": ["independent learning-rate trials", "independent seeds", "checkpoint tournament"]
+}

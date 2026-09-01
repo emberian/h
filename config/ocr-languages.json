@@ -1,0 +1,18 @@
+[
+  {
+    "pattern": "rat_palace/magazines/ostara/**",
+    "languages": ["frk"]
+  },
+  {
+    "pattern": "**/*fraktur*.pdf",
+    "languages": ["frk"]
+  },
+  {
+    "pattern": "**/*-russian*.pdf",
+    "languages": ["rus"]
+  },
+  {
+    "pattern": "**/*_russian*.pdf",
+    "languages": ["rus"]
+  }
+]

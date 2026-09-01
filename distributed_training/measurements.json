@@ -1,0 +1,66 @@
+{
+  "date": "2026-09-01",
+  "model": {
+    "id": "tiiuae/Falcon-H1-Tiny-90M-Base",
+    "revision": "7994372e93b62822ae25f8bfb19f653649cea3a3",
+    "parameters": 91131072,
+    "bf16_parameter_payload_mib": 173.8187255859375
+  },
+  "network_tcp_mib_per_second": [
+    {"source": "nextop.local", "destination": "hbox", "value": 20.44},
+    {"source": "hbox", "destination": "nextop.local", "value": 16.02},
+    {"source": "nextop.local", "destination": "persvati", "value": 14.09},
+    {"source": "persvati", "destination": "nextop.local", "value": 6.48},
+    {"source": "hbox", "destination": "persvati", "value": 12.714},
+    {"source": "persvati", "destination": "hbox", "value": 7.067}
+  ],
+  "hbox_persvati_rccl_allreduce": {
+    "payload_mib": 173.8187255859375,
+    "hbox_seconds": 29.0234,
+    "hbox_payload_mib_per_second": 5.989,
+    "persvati_seconds": 29.1168,
+    "persvati_payload_mib_per_second": 5.970
+  },
+  "full_weight_bf16_training": {
+    "nextop_mlx": [
+      {
+        "batch": 1,
+        "sequence": 512,
+        "steps_seconds": [0.9638, 0.5964, 0.07689, 0.07928],
+        "warmed_tokens_per_second": [6659, 6458],
+        "peak_memory_mib": 1246
+      },
+      {
+        "batch": 1,
+        "sequence": 1024,
+        "steps_seconds": [1.7215, 0.4151, 0.08062, 0.06808],
+        "warmed_tokens_per_second": [12702, 15040],
+        "peak_memory_mib": 1676
+      },
+      {
+        "batch": 1,
+        "sequence": 8,
+        "note": "fresh compile plus update verification while another MLX service was active",
+        "steps_seconds": [10.533638458, 0.157133542],
+        "gradient_l2_norms": [2046.9949951171875, 1148.6380615234375],
+        "changed_parameter_elements": [2916251, 4775603],
+        "max_parameter_delta": 0.00006103515625,
+        "losses": [32.45941162109375, 15.694745063781738],
+        "peak_memory_mib": 1466.15
+      }
+    ],
+    "hbox_pytorch_rocm": [
+      {"batch": 1, "sequence": 256, "tokens_per_second": 464.6, "peak_allocated_gib": 1.85, "peak_reserved_gib": 1.96},
+      {"batch": 1, "sequence": 512, "tokens_per_second": 481.0, "peak_allocated_gib": 2.96, "peak_reserved_gib": 3.49},
+      {"batch": 1, "sequence": 1024, "tokens_per_second": 443.9, "peak_allocated_gib": 5.51, "peak_reserved_gib": 6.58},
+      {"batch": 4, "sequence": 512, "tokens_per_second": 454.6, "peak_allocated_gib": 9.49, "peak_reserved_gib": 11.32}
+    ],
+    "persvati_pytorch_rocm": [
+      {"batch": 1, "sequence": 64, "tokens_per_second": 72.72, "peak_allocated_mib": 1265.6, "peak_reserved_mib": 1330},
+      {"batch": 1, "sequence": 256, "tokens_per_second": 136.52, "peak_allocated_mib": 1890, "peak_reserved_mib": 2006}
+    ],
+    "nextop_pytorch_mps": [
+      {"batch": 1, "sequence": 16, "forward_seconds": 8.4, "backward_seconds": 29.45, "optimizer_seconds": 0.6, "tokens_per_second_approx": 0.416}
+    ]
+  }
+}

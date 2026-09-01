@@ -1,0 +1,59 @@
+.DS_Store
+
+# Local Python environments and caches.
+.venv/
+.venv-*/
+**/.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+.ruff_cache/
+.mypy_cache/
+
+# Local secrets. Commit named examples only.
+.env
+.env.*
+!.env.example
+kaggle.json
+.kaggle/
+access_token
+
+# Corpus preparation and local runtime output.
+artifacts/
+tmp/
+logs/
+runs/
+checkpoints/
+outputs/
+*.log
+*.pid
+h.h
+
+# Build products.
+build/
+dist/
+
+# Large datasets, weights, and optimizer/checkpoint payloads live on Kaggle,
+# Hugging Face, or the training machines. Keep their manifests and configs.
+*.safetensors
+*.gguf
+*.ckpt
+*.msgpack
+*.pt
+*.pth
+*.npz
+*.bin
+*.jsonl.gz
+*.zst
+*.whl
+
+# Local Kaggle upload staging. Public, source-only dataset/kernel definitions
+# live in the sibling *_public and tpu_* directories.
+kaggle/base_model_dataset/
+kaggle/code_dataset/
+
+# Papers are reproducibly fetched by research/download_papers.sh. Track the
+# bibliography and SHA-256 manifest, not another copy of each PDF in Git.
+research/papers/*.pdf
+research/sources/tiny_h1_blog/
