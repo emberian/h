@@ -8,16 +8,15 @@ import hashlib
 import json
 import math
 import os
-from pathlib import Path
 import shutil
 import tempfile
 import time
+from pathlib import Path
 
 import numpy as np
 import torch
-import torch.nn.functional as functional
+from torch.nn import functional
 from transformers import AutoConfig, AutoModelForCausalLM
-
 
 TOKENIZER_FILES = (
     "tokenizer.json",
@@ -46,7 +45,16 @@ def parser() -> argparse.ArgumentParser:
         "--parameter-dtype",
         choices=("float32", "bfloat16"),
         default="float32",
-        help="master parameter and AdamW-moment dtype; compute remains BF16",
+        help="master parameter and AdamW-moment dtype; independent of autocast compute",
+    )
+    result.add_argument(
+        "--compute-dtype",
+        choices=("bfloat16", "float16", "float16-bfloat16-scan"),
+        default="bfloat16",
+        help=(
+            "autocast policy; the mixed policy uses FP16 generally and BF16 "
+            "inside the recurrent Triton scan"
+        ),
     )
     result.add_argument(
         "--rocm-triton-mamba-root",
@@ -58,6 +66,12 @@ def parser() -> argparse.ArgumentParser:
         action=argparse.BooleanOptionalAction,
         default=False,
         help="rematerialize layers when a longer sequence would otherwise exhaust VRAM",
+    )
+    result.add_argument(
+        "--fused-adamw",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="use PyTorch's fused AdamW implementation after target-machine validation",
     )
     result.add_argument("--seed", type=int, default=17)
     result.add_argument(
@@ -86,7 +100,9 @@ def sha256(path: Path) -> str:
 
 def atomic_json(path: Path, value: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    descriptor, temporary_name = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{path.name}.", dir=path.parent
+    )
     temporary = Path(temporary_name)
     try:
         with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
@@ -108,16 +124,24 @@ def verify_corpus(root: Path, *, vocab_size: int, eos_token_id: int) -> dict:
         path = (root / name).resolve()
         if path.parent != root.resolve() or not path.is_file():
             raise RuntimeError(f"Invalid sealed corpus path: {name!r}")
-        if path.stat().st_size != int(expected["bytes"]) or sha256(path) != expected["sha256"]:
+        if (
+            path.stat().st_size != int(expected["bytes"])
+            or sha256(path) != expected["sha256"]
+        ):
             raise RuntimeError(f"Sealed corpus hash/size mismatch: {name}")
     manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
-    validation = json.loads((root / "validation-report.json").read_text(encoding="utf-8"))
+    validation = json.loads(
+        (root / "validation-report.json").read_text(encoding="utf-8")
+    )
     if validation.get("ok") is not True:
         raise RuntimeError("Corpus validation report is not successful")
     if manifest.get("dtype") != "little-endian uint16":
         raise RuntimeError(f"Unsupported corpus dtype: {manifest.get('dtype')}")
     for key, expected in (("vocab_size", vocab_size), ("eos_token_id", eos_token_id)):
-        if int(manifest.get(key, -1)) != expected or int(validation.get(key, -1)) != expected:
+        if (
+            int(manifest.get(key, -1)) != expected
+            or int(validation.get(key, -1)) != expected
+        ):
             raise RuntimeError(f"Corpus {key} does not match model config")
     if validation["dataset_manifest_sha256"] != manifest["source_manifest_sha256"]:
         raise RuntimeError("Corpus manifest and validation report disagree")
@@ -132,7 +156,9 @@ def verify_corpus(root: Path, *, vocab_size: int, eos_token_id: int) -> dict:
 
 
 class TokenStream:
-    def __init__(self, path: Path, sequence_length: int, seed: int, *, validation: bool = False):
+    def __init__(
+        self, path: Path, sequence_length: int, seed: int, *, validation: bool = False
+    ):
         self.tokens = np.memmap(path, dtype="<u2", mode="r")
         self.sequence_length = sequence_length
         self.sequence_count = (len(self.tokens) - 1) // sequence_length
@@ -158,7 +184,9 @@ class TokenStream:
         return torch.from_numpy(values)
 
 
-def learning_rate(step: int, total_steps: int, warmup_steps: int, peak: float, floor: float) -> float:
+def learning_rate(
+    step: int, total_steps: int, warmup_steps: int, peak: float, floor: float
+) -> float:
     if step < warmup_steps:
         return peak * step / max(1, warmup_steps)
     progress = (step - warmup_steps) / max(1, total_steps - warmup_steps)
@@ -211,6 +239,11 @@ def validate_args(args: argparse.Namespace) -> None:
         raise ValueError("Invalid optimizer hyperparameters")
     if not 0 <= args.min_learning_rate_ratio <= 1:
         raise ValueError("--min-learning-rate-ratio must be between zero and one")
+    if (
+        args.compute_dtype == "float16-bfloat16-scan"
+        and args.rocm_triton_mamba_root is None
+    ):
+        raise ValueError("The mixed compute policy requires --rocm-triton-mamba-root")
 
 
 def main() -> None:
@@ -228,7 +261,9 @@ def main() -> None:
     config = AutoConfig.from_pretrained(model_dir, local_files_only=True)
     config.use_cache = False
     manifest = verify_corpus(
-        corpus_dir, vocab_size=int(config.vocab_size), eos_token_id=int(config.eos_token_id)
+        corpus_dir,
+        vocab_size=int(config.vocab_size),
+        eos_token_id=int(config.eos_token_id),
     )
     train_path = corpus_dir / manifest["splits"]["train"]["path"]
     validation_path = corpus_dir / manifest["splits"]["validation"]["path"]
@@ -248,17 +283,33 @@ def main() -> None:
         "max_gradient_norm": args.max_gradient_norm,
         "gradient_checkpointing": args.gradient_checkpointing,
         "parameter_dtype": args.parameter_dtype,
+        "compute_dtype": args.compute_dtype,
+        "fused_adamw": args.fused_adamw,
         "rocm_triton_ssd": args.rocm_triton_mamba_root is not None,
         "seed": args.seed,
     }
 
     kernel_report = None
+    compute_dtype = {
+        "bfloat16": torch.bfloat16,
+        "float16": torch.float16,
+        "float16-bfloat16-scan": torch.float16,
+    }[args.compute_dtype]
     if args.rocm_triton_mamba_root is not None:
         from rocm_triton_ssd import enable_rocm_triton_ssd
 
-        kernel_report = enable_rocm_triton_ssd(args.rocm_triton_mamba_root)
+        kernel_report = enable_rocm_triton_ssd(
+            args.rocm_triton_mamba_root,
+            scan_dtype=(
+                torch.bfloat16
+                if args.compute_dtype == "float16-bfloat16-scan"
+                else None
+            ),
+        )
 
-    load_from = args.resume.expanduser().resolve() if args.resume is not None else model_dir
+    load_from = (
+        args.resume.expanduser().resolve() if args.resume is not None else model_dir
+    )
     parameter_dtype = {
         "float32": torch.float32,
         "bfloat16": torch.bfloat16,
@@ -274,6 +325,7 @@ def main() -> None:
     decay, no_decay = [], []
     for parameter in model.parameters():
         (decay if parameter.ndim >= 2 else no_decay).append(parameter)
+    optimizer_options = {"fused": True} if args.fused_adamw else {"foreach": False}
     optimizer = torch.optim.AdamW(
         [
             {"params": decay, "weight_decay": args.weight_decay},
@@ -282,10 +334,12 @@ def main() -> None:
         lr=args.learning_rate,
         betas=(0.9, 0.95),
         eps=1e-8,
-        foreach=False,
+        **optimizer_options,
     )
     if args.resume is not None:
-        state = json.loads((load_from / "trainer_state.json").read_text(encoding="utf-8"))
+        state = json.loads(
+            (load_from / "trainer_state.json").read_text(encoding="utf-8")
+        )
         mismatches = {
             key: (state.get(key), expected)
             for key, expected in run_settings.items()
@@ -294,7 +348,9 @@ def main() -> None:
         if mismatches:
             raise RuntimeError(f"Resume settings do not match: {mismatches}")
         optimizer.load_state_dict(
-            torch.load(load_from / "optimizer.pt", map_location="cuda", weights_only=True)
+            torch.load(
+                load_from / "optimizer.pt", map_location="cuda", weights_only=True
+            )
         )
         start_step = int(state["step"])
     else:
@@ -314,7 +370,9 @@ def main() -> None:
             *([args.total_tokens] if args.save_final_checkpoint else []),
         }
     )
-    save_thresholds = [value for value in save_thresholds if start_tokens < value <= args.total_tokens]
+    save_thresholds = [
+        value for value in save_thresholds if start_tokens < value <= args.total_tokens
+    ]
     next_eval = (start_tokens // args.eval_every_tokens + 1) * args.eval_every_tokens
     parameter_count = sum(parameter.numel() for parameter in model.parameters())
     atomic_json(
@@ -326,12 +384,14 @@ def main() -> None:
             "start_tokens": start_tokens,
             "parameters": parameter_count,
             "model_safetensors_sha256": sha256(model_dir / "model.safetensors"),
-            "corpus_upload_manifest_sha256": sha256(corpus_dir / "upload-manifest.json"),
+            "corpus_upload_manifest_sha256": sha256(
+                corpus_dir / "upload-manifest.json"
+            ),
             "torch": torch.__version__,
             "hip": torch.version.hip,
             "device": torch.cuda.get_device_name(0),
             "parameter_dtype": args.parameter_dtype,
-            "compute_dtype": "bfloat16",
+            "compute_dtype": args.compute_dtype,
             "kernel": kernel_report,
             "save_final_checkpoint": args.save_final_checkpoint,
         },
@@ -355,19 +415,28 @@ def main() -> None:
     for step in range(start_step, total_steps):
         loss_total = accuracy_total = 0.0
         for micro in range(args.accumulation_steps):
-            example_offset = step * args.batch_size * args.accumulation_steps + micro * args.batch_size
-            tokens = training.batch(example_offset, args.batch_size).to("cuda", non_blocking=True)
-            with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+            example_offset = (
+                step * args.batch_size * args.accumulation_steps
+                + micro * args.batch_size
+            )
+            tokens = training.batch(example_offset, args.batch_size).to(
+                "cuda", non_blocking=True
+            )
+            with torch.autocast(device_type="cuda", dtype=compute_dtype):
                 logits = model(input_ids=tokens[:, :-1], use_cache=False).logits
                 labels = tokens[:, 1:]
                 loss = functional.cross_entropy(
                     logits.float().reshape(-1, logits.shape[-1]), labels.reshape(-1)
                 )
             if not bool(torch.isfinite(loss)):
-                raise FloatingPointError(f"Non-finite loss at step {step + 1}, microbatch {micro}")
+                raise FloatingPointError(
+                    f"Non-finite loss at step {step + 1}, microbatch {micro}"
+                )
             (loss / args.accumulation_steps).backward()
             loss_total += float(loss.detach())
-            accuracy_total += float((logits.detach().argmax(-1) == labels).float().mean())
+            accuracy_total += float(
+                (logits.detach().argmax(-1) == labels).float().mean()
+            )
 
         lr = learning_rate(
             step,
@@ -404,7 +473,7 @@ def main() -> None:
                         "event": "optimizer_precision",
                         "parameter_dtype": str(next(model.parameters()).dtype),
                         "moment_dtypes": moment_dtypes,
-                        "compute_dtype": "torch.bfloat16",
+                        "compute_dtype": str(compute_dtype),
                     }
                 ),
                 flush=True,
@@ -437,12 +506,15 @@ def main() -> None:
             eval_loss = eval_accuracy = 0.0
             with torch.no_grad():
                 for index in range(args.eval_batches):
-                    tokens = validation.batch(index * args.batch_size, args.batch_size).to("cuda")
-                    with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+                    tokens = validation.batch(
+                        index * args.batch_size, args.batch_size
+                    ).to("cuda")
+                    with torch.autocast(device_type="cuda", dtype=compute_dtype):
                         logits = model(input_ids=tokens[:, :-1], use_cache=False).logits
                         labels = tokens[:, 1:]
                         loss = functional.cross_entropy(
-                            logits.float().reshape(-1, logits.shape[-1]), labels.reshape(-1)
+                            logits.float().reshape(-1, logits.shape[-1]),
+                            labels.reshape(-1),
                         )
                     eval_loss += float(loss)
                     eval_accuracy += float((logits.argmax(-1) == labels).float().mean())
@@ -480,7 +552,9 @@ def main() -> None:
                     "parameters": parameter_count,
                 },
             )
-            print(json.dumps({"event": "checkpoint", "path": str(checkpoint)}), flush=True)
+            print(
+                json.dumps({"event": "checkpoint", "path": str(checkpoint)}), flush=True
+            )
 
     atomic_json(
         output / "training-complete.json",

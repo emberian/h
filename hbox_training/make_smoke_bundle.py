@@ -26,7 +26,9 @@ def main() -> None:
     output.mkdir(parents=True, exist_ok=False)
     rng = np.random.default_rng(20260901)
     for split in ("train", "validation"):
-        rng.integers(0, 32_768, size=4_097, dtype=np.uint16).tofile(output / f"{split}.bin")
+        rng.integers(0, 32_768, size=4_097, dtype=np.uint16).tofile(
+            output / f"{split}.bin"
+        )
     source_hash = "0" * 64
     manifest = {
         "schema_version": 1,
@@ -58,13 +60,21 @@ def main() -> None:
         },
     }
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
-    (output / "validation-report.json").write_text(json.dumps(validation, indent=2) + "\n")
+    (output / "validation-report.json").write_text(
+        json.dumps(validation, indent=2) + "\n"
+    )
     files = {
         name: spec(output / name)
-        for name in ("train.bin", "validation.bin", "manifest.json", "validation-report.json")
+        for name in (
+            "train.bin",
+            "validation.bin",
+            "manifest.json",
+            "validation-report.json",
+        )
     }
     (output / "upload-manifest.json").write_text(
-        json.dumps({"schema_version": 1, "sealed": True, "files": files}, indent=2) + "\n"
+        json.dumps({"schema_version": 1, "sealed": True, "files": files}, indent=2)
+        + "\n"
     )
 
 

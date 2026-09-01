@@ -14,12 +14,11 @@ from __future__ import annotations
 
 import importlib.machinery
 import json
-from pathlib import Path
 import sys
 import types
+from pathlib import Path
 
 import torch
-
 
 MINIMUM_MAMBA_VERSION = (2, 0, 4)
 
@@ -44,7 +43,7 @@ def _inject_source_package(source_root: Path):
     version = None
     for line in init_path.read_text(encoding="utf-8").splitlines():
         if line.startswith("__version__"):
-            version = line.split("=", 1)[1].strip().strip('"\'')
+            version = line.split("=", 1)[1].strip().strip("\"'")
             break
     if version is None or _version_tuple(version) < MINIMUM_MAMBA_VERSION:
         raise RuntimeError(f"mamba-ssm {version!r} is older than 2.0.4")
@@ -64,11 +63,23 @@ def _inject_source_package(source_root: Path):
     return package
 
 
-def enable_rocm_triton_ssd(source_root: Path) -> dict:
-    """Patch Falcon-H1 mixers to use Mamba-2's Triton scan on ROCm."""
+def enable_rocm_triton_ssd(
+    source_root: Path,
+    *,
+    scan_dtype: torch.dtype | None = None,
+) -> dict:
+    """Patch Falcon-H1 mixers to use Mamba-2's Triton scan on ROCm.
+
+    ``scan_dtype`` optionally creates a precision island around the recurrent
+    scan while leaving the surrounding projections under the caller's
+    autocast policy. RDNA2 executes FP16 GEMMs much faster than BF16, but the
+    final H1 layers can overflow an all-FP16 recurrent scan.
+    """
 
     if torch.version.hip is None or not torch.cuda.is_available():
-        raise RuntimeError("The ROCm Triton SSD path requires a visible PyTorch ROCm GPU")
+        raise RuntimeError(
+            "The ROCm Triton SSD path requires a visible PyTorch ROCm GPU"
+        )
     source_root = source_root.expanduser().resolve()
     existing = sys.modules.get("mamba_ssm")
     if existing is None:
@@ -76,11 +87,33 @@ def enable_rocm_triton_ssd(source_root: Path) -> dict:
     else:
         package = existing
 
-    from mamba_ssm.ops.triton.ssd_combined import mamba_chunk_scan_combined
-
     import transformers.models.falcon_h1.modeling_falcon_h1 as falcon_h1
+    from mamba_ssm.ops.triton.ssd_combined import (
+        mamba_chunk_scan_combined as upstream_mamba_chunk_scan_combined,
+    )
 
-    falcon_h1.mamba_chunk_scan_combined = mamba_chunk_scan_combined
+    if scan_dtype is not None and scan_dtype not in (torch.bfloat16, torch.float32):
+        raise ValueError(f"Unsupported recurrent scan dtype: {scan_dtype}")
+
+    if scan_dtype is None:
+        scan = upstream_mamba_chunk_scan_combined
+    else:
+
+        def scan(x, dt, A, B, C, *args, **kwargs):
+            z = kwargs.get("z")
+            if z is not None:
+                kwargs["z"] = z.to(scan_dtype)
+            return upstream_mamba_chunk_scan_combined(
+                x.to(scan_dtype),
+                dt,
+                A,
+                B.to(scan_dtype),
+                C.to(scan_dtype),
+                *args,
+                **kwargs,
+            )
+
+    falcon_h1.mamba_chunk_scan_combined = scan
     mixer_class = falcon_h1.FalconH1Mixer
     if getattr(mixer_class, "_hghost_rocm_triton_enabled", False):
         return {
@@ -88,6 +121,9 @@ def enable_rocm_triton_ssd(source_root: Path) -> dict:
             "already_enabled": True,
             "mamba_ssm": package.__version__,
             "source_root": str(source_root),
+            "scan_input_dtype": str(scan_dtype)
+            if scan_dtype is not None
+            else "inherit",
         }
 
     reference_forward = mixer_class.torch_forward
@@ -139,6 +175,7 @@ def enable_rocm_triton_ssd(source_root: Path) -> dict:
         "triton": __import__("triton").__version__,
         "convolution": "torch grouped Conv1d",
         "scan": "mamba_ssm.ops.triton.ssd_combined.mamba_chunk_scan_combined",
+        "scan_input_dtype": str(scan_dtype) if scan_dtype is not None else "inherit",
     }
     print(json.dumps({"event": "rocm_triton_ssd_enabled", **report}), flush=True)
     return report

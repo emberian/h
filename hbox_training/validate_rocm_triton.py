@@ -5,13 +5,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
 import time
+from pathlib import Path
 
 import torch
-from transformers import AutoModelForCausalLM
-
 from rocm_triton_ssd import enable_rocm_triton_ssd
+from transformers import AutoModelForCausalLM
 
 
 def parser() -> argparse.ArgumentParser:
@@ -23,6 +22,11 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--seed", type=int, default=44)
     result.add_argument("--output", type=Path)
     result.add_argument("--relative-tolerance", type=float, default=0.01)
+    result.add_argument(
+        "--compute-dtype",
+        choices=("bfloat16", "float16", "float16-bfloat16-scan"),
+        default="bfloat16",
+    )
     return result
 
 
@@ -40,9 +44,19 @@ def main() -> None:
     args = parser().parse_args()
     if args.sequence_length < 2 or args.relative_tolerance <= 0:
         raise ValueError("Invalid sequence length or tolerance")
-    kernel = enable_rocm_triton_ssd(args.mamba_root)
+    compute_dtype = {
+        "bfloat16": torch.bfloat16,
+        "float16": torch.float16,
+        "float16-bfloat16-scan": torch.float16,
+    }[args.compute_dtype]
+    kernel = enable_rocm_triton_ssd(
+        args.mamba_root,
+        scan_dtype=(
+            torch.bfloat16 if args.compute_dtype == "float16-bfloat16-scan" else None
+        ),
+    )
     model = AutoModelForCausalLM.from_pretrained(
-        args.model.expanduser().resolve(), dtype=torch.bfloat16, local_files_only=True
+        args.model.expanduser().resolve(), dtype=torch.float32, local_files_only=True
     ).to("cuda")
     mixer = model.model.layers[args.layer].mamba
     mixer.train()
@@ -51,7 +65,7 @@ def main() -> None:
         1,
         args.sequence_length,
         model.config.hidden_size,
-        dtype=torch.bfloat16,
+        dtype=torch.float32,
         device="cuda",
     )
 
@@ -60,8 +74,9 @@ def main() -> None:
         hidden = inputs.detach().clone().requires_grad_(True)
         torch.cuda.synchronize()
         started = time.perf_counter()
-        output = mixer.torch_forward(hidden) if reference else mixer(hidden)
-        loss = output.float().square().mean()
+        with torch.autocast("cuda", dtype=compute_dtype):
+            output = mixer.torch_forward(hidden) if reference else mixer(hidden)
+            loss = output.float().square().mean()
         loss.backward()
         torch.cuda.synchronize()
         gradients = {
@@ -81,7 +96,9 @@ def main() -> None:
     first_triton = collect(reference=False)
     warm_triton = collect(reference=False)
     if set(reference["parameter_gradients"]) != set(warm_triton["parameter_gradients"]):
-        raise RuntimeError("Reference and Triton paths produced different parameter-gradient keys")
+        raise RuntimeError(
+            "Reference and Triton paths produced different parameter-gradient keys"
+        )
 
     result = {
         "schema_version": 1,
@@ -89,6 +106,7 @@ def main() -> None:
         "layer": args.layer,
         "sequence_length": args.sequence_length,
         "relative_tolerance": args.relative_tolerance,
+        "compute_dtype": args.compute_dtype,
         "reference_loss": reference["loss"],
         "triton_loss": warm_triton["loss"],
         "reference_seconds": reference["seconds"],

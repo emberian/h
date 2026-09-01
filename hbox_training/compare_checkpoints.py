@@ -4,19 +4,18 @@
 from __future__ import annotations
 
 import argparse
-from collections import defaultdict
 import gc
 import json
 import math
-from pathlib import Path
 import time
+from collections import defaultdict
+from pathlib import Path
 
 import numpy as np
-from safetensors import safe_open
 import torch
-import torch.nn.functional as functional
+from safetensors import safe_open
+from torch.nn import functional
 from transformers import AutoModelForCausalLM, AutoTokenizer
-
 
 DEFAULT_PROMPTS = (
     "The relation between thought and language",
@@ -62,7 +61,9 @@ def parameter_group(name: str) -> str:
     return "other"
 
 
-def parameter_deltas(base: Path, checkpoint: Path) -> dict[str, dict[str, float | int | None]]:
+def parameter_deltas(
+    base: Path, checkpoint: Path
+) -> dict[str, dict[str, float | int | None]]:
     accumulators: dict[str, dict[str, float | int]] = defaultdict(
         lambda: {
             "elements": 0,
@@ -72,22 +73,26 @@ def parameter_deltas(base: Path, checkpoint: Path) -> dict[str, dict[str, float 
             "max_abs_delta": 0.0,
         }
     )
-    with safe_open(base / "model.safetensors", framework="pt", device="cpu") as original:
-        with safe_open(checkpoint / "model.safetensors", framework="pt", device="cpu") as trained:
-            if set(original.keys()) != set(trained.keys()):
-                raise RuntimeError("Base and checkpoint tensor names differ")
-            for name in original.keys():
-                before = original.get_tensor(name).float()
-                after = trained.get_tensor(name).float()
-                delta = after - before
-                values = accumulators[parameter_group(name)]
-                values["elements"] += before.numel()
-                values["changed"] += int((delta != 0).sum())
-                values["base_square_sum"] += float((before * before).sum())
-                values["delta_square_sum"] += float((delta * delta).sum())
-                values["max_abs_delta"] = max(
-                    float(values["max_abs_delta"]), float(delta.abs().max())
-                )
+    with (
+        safe_open(base / "model.safetensors", framework="pt", device="cpu") as original,
+        safe_open(
+            checkpoint / "model.safetensors", framework="pt", device="cpu"
+        ) as trained,
+    ):
+        if set(original.keys()) != set(trained.keys()):
+            raise RuntimeError("Base and checkpoint tensor names differ")
+        for name in original:
+            before = original.get_tensor(name).float()
+            after = trained.get_tensor(name).float()
+            delta = after - before
+            values = accumulators[parameter_group(name)]
+            values["elements"] += before.numel()
+            values["changed"] += int((delta != 0).sum())
+            values["base_square_sum"] += float((before * before).sum())
+            values["delta_square_sum"] += float((delta * delta).sum())
+            values["max_abs_delta"] = max(
+                float(values["max_abs_delta"]), float(delta.abs().max())
+            )
 
     result: dict[str, dict[str, float | int | None]] = {}
     for group, values in sorted(accumulators.items()):
@@ -206,7 +211,9 @@ def evaluate_and_generate(
 def main() -> None:
     args = parser().parse_args()
     if args.sequence_length < 2 or args.eval_batches < 1 or args.max_new_tokens < 1:
-        raise ValueError("Sequence length, eval batches, and generation length must be positive")
+        raise ValueError(
+            "Sequence length, eval batches, and generation length must be positive"
+        )
     if not torch.cuda.is_available():
         raise RuntimeError("This comparison expects a CUDA or ROCm PyTorch device")
 
@@ -218,12 +225,16 @@ def main() -> None:
     validation = np.memmap(validation_path, dtype="<u2", mode="r")
     required = args.eval_batches * args.sequence_length + 1
     if len(validation) < required:
-        raise RuntimeError(f"Validation stream has {len(validation)} tokens; need {required}")
+        raise RuntimeError(
+            f"Validation stream has {len(validation)} tokens; need {required}"
+        )
 
     tokenizer = AutoTokenizer.from_pretrained(base, local_files_only=True)
     prompts = list(DEFAULT_PROMPTS)
     prompts.append(
-        tokenizer.decode(np.asarray(validation[:96], dtype=np.int64), skip_special_tokens=True)
+        tokenizer.decode(
+            np.asarray(validation[:96], dtype=np.int64), skip_special_tokens=True
+        )
     )
     result = {
         "schema_version": 1,
@@ -261,7 +272,9 @@ def main() -> None:
     output = args.output.expanduser().resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
     temporary = output.with_suffix(output.suffix + ".tmp")
-    temporary.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    temporary.write_text(
+        json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     temporary.replace(output)
     print(json.dumps({"event": "comparison_complete", "output": str(output)}))
 
