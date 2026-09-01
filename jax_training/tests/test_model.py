@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import jax
 import jax.numpy as jnp
@@ -45,6 +46,17 @@ def test_preset_parameter_counts() -> None:
     assert parameter_count_for_config(FalconH1Config()) == 91_131_072
 
 
+def test_official_half_billion_config_parameter_count() -> None:
+    root = Path(__file__).resolve().parents[2]
+    cfg = FalconH1Config.from_json(
+        root / "research/sources/model_configs/falcon_h1_0.5b_base_config.json"
+    )
+    assert cfg.attention_width == 512
+    assert cfg.hidden_size == 1024
+    assert not cfg.tie_word_embeddings
+    assert parameter_count_for_config(cfg) == 521_411_104
+
+
 def test_forward_loss_and_gradient() -> None:
     cfg = tiny_config()
     params = init_params(cfg, seed=3)
@@ -58,6 +70,32 @@ def test_forward_loss_and_gradient() -> None:
     assert bool(jnp.isfinite(loss))
     assert float(jax.tree_util.tree_reduce(lambda total, x: total + jnp.sum(x * x), grads, 0.0)) > 0
     assert count_parameters(params) > 0
+
+
+def test_attention_width_can_be_narrower_than_hidden_size() -> None:
+    cfg = FalconH1Config(
+        vocab_size=128,
+        hidden_size=64,
+        num_hidden_layers=1,
+        num_attention_heads=2,
+        num_key_value_heads=1,
+        head_dim=16,
+        intermediate_size=96,
+        mamba_d_ssm=96,
+        mamba_d_state=8,
+        mamba_d_head=16,
+        mamba_n_heads=6,
+        mamba_n_groups=1,
+        mamba_d_conv=4,
+        mamba_chunk_size=4,
+        rope_theta=10000.0,
+    )
+    params = init_params(cfg, seed=4)
+    tokens = jnp.arange(8, dtype=jnp.int32).reshape(1, 8)
+    logits = falcon_h1_forward(params, tokens, cfg, compute_dtype=jnp.float32)
+    assert cfg.attention_width == 32
+    assert params["model.layers.0.self_attn.o_proj.weight"].shape == (64, 32)
+    assert logits.shape == (1, 8, cfg.vocab_size)
 
 
 def test_chunked_ssd_matches_recurrence() -> None:

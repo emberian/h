@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "model": "tiiuae/Falcon-H1-0.5B-Base",
+  "revision": "59fb76e8c5d3fc7441b062be638e1ba0afd5c687",
+  "checkpoint": {
+    "filename": "model.safetensors",
+    "bytes": 1042886408,
+    "sha256": "865a1e864b3fe6495ec37256e1fdec8cd1d254b607eab29141e7263791172ce6",
+    "tensor_count": 579,
+    "parameter_count": 521411104,
+    "dtype": "bfloat16"
+  },
+  "configuration": {
+    "hidden_size": 1024,
+    "attention_width": 512,
+    "layers": 36,
+    "vocab_size": 32784,
+    "tie_word_embeddings": false
+  },
+  "tokenizer_compatibility": {
+    "tiny_tokenizer_json_sha256": "605c664925653e3fbf2f35ea063847db441ba5b7a6af04378880409c3ab311fc",
+    "half_billion_tokenizer_json_sha256": "605c664925653e3fbf2f35ea063847db441ba5b7a6af04378880409c3ab311fc",
+    "byte_identical": true,
+    "learned_token_ids": 32768,
+    "half_billion_output_rows": 32784,
+    "note": "The extra 16 output rows are not produced by the shared tokenizer; the sealed Tiny-tokenized corpus is directly compatible."
+  },
+  "float32_parity": {
+    "reference_backend": "transformers-4.57.1 eager FalconH1ForCausalLM on CPU",
+    "jax_backend": "JAX CPU",
+    "shape": [
+      1,
+      15,
+      32784
+    ],
+    "max_absolute_error": 0.0000667572021484375,
+    "mean_absolute_error": 0.00000756471172280726,
+    "atol": 0.002,
+    "rtol": 0.002,
+    "allclose": true,
+    "tokens_sha256": "5995b319cf834757fe9a48c9626fcbb5bb6c4c291d4f0c725d58c3eb6765e33d",
+    "reference_logits_sha256": "ee4626a30bd86b43b397e399d6feb46e5c92fa290c27f891adf0635a168c5ac0"
+  },
+  "remaining_gates": [
+    "TPU v5e-8 rematerialized backward compilation",
+    "per-core memory headroom",
+    "two finite optimizer updates",
+    "save and reload a training checkpoint",
+    "measured post-compilation throughput"
+  ]
+}

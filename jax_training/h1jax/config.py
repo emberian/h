@@ -64,8 +64,6 @@ class FalconH1Config:
     def __post_init__(self) -> None:
         if self.hidden_act != "silu":
             raise ValueError("Only Falcon-H1's silu activation is implemented")
-        if self.num_attention_heads * self.head_dim != self.hidden_size:
-            raise ValueError("num_attention_heads * head_dim must equal hidden_size")
         if self.num_attention_heads % self.num_key_value_heads:
             raise ValueError("num_attention_heads must be divisible by num_key_value_heads")
         if self.mamba_n_heads * self.mamba_d_head != self.mamba_d_ssm:
@@ -76,6 +74,10 @@ class FalconH1Config:
     @property
     def mamba_group_state_size(self) -> int:
         return self.mamba_n_groups * self.mamba_d_state
+
+    @property
+    def attention_width(self) -> int:
+        return self.num_attention_heads * self.head_dim
 
     @property
     def mamba_conv_dim(self) -> int:

@@ -10,7 +10,9 @@ and saves resumable optimizer state with HF-loadable weights.
 The implementation is not a loose H1-like model. It includes GQA causal
 attention, non-interleaved RoPE, the causal depthwise convolution, chunked
 Mamba-2 SSD, all Falcon-H1 muP multipliers, parallel attention/SSM residuals,
-SwiGLU MLPs, tied embeddings, and the scaled language-model head.
+SwiGLU MLPs, tied or untied embeddings/heads, and the scaled language-model
+head. Attention projection width may differ from residual width, as it does in
+the official 0.5B checkpoint.
 
 ## Verification performed
 
@@ -25,6 +27,10 @@ SwiGLU MLPs, tied embeddings, and the scaled language-model head.
 - The full 91M BF16/rematerialized backward graph traces successfully at the
   production `[1, 513]` microbatch shape, producing gradients for all 386
   checkpoint tensors.
+- The published 521,411,104-parameter `Falcon-H1-0.5B-Base` checkpoint agrees
+  with eager Transformers float32 over a 15-token input (491,760 logits):
+  maximum absolute error `6.67572e-5`, mean absolute error `7.56471e-6`. See
+  `falcon_h1_0_5b_preflight.json` for the pinned revision and file hashes.
 
 Run the local tests:
 

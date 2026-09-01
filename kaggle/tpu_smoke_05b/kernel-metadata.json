@@ -1,0 +1,19 @@
+{
+  "id": "emberian64/h-ghost-falcon-h1-05b-tpu-smoke",
+  "title": "H Ghost Falcon-H1 0.5B TPU Smoke",
+  "code_file": "run.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": false,
+  "enable_gpu": false,
+  "enable_tpu": true,
+  "enable_internet": false,
+  "dataset_sources": [
+    "emberian64/hghost-jax-code-public",
+    "emberian64/hghost-curated-tokens-v1",
+    "emberian64/hghost-falcon-h1-0-5b-base-public"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}

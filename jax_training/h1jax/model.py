@@ -77,7 +77,7 @@ def attention(layer: Params, x: Array, cfg: FalconH1Config) -> Array:
     scores = jnp.where(causal[None, None, :, :], scores, -jnp.inf)
     probabilities = jax.nn.softmax(scores.astype(jnp.float32), axis=-1).astype(q.dtype)
     output = jnp.matmul(probabilities, v)
-    output = output.transpose(0, 2, 1, 3).reshape(batch, seq_len, cfg.hidden_size)
+    output = output.transpose(0, 2, 1, 3).reshape(batch, seq_len, cfg.attention_width)
     return _linear(output, layer["self_attn.o_proj.weight"])
 
 
@@ -418,9 +418,9 @@ def parameter_count_for_config(cfg: FalconH1Config) -> int:
     if not cfg.tie_word_embeddings:
         total += cfg.vocab_size * cfg.hidden_size
     layer = 2 * cfg.hidden_size
-    layer += cfg.hidden_size * cfg.num_attention_heads * cfg.head_dim
+    layer += cfg.hidden_size * cfg.attention_width
     layer += 2 * cfg.hidden_size * cfg.num_key_value_heads * cfg.head_dim
-    layer += cfg.hidden_size * cfg.num_attention_heads * cfg.head_dim
+    layer += cfg.hidden_size * cfg.attention_width
     if cfg.attention_bias:
         layer += (
             2 * cfg.num_attention_heads * cfg.head_dim
@@ -462,10 +462,10 @@ def init_params(cfg: FalconH1Config, seed: int = 0) -> dict[str, Array]:
         params[prefix + "input_layernorm.weight"] = jnp.ones((cfg.hidden_size,), jnp.float32)
         params[prefix + "pre_ff_layernorm.weight"] = jnp.ones((cfg.hidden_size,), jnp.float32)
         for name, output, input_size in (
-            ("self_attn.q_proj.weight", cfg.num_attention_heads * cfg.head_dim, cfg.hidden_size),
+            ("self_attn.q_proj.weight", cfg.attention_width, cfg.hidden_size),
             ("self_attn.k_proj.weight", cfg.num_key_value_heads * cfg.head_dim, cfg.hidden_size),
             ("self_attn.v_proj.weight", cfg.num_key_value_heads * cfg.head_dim, cfg.hidden_size),
-            ("self_attn.o_proj.weight", cfg.hidden_size, cfg.num_attention_heads * cfg.head_dim),
+            ("self_attn.o_proj.weight", cfg.hidden_size, cfg.attention_width),
             ("feed_forward.gate_proj.weight", cfg.intermediate_size, cfg.hidden_size),
             ("feed_forward.up_proj.weight", cfg.intermediate_size, cfg.hidden_size),
             ("feed_forward.down_proj.weight", cfg.hidden_size, cfg.intermediate_size),
@@ -475,7 +475,7 @@ def init_params(cfg: FalconH1Config, seed: int = 0) -> dict[str, Array]:
             params[prefix + name] = _normal(rng, (output, input_size), cfg.initializer_range)
         if cfg.attention_bias:
             for name, size in (
-                ("self_attn.q_proj.bias", cfg.num_attention_heads * cfg.head_dim),
+                ("self_attn.q_proj.bias", cfg.attention_width),
                 ("self_attn.k_proj.bias", cfg.num_key_value_heads * cfg.head_dim),
                 ("self_attn.v_proj.bias", cfg.num_key_value_heads * cfg.head_dim),
                 ("self_attn.o_proj.bias", cfg.hidden_size),

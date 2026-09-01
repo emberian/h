@@ -1,7 +1,7 @@
 {
   "title": "H Ghost Falcon-H1 JAX Code (Public)",
   "id": "emberian64/hghost-jax-code-public",
-  "subtitle": "Public wheel for the exact Falcon-H1 JAX port and TPU trainer",
-  "description": "Versioned public training code for h ghost. This dataset contains only the Apache-2.0 JAX training wheel; it contains no model weights, source documents, credentials, or corpus text.",
+  "subtitle": "Public wheel for the exact Falcon-H1 JAX port and TPU trainers",
+  "description": "Versioned public training code for h ghost, including 90M and 0.5B TPU gates. This dataset contains only Apache-2.0 code; it contains no model weights, source documents, credentials, or corpus text.",
   "licenses": [{"name": "apache-2.0"}]
 }
