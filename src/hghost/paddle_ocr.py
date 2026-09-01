@@ -104,15 +104,32 @@ def _value(container: Any, key: str, default: Any = None) -> Any:
         return getattr(container, key, default)
 
 
+_MISSING = object()
+
+
+def _first_value(container: Any, *keys: str, default: Any = None) -> Any:
+    """Read either Paddle's JSON field names or its live block attributes."""
+    for key in keys:
+        value = _value(container, key, _MISSING)
+        if value is not _MISSING:
+            return value
+    return default
+
+
 def page_from_result(result: Any, fallback_index: int) -> dict:
     blocks: list[dict] = []
     for block in result.get("parsing_res_list", []):
         blocks.append(
             {
-                "label": str(_value(block, "block_label") or ""),
-                "content": str(_value(block, "block_content") or ""),
-                "bbox": _plain(_value(block, "block_bbox")),
-                "order": _value(block, "block_order"),
+                # PaddleOCR 3.7 exposes live PaddleOCRVLBlock instances with
+                # label/content/bbox attributes. Its serialized JSON view uses
+                # block_label/block_content/block_bbox instead. Accept both.
+                "label": str(_first_value(block, "block_label", "label") or ""),
+                "content": str(
+                    _first_value(block, "block_content", "content") or ""
+                ),
+                "bbox": _plain(_first_value(block, "block_bbox", "bbox")),
+                "order": _first_value(block, "block_order", "order"),
                 "group_id": _value(block, "group_id"),
             }
         )

@@ -154,6 +154,27 @@ def test_paddle_result_accepts_mapping_blocks_without_get() -> None:
     assert page["blocks"][0]["content"] == "a recovered sentence"
 
 
+def test_paddle_result_accepts_live_block_attributes() -> None:
+    class PaddleBlock:
+        label = "text"
+        content = "the live result keeps different field names"
+        bbox = [5, 6, 70, 80]
+        group_id = 3
+
+    page = page_from_result(
+        {"parsing_res_list": [PaddleBlock()], "width": 100, "height": 200}, 0
+    )
+    assert page["blocks"] == [
+        {
+            "label": "text",
+            "content": "the live result keeps different field names",
+            "bbox": [5, 6, 70, 80],
+            "order": None,
+            "group_id": 3,
+        }
+    ]
+
+
 def test_paddle_discovery_prefers_larger_bounded_documents(tmp_path: Path) -> None:
     records = tmp_path / "records" / "sample"
     records.mkdir(parents=True)
