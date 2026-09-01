@@ -7,7 +7,9 @@ The selected starting checkpoint is [`tiiuae/Falcon-H1-Tiny-90M-Base`](https://h
 The 90M checkpoint remains the active baseline. The next accelerator gate compares it with the deployable
 [`Falcon-H1-0.5B-Base`](https://huggingface.co/tiiuae/Falcon-H1-0.5B-Base) before assigning the remaining
 TPU budget. The verified literature bundle, claims audit, and staged experiment plan are in
-[`research/`](research/README.md).
+[`research/`](research/README.md). The integrated multi-week roadmap—including corpus quality, Kaggle quota,
+ChapterX residency, continual learning, long context, and mechinterp—is in
+[`FUTURETHOUGHT.md`](FUTURETHOUGHT.md).
 
 ## Current corpus census
 
