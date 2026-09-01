@@ -11,6 +11,8 @@ were not run on Falcon-H1, on continued pretraining, or on a 90M model.
 - [`bibliography.json`](bibliography.json): machine-readable metadata for the selected references.
 - [`papers/`](papers/): 22 primary-source PDFs plus SHA-256 checksums.
 - [`sources/`](sources/): pinned official Falcon-H1 model configs and the source chapters of TII's Tiny-H1 blog.
+- [`results/hbox-cpt-10m.md`](results/hbox-cpt-10m.md): first-checkpoint validation, generations, and BF16 update-resolution diagnosis.
+- [`results/hbox-rocm-triton.md`](results/hbox-rocm-triton.md): parity and full-model throughput evidence for the experimental AMD Triton SSD path.
 - [`download_papers.sh`](download_papers.sh): idempotent paper downloader.
 - [`download_primary_sources.sh`](download_primary_sources.sh): idempotent official-source downloader.
 

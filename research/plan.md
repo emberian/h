@@ -2,20 +2,21 @@
 
 ## Decision in one paragraph
 
-Do not perturb the running 90M full-CPT, LoRA, or OCR jobs. The first new accelerator decision is a
-short, matched 90M-versus-0.5B full-CPT bakeoff, because both inherited H1 checkpoints fit the actual
-deployment budget. Choose by held-out lo2 bits per byte gained per wall-clock hour, generic-retention loss,
-and blind fragment quality. Treat MIR, blockwise learning rates, late SAM, recurrence, synthetic data,
-steering, introspection, and GLaDOS as gated branches after a clean H1 baseline exists.
+The hbox full-CPT run was deliberately interrupted after its first durable 10M-token checkpoint. That
+checkpoint already improves the fixed validation slice and changes generation strongly, but it exposed an
+unfused Mamba fallback and BF16 parameter/moment update quantization. Do not resume that exact recipe. Keep
+the 90M-versus-0.5B bakeoff as the next scale decision after the production backend uses FP32 master state
+with BF16 compute. Treat MIR, blockwise learning rates, late SAM, recurrence, synthetic data, steering,
+introspection, and GLaDOS as gated branches after a clean H1 baseline exists.
 
 ## What is already running
 
 | Machine | Job | Scientific role | Action |
 |---|---|---|---|
-| hbox | H1-Tiny-90M full CPT, one corpus pass | Mainline baseline | Let it run; preserve all planned checkpoints. |
+| hbox | H1-Tiny-90M full CPT stopped at 10M | Precision/kernel diagnostic | Preserve the checkpoint; do not resume the BF16-state fallback recipe. |
 | persvati | H1-Tiny-90M LoRA, matched corpus stream | Adapter control | Let it run; stop only if clearly dominated after matched evaluation. |
 | nextop | PaddleOCR-VL extraction | Corpus-v2 growth | Continue asynchronously; admit OCR text only through quality and dedupe gates. |
-| Kaggle | TPU kernel prepared but not successfully TPU-launched | Fast mainline/challenger path | Add a 0.5B preflight before spending the allocation. |
+| Kaggle | EasyDeL 91M real-data TPU smoke completed | Fast mainline/challenger path | Benchmark production shapes, rematerialization, and checkpoint resume before a full pass. |
 
 ## Stage 0 — freeze the scientific substrate
 

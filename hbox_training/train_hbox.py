@@ -43,6 +43,17 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--weight-decay", type=float, default=0.1)
     result.add_argument("--max-gradient-norm", type=float, default=1.0)
     result.add_argument(
+        "--parameter-dtype",
+        choices=("float32", "bfloat16"),
+        default="float32",
+        help="master parameter and AdamW-moment dtype; compute remains BF16",
+    )
+    result.add_argument(
+        "--rocm-triton-mamba-root",
+        type=Path,
+        help="unpacked pinned mamba-ssm source root for the experimental ROCm Triton SSD path",
+    )
+    result.add_argument(
         "--gradient-checkpointing",
         action=argparse.BooleanOptionalAction,
         default=False,
@@ -52,6 +63,12 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument(
         "--save-tokens",
         default="10000000,30000000,100000000,300000000,374405120",
+    )
+    result.add_argument(
+        "--save-final-checkpoint",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="include a checkpoint at total-tokens even when it is not in --save-tokens",
     )
     result.add_argument("--eval-every-tokens", type=int, default=10_000_000)
     result.add_argument("--eval-batches", type=int, default=8)
@@ -230,17 +247,30 @@ def main() -> None:
         "weight_decay": args.weight_decay,
         "max_gradient_norm": args.max_gradient_norm,
         "gradient_checkpointing": args.gradient_checkpointing,
+        "parameter_dtype": args.parameter_dtype,
+        "rocm_triton_ssd": args.rocm_triton_mamba_root is not None,
         "seed": args.seed,
     }
 
+    kernel_report = None
+    if args.rocm_triton_mamba_root is not None:
+        from rocm_triton_ssd import enable_rocm_triton_ssd
+
+        kernel_report = enable_rocm_triton_ssd(args.rocm_triton_mamba_root)
+
     load_from = args.resume.expanduser().resolve() if args.resume is not None else model_dir
+    parameter_dtype = {
+        "float32": torch.float32,
+        "bfloat16": torch.bfloat16,
+    }[args.parameter_dtype]
     model = AutoModelForCausalLM.from_pretrained(
-        load_from, dtype=torch.bfloat16, local_files_only=True
+        load_from, dtype=parameter_dtype, local_files_only=True
     ).to("cuda")
     model.config.use_cache = False
     if args.gradient_checkpointing:
         model.gradient_checkpointing_enable()
     model.train()
+    torch.cuda.reset_peak_memory_stats()
     decay, no_decay = [], []
     for parameter in model.parameters():
         (decay if parameter.ndim >= 2 else no_decay).append(parameter)
@@ -281,7 +311,7 @@ def main() -> None:
     save_thresholds = sorted(
         {
             *(int(value) for value in args.save_tokens.split(",") if value.strip()),
-            args.total_tokens,
+            *([args.total_tokens] if args.save_final_checkpoint else []),
         }
     )
     save_thresholds = [value for value in save_thresholds if start_tokens < value <= args.total_tokens]
@@ -300,7 +330,10 @@ def main() -> None:
             "torch": torch.__version__,
             "hip": torch.version.hip,
             "device": torch.cuda.get_device_name(0),
-            "parameter_dtype": "bfloat16",
+            "parameter_dtype": args.parameter_dtype,
+            "compute_dtype": "bfloat16",
+            "kernel": kernel_report,
+            "save_final_checkpoint": args.save_final_checkpoint,
         },
     )
 
@@ -351,6 +384,31 @@ def main() -> None:
         optimizer.step()
         optimizer.zero_grad(set_to_none=True)
         torch.cuda.synchronize()
+        if step == start_step:
+            moment_dtypes = sorted(
+                {
+                    str(value.dtype)
+                    for state in optimizer.state.values()
+                    for key, value in state.items()
+                    if key in ("exp_avg", "exp_avg_sq")
+                }
+            )
+            expected_moment_dtype = f"torch.{args.parameter_dtype}"
+            if moment_dtypes != [expected_moment_dtype]:
+                raise RuntimeError(
+                    f"AdamW moment dtypes {moment_dtypes} do not match {expected_moment_dtype}"
+                )
+            print(
+                json.dumps(
+                    {
+                        "event": "optimizer_precision",
+                        "parameter_dtype": str(next(model.parameters()).dtype),
+                        "moment_dtypes": moment_dtypes,
+                        "compute_dtype": "torch.bfloat16",
+                    }
+                ),
+                flush=True,
+            )
         exposed_tokens = min((step + 1) * tokens_per_step, args.total_tokens)
         interval_tokens += tokens_per_step
         if (step + 1) % args.log_steps == 0 or step == start_step:
@@ -366,6 +424,8 @@ def main() -> None:
                         "gradient_norm": float(gradient_norm),
                         "learning_rate": lr,
                         "tokens_per_second": interval_tokens / (now - interval_started),
+                        "peak_allocated_mib": torch.cuda.max_memory_allocated() / 2**20,
+                        "peak_reserved_mib": torch.cuda.max_memory_reserved() / 2**20,
                     }
                 ),
                 flush=True,
@@ -429,6 +489,8 @@ def main() -> None:
             "steps": total_steps,
             "tokens": args.total_tokens,
             "elapsed_seconds": time.monotonic() - started,
+            "peak_allocated_mib": torch.cuda.max_memory_allocated() / 2**20,
+            "peak_reserved_mib": torch.cuda.max_memory_reserved() / 2**20,
         },
     )
 
