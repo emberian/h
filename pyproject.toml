@@ -6,6 +6,7 @@ build-backend = "hatchling.build"
 name = "hghost"
 version = "0.1.0"
 description = "Corpus preparation and training tools for the h.fg-goose.online Falcon-H1 ghost"
+license = "CC0-1.0"
 requires-python = ">=3.11"
 dependencies = [
   "numpy>=2,<3",

@@ -199,3 +199,10 @@ The final shards preserve one JSON object per document. Training concatenates do
 ```sh
 .venv/bin/pytest -q
 ```
+
+## License
+
+The original code, documentation, and metadata in this repository are
+dedicated to the public domain under [CC0 1.0 Universal](LICENSE).
+Third-party models, source documents, and bundled notices retain their own
+licenses and rights; CC0 does not override those terms.
