@@ -513,3 +513,4 @@ New main line, h first:
   out-of-corpus ones. e2-v3 is the right resident. Night's TPU work ends here; ~8.9 TPU h left for the week.
 - 08:04: 91M GPU table recovered (own kernel id, T4): room loss base 3.578 -> trunk ~3.68 -> leaf-e4 3.664. The library
   epochs made the 91M worse at room text; the 0.5B room line sits at 2.58. That is the Discord failure as a number.
+- 09:23: GPU eval v5 (e2-v3) complete; results saved. All background work of the night has landed.

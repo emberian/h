@@ -42,6 +42,6 @@ spend in bounded, reported increments; never launch a run whose worst case excee
 | 2026-09-02 02:27 | h-ghost-gpu-room-eval (GPU) | v3 | ~60 | COMPLETE: 0.5B base + e1 pre-cooldown + e1 cooled on a T4; agrees with hbox and the TPU to 4 decimals |
 | 2026-09-02 04:12 | h-ghost-h1jax-room05b-e2-v3 | v1 | 66 | **COMPLETE** 05:38: second epoch on corpus-v1.3-room (scenes A x6 + B x8) from the e1 pre-cooldown; library 2.852 (e2 2.858), room 2.581 (2.582), fixed-32 3.011 (3.016); 131K tok/s |
 | 2026-09-02 04:44 | h-ghost-gpu-room-eval (GPU) | v4 | ~95 | COMPLETE: e2 pre-cooldown + cooled on a T4; agrees with hbox/TPU (2.858 / 2.628 / 3.142, room 2.582) |
-| 2026-09-02 07:08 | h-ghost-gpu-room-eval (GPU) | v5 | (running) | e2-v3 pre-cooldown + cooled |
 | 2026-09-02 05:55 | h-ghost-h1jax-room05b-e3 | v1 | 66 | **COMPLETE** 07:20: third epoch on v1.3 from the e2-v3 pre-cooldown; library 2.848 (e2-v3 2.852), room 2.576 (2.581), fixed-32 3.019 (3.011); train loss 2.35 vs 2.48: the train/val gap opens (0.37 -> 0.50). Diminishing returns; stop at two epochs. |
 | 2026-09-02 04:46 | h-ghost-gpu-room-eval-91m (GPU) | v1 | ~195 | COMPLETE 08:0x: 91M base + trunk (8) + leaves (2) on a T4; the room-loss column: base 3.578, trunk 3.68, leaf-e4 3.664 (library epochs made the 91M worse at room text) |
+| 2026-09-02 07:08 | h-ghost-gpu-room-eval (GPU) | v5 | ~55 | COMPLETE: e2-v3 pre-cooldown + cooled on a T4 |

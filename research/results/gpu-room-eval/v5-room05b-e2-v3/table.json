@@ -1,0 +1,476 @@
+{
+ "base": {
+  "returncode": 0,
+  "seconds": 2643.2,
+  "summary": {
+   "name": "base",
+   "checkpoint": "/kaggle/input/datasets/emberian64/hghost-falcon-h1-0-5b-base-public",
+   "model_safetensors_sha256": "865a1e864b3fe6495ec37256e1fdec8cd1d254b607eab29141e7263791172ce6",
+   "config_dtype": null,
+   "sequence_length": 512,
+   "batch": 8,
+   "kernel": {
+    "requested": "reference",
+    "triton": null,
+    "losses": "reference",
+    "generation": "reference"
+   },
+   "timings": {
+    "load_seconds": 12.26,
+    "losses": {
+     "first-512": {
+      "seconds": 574.548,
+      "tokens_per_second": 456.3
+     },
+     "clean-512": {
+      "seconds": 574.397,
+      "tokens_per_second": 456.4
+     },
+     "retention": {
+      "seconds": 31.33,
+      "tokens_per_second": 457.6
+     },
+     "room": {
+      "seconds": 574.498,
+      "tokens_per_second": 456.3
+     }
+    },
+    "generation_seconds": 595.424,
+    "room_seconds": 206.872,
+    "total_seconds": 2606.881
+   },
+   "slices": {
+    "first-512": {
+     "sequences": 512,
+     "tokens": 262144,
+     "loss": 3.4228527999709577,
+     "perplexity": 30.656747959807348,
+     "accuracy": 0.3572654724121094,
+     "furniture_fraction": 0.10590744018554688,
+     "furniture_free_loss": 3.5517832073469964,
+     "furniture_free_accuracy": 0.34455011285044435,
+     "furniture_loss": 2.3343955795263676,
+     "matched_fraction": 0.2052764892578125,
+     "unseen_loss": 3.6374971606333033,
+     "unseen_accuracy": 0.33896376936812395
+    },
+    "clean-512": {
+     "sequences": 512,
+     "tokens": 262144,
+     "loss": 2.8584433177241637,
+     "perplexity": 17.434366033022187,
+     "accuracy": 0.4381599426269531,
+     "furniture_fraction": 0.06396102905273438,
+     "furniture_free_loss": 2.963072082693065,
+     "furniture_free_accuracy": 0.42261499651556583,
+     "furniture_loss": 1.3272515444925679,
+     "matched_fraction": 0.12954330444335938,
+     "unseen_loss": 3.0400197153125146,
+     "unseen_accuracy": 0.4135898503407323
+    },
+    "retention": {
+     "sequences": 28,
+     "tokens": 14336,
+     "loss": 3.2084516536307115,
+     "perplexity": 24.74074930347288,
+     "accuracy": 0.3788364955357143
+    },
+    "room": {
+     "sequences": 512,
+     "tokens": 262144,
+     "loss": 3.240020330149802,
+     "perplexity": 25.53424085701642,
+     "accuracy": 0.3889923095703125
+    },
+    "first-32": {
+     "sequences": 32,
+     "tokens": 16384,
+     "loss": 3.4898507961825205,
+     "perplexity": 32.78105628259305,
+     "accuracy": 0.36724853515625,
+     "furniture_fraction": 0.153564453125,
+     "furniture_free_loss": 3.7515425444691863,
+     "furniture_free_accuracy": 0.3246322468993366,
+     "furniture_loss": 2.0474258497439375,
+     "matched_fraction": 0.199951171875,
+     "unseen_loss": 3.850010915073891,
+     "unseen_accuracy": 0.31354897772352763
+    }
+   },
+   "kernel_check": {
+    "slice": "first-32",
+    "reference_path_batch1_loss": 3.4898509979248047,
+    "reference_path_seconds": 34.368,
+    "expected_loss": 3.745613,
+    "expected_delta": -0.2557620020751954,
+    "ok": true,
+    "run_first32_loss": 3.4898507961825205,
+    "run_kernel": "reference",
+    "run_batch": 8,
+    "run_minus_reference_path": -2.0174228421154794e-07
+   },
+   "retention": {
+    "path": "/kaggle/input/datasets/emberian64/hghost-jax-code-public/retention.txt",
+    "bytes": 52449,
+    "tokens": 14643,
+    "sequences": 28
+   },
+   "room_validation": {
+    "path": "/kaggle/input/datasets/emberian64/hghost-curated-tokens-v1-2-room/room-validation.bin",
+    "tokens": 1000497,
+    "sequences": 512
+   },
+   "masks": [
+    "clean-512",
+    "first-512"
+   ],
+   "generation": {
+    "prompts": 12,
+    "samples_per_prompt": 4,
+    "greedy_per_prompt": 1,
+    "completions": 60,
+    "generated_tokens": 7587,
+    "seconds": 595.424,
+    "tokens_per_second": 12.74,
+    "per_call_tokens_per_second_median": 12.75,
+    "base_seed": 20260901,
+    "max_new_tokens": 128,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "repetition_penalty": 1.08
+   },
+   "room": {
+    "prompts": 12,
+    "samples_per_prompt": 8,
+    "greedy_per_prompt": 1,
+    "completions": 108,
+    "generated_tokens": 1925,
+    "seconds": 206.872,
+    "tokens_per_second": 9.31,
+    "seed": 20260902,
+    "max_new_tokens": 64,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "repetition_penalty": 1.0
+   },
+   "gpu": {
+    "max_memory_allocated_bytes": 11893278720,
+    "max_memory_reserved_bytes": 12522094592
+   }
+  }
+ },
+ "room05b-e2-v3-decay10-t000752156672": {
+  "returncode": 0,
+  "seconds": 2669.2,
+  "summary": {
+   "name": "room05b-e2-v3-decay10-t000752156672",
+   "checkpoint": "/kaggle/working/gpu-room-eval/checkpoints/room05b-e2-v3-decay10-t000752156672",
+   "model_safetensors_sha256": "f8e7da97bb5544de69a93d9b164dd666eb14b7df6c630600d797bed679bfc7a6",
+   "config_dtype": "float32",
+   "sequence_length": 512,
+   "batch": 8,
+   "kernel": {
+    "requested": "reference",
+    "triton": null,
+    "losses": "reference",
+    "generation": "reference"
+   },
+   "timings": {
+    "load_seconds": 12.931,
+    "losses": {
+     "first-512": {
+      "seconds": 573.812,
+      "tokens_per_second": 456.8
+     },
+     "clean-512": {
+      "seconds": 573.696,
+      "tokens_per_second": 456.9
+     },
+     "retention": {
+      "seconds": 31.392,
+      "tokens_per_second": 456.7
+     },
+     "room": {
+      "seconds": 574.327,
+      "tokens_per_second": 456.4
+     }
+    },
+    "generation_seconds": 615.221,
+    "room_seconds": 232.475,
+    "total_seconds": 2656.058
+   },
+   "slices": {
+    "first-512": {
+     "sequences": 512,
+     "tokens": 262144,
+     "loss": 2.882379379146955,
+     "perplexity": 17.856710557017948,
+     "accuracy": 0.4391822814941406,
+     "furniture_fraction": 0.10590744018554688,
+     "furniture_free_loss": 3.113402896799963,
+     "furniture_free_accuracy": 0.40111186486959266,
+     "furniture_loss": 0.9320309625122333,
+     "matched_fraction": 0.2052764892578125,
+     "unseen_loss": 3.2553748894013803,
+     "unseen_accuracy": 0.38316725227041454
+    },
+    "clean-512": {
+     "sequences": 512,
+     "tokens": 262144,
+     "loss": 2.649116715442153,
+     "perplexity": 14.141542121414965,
+     "accuracy": 0.464447021484375,
+     "furniture_fraction": 0.06396102905273438,
+     "furniture_free_loss": 2.7710883998660862,
+     "furniture_free_accuracy": 0.4453881170606862,
+     "furniture_loss": 0.8641196373189763,
+     "matched_fraction": 0.12954330444335938,
+     "unseen_loss": 2.864742448129947,
+     "unseen_accuracy": 0.43353857615531255
+    },
+    "retention": {
+     "sequences": 28,
+     "tokens": 14336,
+     "loss": 3.1660358232110326,
+     "perplexity": 23.713294096308257,
+     "accuracy": 0.3871372767857143
+    },
+    "room": {
+     "sequences": 512,
+     "tokens": 262144,
+     "loss": 2.607162082861687,
+     "perplexity": 13.56051258242621,
+     "accuracy": 0.468231201171875
+    },
+    "first-32": {
+     "sequences": 32,
+     "tokens": 16384,
+     "loss": 3.02637836441632,
+     "perplexity": 20.622410326626945,
+     "accuracy": 0.44232177734375,
+     "furniture_fraction": 0.153564453125,
+     "furniture_free_loss": 3.524708152559607,
+     "furniture_free_accuracy": 0.3554225555235074,
+     "furniture_loss": 0.2796226005168358,
+     "matched_fraction": 0.199951171875,
+     "unseen_loss": 3.6430458449715073,
+     "unseen_accuracy": 0.3366646322856271
+    }
+   },
+   "kernel_check": {
+    "slice": "first-32",
+    "reference_path_batch1_loss": 3.0263783931732178,
+    "reference_path_seconds": 36.219,
+    "run_first32_loss": 3.02637836441632,
+    "run_kernel": "reference",
+    "run_batch": 8,
+    "run_minus_reference_path": -2.8756897751947008e-08
+   },
+   "retention": {
+    "path": "/kaggle/input/datasets/emberian64/hghost-jax-code-public/retention.txt",
+    "bytes": 52449,
+    "tokens": 14643,
+    "sequences": 28
+   },
+   "room_validation": {
+    "path": "/kaggle/input/datasets/emberian64/hghost-curated-tokens-v1-2-room/room-validation.bin",
+    "tokens": 1000497,
+    "sequences": 512
+   },
+   "masks": [
+    "clean-512",
+    "first-512"
+   ],
+   "generation": {
+    "prompts": 12,
+    "samples_per_prompt": 4,
+    "greedy_per_prompt": 1,
+    "completions": 60,
+    "generated_tokens": 7680,
+    "seconds": 615.221,
+    "tokens_per_second": 12.48,
+    "per_call_tokens_per_second_median": 12.5,
+    "base_seed": 20260901,
+    "max_new_tokens": 128,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "repetition_penalty": 1.08
+   },
+   "room": {
+    "prompts": 12,
+    "samples_per_prompt": 8,
+    "greedy_per_prompt": 1,
+    "completions": 108,
+    "generated_tokens": 2168,
+    "seconds": 232.475,
+    "tokens_per_second": 9.33,
+    "seed": 20260902,
+    "max_new_tokens": 64,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "repetition_penalty": 1.0
+   },
+   "gpu": {
+    "max_memory_allocated_bytes": 11893278720,
+    "max_memory_reserved_bytes": 12522094592
+   }
+  }
+ },
+ "room05b-e2-v3-decay10-t000793917970": {
+  "returncode": 0,
+  "seconds": 2671.6,
+  "summary": {
+   "name": "room05b-e2-v3-decay10-t000793917970",
+   "checkpoint": "/kaggle/working/gpu-room-eval/checkpoints/room05b-e2-v3-decay10-t000793917970",
+   "model_safetensors_sha256": "fbe78d9ce2054d9dd007b9fe15df473c1c77deb459a9369375c95274760ec0c7",
+   "config_dtype": "float32",
+   "sequence_length": 512,
+   "batch": 8,
+   "kernel": {
+    "requested": "reference",
+    "triton": null,
+    "losses": "reference",
+    "generation": "reference"
+   },
+   "timings": {
+    "load_seconds": 14.756,
+    "losses": {
+     "first-512": {
+      "seconds": 573.975,
+      "tokens_per_second": 456.7
+     },
+     "clean-512": {
+      "seconds": 574.212,
+      "tokens_per_second": 456.5
+     },
+     "retention": {
+      "seconds": 31.34,
+      "tokens_per_second": 457.4
+     },
+     "room": {
+      "seconds": 574.367,
+      "tokens_per_second": 456.4
+     }
+    },
+    "generation_seconds": 618.842,
+    "room_seconds": 228.416,
+    "total_seconds": 2658.353
+   },
+   "slices": {
+    "first-512": {
+     "sequences": 512,
+     "tokens": 262144,
+     "loss": 2.8523732661372425,
+     "perplexity": 17.328859072118966,
+     "accuracy": 0.44458770751953125,
+     "furniture_fraction": 0.10590744018554688,
+     "furniture_free_loss": 3.0844687270249165,
+     "furniture_free_accuracy": 0.4055874836270858,
+     "furniture_loss": 0.8929752825506712,
+     "matched_fraction": 0.2052764892578125,
+     "unseen_loss": 3.229029670388324,
+     "unseen_accuracy": 0.38682007564848414
+    },
+    "clean-512": {
+     "sequences": 512,
+     "tokens": 262144,
+     "loss": 2.6258661641216894,
+     "perplexity": 13.816536392811537,
+     "accuracy": 0.4689826965332031,
+     "furniture_fraction": 0.06396102905273438,
+     "furniture_free_loss": 2.74724465640752,
+     "furniture_free_accuracy": 0.44997289884545005,
+     "furniture_loss": 0.8495501683192064,
+     "matched_fraction": 0.12954330444335938,
+     "unseen_loss": 2.8410051898947772,
+     "unseen_accuracy": 0.43778074807721806
+    },
+    "retention": {
+     "sequences": 28,
+     "tokens": 14336,
+     "loss": 3.146356260794096,
+     "perplexity": 23.251188774077004,
+     "accuracy": 0.38699776785714285
+    },
+    "room": {
+     "sequences": 512,
+     "tokens": 262144,
+     "loss": 2.580888606029688,
+     "perplexity": 13.208870428111897,
+     "accuracy": 0.4718208312988281
+    },
+    "first-32": {
+     "sequences": 32,
+     "tokens": 16384,
+     "loss": 3.0115373681172866,
+     "perplexity": 20.318613114001558,
+     "accuracy": 0.44659423828125,
+     "furniture_fraction": 0.153564453125,
+     "furniture_free_loss": 3.5063269253281106,
+     "furniture_free_accuracy": 0.3591721949812518,
+     "furniture_loss": 0.2842950869568282,
+     "matched_fraction": 0.199951171875,
+     "unseen_loss": 3.6254286490947236,
+     "unseen_accuracy": 0.3406316753127861
+    }
+   },
+   "kernel_check": {
+    "slice": "first-32",
+    "reference_path_batch1_loss": 3.0115373134613037,
+    "reference_path_seconds": 36.31,
+    "run_first32_loss": 3.0115373681172866,
+    "run_kernel": "reference",
+    "run_batch": 8,
+    "run_minus_reference_path": 5.4655982850704277e-08
+   },
+   "retention": {
+    "path": "/kaggle/input/datasets/emberian64/hghost-jax-code-public/retention.txt",
+    "bytes": 52449,
+    "tokens": 14643,
+    "sequences": 28
+   },
+   "room_validation": {
+    "path": "/kaggle/input/datasets/emberian64/hghost-curated-tokens-v1-2-room/room-validation.bin",
+    "tokens": 1000497,
+    "sequences": 512
+   },
+   "masks": [
+    "clean-512",
+    "first-512"
+   ],
+   "generation": {
+    "prompts": 12,
+    "samples_per_prompt": 4,
+    "greedy_per_prompt": 1,
+    "completions": 60,
+    "generated_tokens": 7680,
+    "seconds": 618.842,
+    "tokens_per_second": 12.41,
+    "per_call_tokens_per_second_median": 12.43,
+    "base_seed": 20260901,
+    "max_new_tokens": 128,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "repetition_penalty": 1.08
+   },
+   "room": {
+    "prompts": 12,
+    "samples_per_prompt": 8,
+    "greedy_per_prompt": 1,
+    "completions": 108,
+    "generated_tokens": 2089,
+    "seconds": 228.416,
+    "tokens_per_second": 9.15,
+    "seed": 20260902,
+    "max_new_tokens": 64,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "repetition_penalty": 1.0
+   },
+   "gpu": {
+    "max_memory_allocated_bytes": 11893278720,
+    "max_memory_reserved_bytes": 12522094592
+   }
+  }
+ }
+}
