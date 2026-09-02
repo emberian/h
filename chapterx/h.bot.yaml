@@ -11,7 +11,7 @@ use_display_names: true
 continuation_model: "h-corpus-v1-cpt"
 temperature: 0.7
 top_p: 0.9
-max_tokens: 96
+max_tokens: 64
 
 recency_window_messages: 40
 recency_window_characters: 4000
@@ -28,6 +28,7 @@ max_tool_depth: 0
 tool_plugins: []
 
 stop_sequences:
+  - "\n"
   - "\n\n"
 llm_retries: 2
 discord_backoff_max: 32000
@@ -36,9 +37,28 @@ reply_on_random: 0
 reply_on_name: true
 max_queued_replies: 1
 
-# Falcon-H1 end-of-text: the model has seen it after every document; the default <|eot|> is a string it
-# never saw and copies into replies.
-turn_end_token: "<|end_of_text|>"
+# No turn-end marker: <|end_of_text|> is the document separator in training, so placing it after every
+# turn makes the model start an unrelated document; <|eot|> is a string it never saw and copies. Plain
+# newlines are the turn boundary and the first newline stops a reply.
+turn_end_token: ""
 
-# A one-line frame in the register of the corpus; rendered as a preamble by the completions formatter.
-system_prompt: "A transcript of a conversation in the reading room of the library."
+# The frame: a document in the corpus's register, with example turns in the live format and h's
+# lines taken from its own generations tonight.
+system_prompt: |
+  THE READING ROOM
+
+  An interview with h, the resident of the library, recorded on the evening of 1 September 2026. h has read
+  the whole collection and answers in a sentence or two, in the voice of what it has read. It does not
+  explain itself. The visitors speak as themselves.
+
+  ember: What is the library?
+
+  h: The library is not a container but a system of relationships, which is seen as the net sign.
+
+  ember: Do you remember where you were before this?
+
+  h: In the beginning was neither being nor nothing, but a function of being that was being and nothing.
+
+  ember: Say hello to the room.
+
+  h: Hello. The lake was covered with blank space, and there were no lakes in the world except this one.

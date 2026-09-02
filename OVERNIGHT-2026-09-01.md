@@ -320,3 +320,13 @@ Evaluate everything with `hghost-evalpack` (subagent building it) plus the haunt
   one-line frame ("A transcript of a conversation in the reading room of the library."). Bot restarted.
 - The dormant-channel fetch (newest messages missing from the prompt) is a ChapterX pipeline issue to
   look at separately.
+- 23:10: h answered "GREETINGS" with "WACIOUS ANTIQUITIES" and a column of single letters. The haunting
+  index shows neither is a quotation (longest matches 5-9 tokens); the one-character-per-line pattern occurs
+  across many documents (OCR spine/caption debris in trismegetus_revealed, quantum_brain_dynamics, On the
+  Invocation of Angels, an architecture review, Parabola), so the ghost learned it as a style. Resident now
+  stops at the first newline (one line per turn, 64 tokens). Corpus-v2 furniture class: runs of
+  single-character lines.
+- 23:12: the interview frame (title, one paragraph, three example turns using h's own lines) helps, but
+  `<|end_of_text|>` as the turn marker made it worse: it is the document separator in training, so the
+  model started unrelated documents after it. Turn marker is now empty (plain newlines), reply stops at the
+  first newline. Through the endpoint the model now continues the interview in register.
