@@ -1,0 +1,2 @@
+{"type": "span", "query_offset": 0, "length": 2000, "corpus_offset": 187202606, "document": {"id": "cbf08d75cc5236534b9a8833", "source": "rat_palace", "path": "people/andrzej_jeziorski/[THE#MY .FEMALE SLAVE @VOLUME-2.OF13.pdf"}, "document_offset": 53168, "crosses_document_boundary": false, "occurrences": 1, "distinct_documents": 1, "distinct_documents_truncated": false, "documents": ["cbf08d75cc5236534b9a8833"]}
+{"type": "summary", "tokens": 2000, "min_tokens": 16, "spans": 1, "longest_match": 2000, "coverage": {"8": 1.0, "16": 1.0, "32": 1.0}, "seconds": 0.023}

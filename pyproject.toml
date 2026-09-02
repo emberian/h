@@ -9,7 +9,9 @@ description = "Corpus preparation and training tools for the h.fg-goose.online F
 license = "CC0-1.0"
 requires-python = ">=3.11"
 dependencies = [
+  "matplotlib>=3.11.1",
   "numpy>=2,<3",
+  "pydivsufsort>=0.0.20",
   "tokenizers>=0.21,<1",
 ]
 
@@ -29,6 +31,11 @@ hghost-tokenize = "hghost.tokenize_dataset:main"
 hghost-train-tokenizer = "hghost.train_tokenizer:main"
 hghost-validate = "hghost.validate_dataset:main"
 hghost-seal = "hghost.seal_corpus:main"
+hghost-haunt = "hghost.haunt:main"
+hghost-families = "hghost.families:main"
+hghost-beliefgeo = "hghost.beliefgeo:main"
+hghost-evalpack = "hghost.evalpack:main"
+hghost-ocr-view = "hghost.ocr_viewer:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/hghost"]

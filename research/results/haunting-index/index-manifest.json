@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "kind": "haunting-index",
+  "tokens_path": "/Users/ember/dev/h/artifacts/tokenized/train.bin",
+  "tokens_bytes": 748810424,
+  "tokens_sha256": "fdaa8b8514b006942e410f7044d5e9da8be852089f7380e5d05eff5b3573f124",
+  "token_dtype": "little-endian uint16",
+  "token_count": 374405212,
+  "eos_token_id": 11,
+  "eos_count": 4837,
+  "documents": 4837,
+  "split": "train",
+  "dataset_manifest_sha256": "6a059742543cde4822f95605e8f0f42e1e89bbad829a95e27234d59a2fc8b7ae",
+  "suffix_array": {
+    "path": "suffix-array.npy",
+    "dtype": "int32",
+    "entries": 374405212,
+    "encoding": "uint16 tokens as big-endian byte pairs; even byte offsets kept",
+    "order_check": {
+      "samples": 20000,
+      "depth": 64,
+      "violations": 0
+    }
+  },
+  "library": {
+    "name": "pydivsufsort",
+    "version": "0.0.20",
+    "numpy": "2.5.2"
+  },
+  "build": {
+    "started": "2026-09-01T23:20:28+00:00",
+    "seconds": 336.749,
+    "sort_seconds": 283.829,
+    "suffix_array_seconds": 289.725,
+    "peak_rss_bytes": 7627079680,
+    "python": "3.13.12",
+    "platform": "macOS-26.6.1-arm64-arm-64bit-Mach-O"
+  }
+}
