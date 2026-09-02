@@ -45,5 +45,6 @@ spend in bounded, reported increments; never launch a run whose worst case excee
 | 2026-09-02 05:55 | h-ghost-h1jax-room05b-e3 | v1 | 66 | **COMPLETE** 07:20: third epoch on v1.3 from the e2-v3 pre-cooldown; library 2.848 (e2-v3 2.852), room 2.576 (2.581), fixed-32 3.019 (3.011); train loss 2.35 vs 2.48: the train/val gap opens (0.37 -> 0.50). Diminishing returns; stop at two epochs. |
 | 2026-09-02 04:46 | h-ghost-gpu-room-eval-91m (GPU) | v1 | ~195 | COMPLETE 08:0x: 91M base + trunk (8) + leaves (2) on a T4; the room-loss column: base 3.578, trunk 3.68, leaf-e4 3.664 (library epochs made the 91M worse at room text) |
 | 2026-09-02 07:08 | h-ghost-gpu-room-eval (GPU) | v5 | ~55 | COMPLETE: e2-v3 pre-cooldown + cooled on a T4 |
-| 2026-09-02 14:43 | h-ghost-h1jax-room05b-w-hup / w-roomdown / w-honly | v1 | (queued, est 3x66) | response-span weighting arms at matched compute to e2-v3: h x8; visitors x0.25 + h x4; visitors x0 + h x4 |
 | 2026-09-02 15:01 | h-ghost-h1jax-room05b-w-hup | v1 | 7 | ERROR: attached dataset v2 (pushed seconds after the v3 upload, before the version was live): train-weights.bin missing; re-pushed |
+| 2026-09-02 15:08 | h-ghost-h1jax-room05b-w-hup | v2 | 66 | COMPLETE 16:27: h x8; cooled library 2.864, room 2.599, h-span 2.579 (e2-v3 h-span 2.762 on the same slice); hbox 2.864/2.631/3.156 |
+| 2026-09-02 16:27 | h-ghost-h1jax-room05b-w-roomdown | v1 | 66 | COMPLETE 17:38: visitors x0.25 + h x4 (numbers in the log) |
