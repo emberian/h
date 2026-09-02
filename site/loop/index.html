@@ -6,12 +6,14 @@
 <title>h · loop</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%2307070a'/%3E%3Ctext x='32' y='50' font-family='Georgia,serif' font-size='52' text-anchor='middle' fill='%23ece6d8'%3Eh%3C/text%3E%3C/svg%3E">
 <style>
-  :root { color-scheme: dark; --bg:#07070a; --ink:#ece6d8; --dim:#8b857a; --line:#2a2a33; --acc:#7cc4ff; --warn:#ffb26b; }
+  :root { color-scheme: dark; --bg:#07070a; --ink:#ece6d8; --dim:#8b857a; --line:#2a2a33; --acc:#7cc4ff; --warn:#ffb26b; --ok:#9be39b; }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html, body { margin:0; background:var(--bg); color:var(--ink); font: 16px/1.4 Georgia, "Times New Roman", serif; }
   main { max-width: 720px; margin: 0 auto; padding: 16px 14px 60px; }
   h1 { font-weight: normal; font-size: 22px; margin: 4px 0 2px; }
   h1 a { color: var(--ink); text-decoration: none; }
+  h2 { font-weight: normal; font-size: 16px; margin: 0 0 8px; color: var(--dim); }
   .sub { color: var(--dim); font-size: 14px; margin: 0 0 14px; }
   .card { border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin: 12px 0; }
   .pick { display:block; width:100%; padding: 18px; text-align:center; border: 1px dashed var(--acc); border-radius: 10px; color: var(--acc); font-size: 18px; cursor: pointer; }
@@ -22,7 +24,8 @@
   label { display:block; color: var(--dim); font-size: 13px; margin-bottom: 4px; }
   .spin { display:flex; align-items: stretch; border: 1px solid var(--line); border-radius: 8px; overflow:hidden; }
   .spin button { width: 44px; font-size: 20px; background:#15151c; color: var(--ink); border: none; cursor:pointer; }
-  .spin input { flex:1; min-width: 0; width: 100%; text-align:center; font: 18px/1 ui-monospace, Menlo, monospace; background:#0d0d12; color: var(--ink); border:none; padding: 10px 4px; }
+  .spin input { flex:1; min-width: 0; width: 100%; text-align:center; font: 17px/1 ui-monospace, Menlo, monospace; background:#0d0d12; color: var(--ink); border:none; padding: 10px 2px; -moz-appearance: textfield; appearance: textfield; }
+  .spin input::-webkit-inner-spin-button, .spin input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   .spin input:focus { outline: 1px solid var(--acc); }
   input[type=range] { width: 100%; accent-color: var(--acc); }
   .tl { position: relative; margin-top: 8px; }
@@ -31,10 +34,11 @@
   .btns { display:flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
   button.b { padding: 10px 14px; border-radius: 8px; border: 1px solid var(--line); background:#15151c; color: var(--ink); font: inherit; cursor:pointer; }
   button.b.primary { border-color: var(--acc); color: var(--acc); }
+  button.b.small { padding: 6px 8px; font-size: 13px; }
   button.b:disabled { opacity: .4; cursor: default; }
   .mono { font: 14px/1.4 ui-monospace, Menlo, monospace; }
   .seam { display:flex; gap: 8px; align-items: center; margin-top: 8px; }
-  .seam canvas { width: 48%; aspect-ratio: 16/9; background:#000; border-radius: 6px; }
+  .seam canvas { flex: 1 1 0; min-width: 0; aspect-ratio: 16/9; background:#000; border-radius: 6px; }
   .seam .arrow { color: var(--dim); }
   .score { color: var(--dim); font-size: 14px; }
   .score b { color: var(--ink); }
@@ -43,7 +47,24 @@
   details summary { cursor: pointer; color: var(--dim); }
   pre { white-space: pre-wrap; word-break: break-all; background:#0d0d12; padding: 8px; border-radius: 6px; }
   .scanlist { display:flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
-  .scanlist button { padding: 6px 8px; font-size: 13px; }
+  .curve { width: 100%; height: 120px; background:#0d0d12; border-radius: 6px; display:block; touch-action: none; margin-top: 8px; }
+  .cands { display:grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 8px; }
+  .cand { border: 1px solid var(--line); border-radius: 8px; padding: 6px; cursor: pointer; background:#0d0d12; }
+  .cand:hover, .cand.on { border-color: var(--acc); }
+  .cand .pair { display:flex; gap: 4px; align-items:center; }
+  .cand canvas { width: 46%; aspect-ratio: 16/9; background:#000; border-radius: 4px; }
+  .cand .m { font: 12px/1.3 ui-monospace, Menlo, monospace; color: var(--dim); margin-top: 4px; }
+  .cand .m b { color: var(--ink); }
+  .clip { display:grid; grid-template-columns: 1fr auto; gap: 6px; border: 1px solid var(--line); border-radius: 8px; padding: 8px; margin-top: 8px; background:#0d0d12; }
+  .clip .name { font-size: 14px; word-break: break-all; }
+  .clip .name.missing { color: var(--warn); }
+  .clip .fields { display:flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .clip .fields label { display:flex; flex-direction: column; font-size: 12px; }
+  .clip .fields input { width: 76px; font: 13px ui-monospace, Menlo, monospace; background:#15151c; color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 4px; }
+  .clip .ops { display:flex; flex-direction: column; gap: 4px; }
+  .clip .ops button { padding: 4px 8px; }
+  .repick { font-size: 13px; color: var(--acc); cursor: pointer; }
+  .repick input { display:none; }
   footer { color: var(--dim); font-size: 13px; margin-top: 24px; }
 </style>
 </head>
@@ -52,7 +73,7 @@
   <h1><a href="../">h</a> · loop</h1>
   <p class="sub">Cut one clean loop out of a video, on your phone, in your browser. Nothing is uploaded anywhere.</p>
 
-  <label class="pick" id="pickLabel">Choose a video<input id="file" type="file" accept="video/*"></label>
+  <label class="pick" id="pickLabel"><span id="pickText">Choose a video</span><input id="file" type="file" accept="video/*"></label>
   <div class="status" id="loadstatus"></div>
 
   <div class="card" id="editor" hidden>
@@ -81,6 +102,18 @@
     <div class="mono" id="loopinfo"></div>
 
     <div class="card">
+      <h2>Find loops</h2>
+      <div class="btns" style="margin-top:0">
+        <button class="b primary" id="find">Find loops</button>
+        <span class="status" id="findstatus" style="margin:0; align-self:center"></span>
+      </div>
+      <canvas id="curve" class="curve" hidden></canvas>
+      <div class="scanlist" id="periods"></div>
+      <div class="status" id="candstatus"></div>
+      <div class="cands" id="cands"></div>
+    </div>
+
+    <div class="card">
       <div class="score">Seam: last frame → first frame. <b id="seamScore">—</b> <span id="seamHint"></span></div>
       <div class="seam"><canvas id="cEnd"></canvas><span class="arrow">→</span><canvas id="cStart"></canvas></div>
       <div class="btns">
@@ -92,12 +125,15 @@
 
     <div class="card">
       <div class="row">
-        <div class="field" style="flex:0 1 120px"><label>Repeats</label>
+        <div class="field" style="flex:0 1 110px"><label>Repeats</label>
           <div class="spin"><input id="repeats" type="number" min="1" max="50" value="1" inputmode="numeric"></div></div>
+        <div class="field" style="flex:0 1 150px"><label>Crossfade (frames)</label>
+          <div class="spin"><input id="xfade" type="number" min="0" max="15" value="0" inputmode="numeric"></div></div>
         <div class="field"><label>Export</label>
           <div class="btns" style="margin:0">
             <button class="b primary" id="export">⬇ Export loop</button>
             <button class="b" id="share" hidden>Share…</button>
+            <button class="b" id="addclip">+ Add to sequence</button>
           </div></div>
       </div>
       <div class="status" id="status"></div>
@@ -106,7 +142,18 @@
     </div>
   </div>
 
-  <footer>Preview and seam checks are frame-accurate where the browser allows (requestVideoFrameCallback). Export re-records the loop through a canvas; the ffmpeg line is the lossless cut for a computer. Made in the reading room.</footer>
+  <div class="card" id="seq" hidden>
+    <h2>Sequence <span class="mono" id="seqtotal"></span></h2>
+    <div id="clips"></div>
+    <div class="btns">
+      <button class="b primary" id="exportseq">⬇ Export sequence</button>
+      <button class="b" id="clearseq">Clear</button>
+    </div>
+    <div class="status" id="seqstatus"></div>
+    <video id="seqout" playsinline controls hidden style="margin-top:8px"></video>
+  </div>
+
+  <footer>Preview and seam checks are frame-accurate where the browser allows (requestVideoFrameCallback). "Find loops" reads the clip once into tiny luma thumbnails and looks for periods. Export re-records through a canvas; the ffmpeg line is the lossless cut for a computer. Made in the reading room.</footer>
 </main>
 
 <script>
@@ -116,22 +163,25 @@
   const status = $('status'), loopinfo = $('loopinfo'), timeEl = $('time');
   let duration = 0, looping = false, pingpong = false, dir = 1, loops = 0, url = null, blobUrl = null;
   const hasRVFC = 'requestVideoFrameCallback' in HTMLVideoElement.prototype;
+  const isFirefox = /Firefox\//.test(navigator.userAgent);
 
   const fmt = t => t.toFixed(3);
   const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
   const start = () => clamp(parseFloat(startI.value) || 0, 0, duration);
   const end = () => clamp(parseFloat(endI.value) || 0, 0, duration);
-  const frame = () => 1 / (parseFloat(fpsI.value) || 30);
+  const fpsVal = () => parseFloat(fpsI.value) || 30;
+  const frame = () => 1 / fpsVal();
 
   function setStatus(msg, warn) { status.textContent = msg; status.className = 'status' + (warn ? ' warn' : ''); }
   function updateSel() {
     if (!duration) return;
     const a = start() / duration * 100, b = end() / duration * 100;
     sel.style.left = a + '%'; sel.style.width = Math.max(0, b - a) + '%';
-    loopinfo.textContent = `loop ${fmt(Math.max(0, end() - start()))} s ≈ ${Math.round(Math.max(0, end() - start()) * (parseFloat(fpsI.value) || 30))} frames` + (looping ? ` · played ${loops}×` : '');
+    loopinfo.textContent = `loop ${fmt(Math.max(0, end() - start()))} s ≈ ${Math.round(Math.max(0, end() - start()) * fpsVal())} frames` + (looping ? ` · played ${loops}×` : '');
     $('ffm').textContent = `ffmpeg -ss ${fmt(start())} -to ${fmt(end())} -i input.mp4 -c copy loop.mp4\n# re-encoded, frame-exact:\nffmpeg -ss ${fmt(start())} -to ${fmt(end())} -i input.mp4 -c:v libx264 -crf 18 -an loop.mp4`;
   }
 
+  // ------------------------------------------------------------ loading
   const loadstatus = $('loadstatus');
   function setLoad(msg, warn) { loadstatus.textContent = msg; loadstatus.className = 'status' + (warn ? ' warn' : ''); }
   let loadTimer = null, currentFile = null;
@@ -139,36 +189,47 @@
     const f = e.target.files[0]; if (!f) return;
     currentFile = f;
     if (url) URL.revokeObjectURL(url);
-    url = URL.createObjectURL(f); $('editor').hidden = true; duration = 0;
-    $('pickLabel').textContent = f.name + ' — choose another';
+    url = URL.createObjectURL(f); $('editor').hidden = true; duration = 0; features = null;
+    $('pickText').textContent = f.name + ' — choose another';
     setLoad(`Loading ${f.name} (${(f.size / 1e6).toFixed(1)} MB, ${f.type || 'unknown type'})…`);
-    v.src = url; v.load();
+    v._durationProbe = false; v.src = url; v.load();
     clearTimeout(loadTimer);
     loadTimer = setTimeout(() => { if (!duration) setLoad(`Still loading after 10 s. readyState=${v.readyState}, networkState=${v.networkState}. If this browser cannot decode the file (iPhone HEVC videos in Chrome, for example), try Safari, or re-export the clip as H.264.`, true); }, 10000);
   });
   v.addEventListener('error', () => {
     const err = v.error; const codes = { 1: 'aborted', 2: 'network', 3: 'decode failed', 4: 'format not supported' };
-    setLoad(`This browser could not open the video: ${codes[err && err.code] || 'error'}${err && err.message ? ' (' + err.message + ')' : ''}. iPhone "High Efficiency" (HEVC) .mov files do not play in Chrome on most systems; Safari plays them, or set the iPhone camera to "Most Compatible", or convert once with ffmpeg: ffmpeg -i in.mov -c:v libx264 -crf 18 out.mp4`, true);
+    const msg = (err && err.message) || '';
+    const base = `This browser could not open the video: ${codes[err && err.code] || 'error'}${msg ? ' (' + msg + ')' : ''}.`;
+    let hint;
+    if (/NS_ERROR_DOM_MEDIA|NS_ERROR/.test(msg) || isFirefox) hint = ' Firefox cannot parse this QuickTime file. Open the page in Safari or Chrome, or re-encode it once on a computer: ffmpeg -i in.mov -c:v libx264 -crf 18 out.mp4';
+    else hint = ' iPhone "High Efficiency" (HEVC) .mov files often fail in Chrome; Safari plays them, or set the iPhone camera to "Most Compatible", or convert once: ffmpeg -i in.mov -c:v libx264 -crf 18 out.mp4';
+    setLoad(base + hint, true);
     clearTimeout(loadTimer);
   });
   function ready() {
-    let d = v.duration;
+    if (duration) return;
+    const d = v.duration;
     if (!isFinite(d) || d <= 0) {
-      // some recordings report an infinite duration until the element is seeked past the end
-      if (!v._durationProbe) { v._durationProbe = true; v.currentTime = 1e101; v.addEventListener('durationchange', ready, { once: true }); }
+      // some recordings report an infinite duration until the element is seeked past the end; durationchange brings us back here
+      if (!v._durationProbe) { v._durationProbe = true; v.currentTime = 1e101; }
       return;
     }
     if (v._durationProbe && v.currentTime > 1e6) v.currentTime = 0;
+    if (v.videoWidth === 0 && v.readyState >= 1) {
+      setLoad('This file has no video track this browser can show (audio only, or an unsupported video codec inside a playable container).', true);
+      clearTimeout(loadTimer); return;
+    }
     duration = d;
     scrub.max = duration; startI.max = endI.max = duration;
     startI.value = '0'; endI.value = fmt(Math.min(duration, 3));
     $('editor').hidden = false; clearTimeout(loadTimer);
-    setLoad(`Loaded ${fmt(duration)} s${v.videoWidth ? `, ${v.videoWidth}×${v.videoHeight}` : ''}.`);
+    setLoad(`Loaded ${fmt(duration)} s, ${v.videoWidth}×${v.videoHeight}.`);
     setStatus(hasRVFC ? 'Frame callbacks available: frame-accurate preview and seam checks.' : 'This browser lacks frame callbacks; preview is approximate.');
+    resetFind();
     updateSel(); estimateFps();
   }
   v.addEventListener('loadedmetadata', ready);
-  v.addEventListener('durationchange', () => { if (!duration && isFinite(v.duration) && v.duration > 0) ready(); });
+  v.addEventListener('durationchange', ready);
   v.addEventListener('timeupdate', () => { if (!scrubbing) scrub.value = v.currentTime; timeEl.textContent = `${fmt(v.currentTime)} / ${fmt(duration)} s`; });
   let scrubbing = false;
   scrub.addEventListener('input', () => { scrubbing = true; v.currentTime = parseFloat(scrub.value); timeEl.textContent = `${fmt(v.currentTime)} / ${fmt(duration)} s`; });
@@ -184,24 +245,26 @@
   $('mute').onclick = () => { v.muted = !v.muted; $('mute').textContent = v.muted ? '🔇' : '🔊'; };
   $('pingpong').onclick = () => { pingpong = !pingpong; $('pingpong').style.borderColor = pingpong ? 'var(--acc)' : ''; };
 
-  // ---- fps estimate from presented frames (when frame callbacks exist)
+  // ------------------------------------------------------------ fps estimate from presented frames
+  let fpsEstimating = false;
   function estimateFps() {
     if (!hasRVFC || duration < 0.5) return;
-    let first = null, count = 0;
+    let first = null, count = 0; fpsEstimating = true;
     const tick = (now, md) => {
+      if (!fpsEstimating) return;
       if (first === null) first = md.mediaTime;
       count++;
       if (md.mediaTime - first >= 1.0 && count > 5) {
         const est = (count - 1) / (md.mediaTime - first);
         if (est > 5 && est < 240) { fpsI.value = est.toFixed(3); updateSel(); }
-        v.pause(); v.currentTime = 0; return;
+        v.pause(); v.currentTime = 0; fpsEstimating = false; return;
       }
       v.requestVideoFrameCallback(tick);
     };
-    v.currentTime = 0; v.play().then(() => v.requestVideoFrameCallback(tick)).catch(() => {});
+    v.currentTime = 0; v.play().then(() => v.requestVideoFrameCallback(tick)).catch(() => { fpsEstimating = false; });
   }
 
-  // ---- seamless-ish preview: jump back at the end using frame callbacks
+  // ------------------------------------------------------------ preview loop
   function loopTick() {
     if (!looping) return;
     const s = start(), e = end();
@@ -210,7 +273,6 @@
     if (!pingpong) {
       if (t >= e - frame() / 2 || t < s - 0.05) { v.currentTime = s; loops++; }
     } else {
-      // ping-pong: play forward with the element, backward by stepping frames
       if (dir === 1 && t >= e - frame() / 2) { dir = -1; v.pause(); }
       if (dir === -1) { const nt = t - frame(); if (nt <= s) { dir = 1; loops++; v.currentTime = s; v.play(); } else { v.currentTime = nt; } }
     }
@@ -218,33 +280,54 @@
     if (hasRVFC && !v.paused) v.requestVideoFrameCallback(loopTick); else requestAnimationFrame(loopTick);
   }
   $('loop').onclick = () => {
-    looping = !looping; loops = 0; dir = 1;
+    looping = !looping; loops = 0; dir = 1; fpsEstimating = false; v.playbackRate = 1;
     if (looping) { v.currentTime = start(); v.play().catch(() => {}); $('loop').textContent = '■ Stop'; loopTick(); }
     else { v.pause(); $('loop').textContent = '▶ Preview loop'; }
   };
 
-  // ---- seam view and scan: draw the frame at t into a canvas via a hidden video
+  // ------------------------------------------------------------ seam view and manual scan (hidden video)
   const hidden = document.createElement('video'); hidden.muted = true; hidden.playsInline = true; hidden.preload = 'auto';
-  function frameAt(t) {
+  // seek and resolve when the frame is there; a timeout guards against browsers that never fire seeked for a no-op seek
+  function seekTo(el, t, timeout = 4000) {
     return new Promise((resolve, reject) => {
-      if (hidden.src !== v.src) hidden.src = v.src;
-      const done = () => { hidden.removeEventListener('seeked', done); resolve(); };
-      hidden.addEventListener('seeked', done);
-      hidden.addEventListener('error', reject, { once: true });
-      hidden.currentTime = clamp(t, 0, Math.max(0, duration - 0.001));
+      let timer = null;
+      const off = () => { el.removeEventListener('seeked', ok); el.removeEventListener('error', bad); clearTimeout(timer); };
+      const ok = () => { off(); resolve(); };
+      const bad = () => { off(); reject(new Error('video error while seeking')); };
+      el.addEventListener('seeked', ok); el.addEventListener('error', bad);
+      timer = setTimeout(() => { off(); if (el.error) reject(new Error('video error while seeking')); else resolve(); }, timeout);
+      el.currentTime = t;
     });
   }
-  function draw(canvas, w, h) {
+  function frameAt(t, el = hidden, src = null) {
+    const want = src || v.src;
+    if (el.src !== want) { el.src = want; el.load(); }
+    const d = isFinite(el.duration) && el.duration > 0 ? el.duration : duration;
+    return seekTo(el, clamp(t, 0, Math.max(0, d - 0.001)));
+  }
+  function draw(canvas, w, h, el = hidden) {
     canvas.width = w; canvas.height = h;
-    canvas.getContext('2d', { willReadFrequently: true }).drawImage(hidden, 0, 0, w, h);
-    return canvas.getContext('2d').getImageData(0, 0, w, h).data;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(el, 0, 0, w, h);
+    return ctx.getImageData(0, 0, w, h).data;
   }
   function diff(a, b) { let s = 0; for (let i = 0; i < a.length; i += 4) s += Math.abs(a[i] - b[i]) + Math.abs(a[i + 1] - b[i + 1]) + Math.abs(a[i + 2] - b[i + 2]); return s / (a.length / 4) / 3; }
   const W = 160, H = 90;
-  async function seam(s, e) {
-    await frameAt(e - frame() / 2); const A = draw($('cEnd'), W, H);
-    await frameAt(s); const B = draw($('cStart'), W, H);
-    return diff(A, B);
+  const scratch = document.createElement('canvas');
+  // The loop shows its last frame and then its first. The seam is clean when the first frame looks like the frame that
+  // would have come next, so the score compares first (at s) with next (at e), seeking to frame centres; comparing
+  // last with first instead would reward a stuttered duplicate. The pair drawn for the eye is still last → first.
+  async function seamScore(s, e, first = null) {
+    const f = frame();
+    if (!first) { await frameAt(s + f / 2); first = draw(scratch, W, H); }
+    await frameAt(e + f / 2); const next = draw(scratch, W, H);
+    return diff(next, first);
+  }
+  async function seam(s, e, cEnd = $('cEnd'), cStart = $('cStart')) {
+    const f = frame();
+    await frameAt(s + f / 2); const first = draw(cStart, W, H);
+    await frameAt(e - f / 2); draw(cEnd, W, H);
+    return seamScore(s, e, first);
   }
   $('seam').onclick = async () => {
     setStatus('Comparing the seam…');
@@ -255,66 +338,452 @@
     const s = start(), e0 = end(), f = frame(); const list = $('scanlist'); list.innerHTML = '';
     setStatus('Scanning…');
     try {
-      await frameAt(s); const B = draw($('cStart'), W, H);
+      await frameAt(s + f / 2); const B = draw($('cStart'), W, H);
       const results = [];
       for (let k = -Math.round(0.5 / f); k <= Math.round(0.5 / f); k++) {
         const e = e0 + k * f; if (e <= s + f || e > duration) continue;
-        await frameAt(e - f / 2); const A = draw($('cEnd'), W, H);
-        results.push([e, diff(A, B)]);
+        results.push([e, await seamScore(s, e, B)]);
         setStatus(`Scanning… ${results.length}`);
       }
       results.sort((x, y) => x[1] - y[1]);
       results.slice(0, 8).forEach(([e, d]) => {
-        const b = document.createElement('button'); b.className = 'b'; b.textContent = `${fmt(e)} s · ${d.toFixed(1)}`;
+        const b = document.createElement('button'); b.className = 'b small'; b.textContent = `${fmt(e)} s · ${d.toFixed(1)}`;
         b.onclick = () => { endI.value = fmt(e); updateSel(); $('seam').click(); }; list.appendChild(b);
       });
       setStatus(results.length ? 'Lowest seam difference first; tap to use.' : 'Nothing to scan.');
     } catch (err) { setStatus('Scan failed: ' + err, true); }
   };
 
-  // ---- export: replay the range through a canvas into MediaRecorder
-  $('export').onclick = async () => {
-    const s = start(), e = end(), reps = clamp(parseInt($('repeats').value) || 1, 1, 50);
-    if (e <= s + frame()) { setStatus('End must be after start.', true); return; }
-    if (!('MediaRecorder' in window)) { setStatus('This browser cannot record video (no MediaRecorder). Use the ffmpeg line below on a computer.', true); return; }
-    looping = false; v.pause(); $('loop').textContent = '▶ Preview loop';
-    const fps = parseFloat(fpsI.value) || 30;
-    const canvas = document.createElement('canvas'); canvas.width = v.videoWidth; canvas.height = v.videoHeight;
+  // ------------------------------------------------------------ feature capture (32×18 luma per presented frame)
+  const FW = 32, FH = 18, FD = FW * FH;
+  let features = null; // { data: Uint8Array(n*FD), times: Float32Array(n), n, step (seconds per feature) }
+  const fcanvas = document.createElement('canvas'); fcanvas.width = FW; fcanvas.height = FH;
+  const fctx = fcanvas.getContext('2d', { willReadFrequently: true });
+  function lumaOf(el, out, off) {
+    fctx.drawImage(el, 0, 0, FW, FH);
+    const d = fctx.getImageData(0, 0, FW, FH).data;
+    for (let i = 0, j = 0; i < d.length; i += 4, j++) out[off + j] = (d[i] * 77 + d[i + 1] * 150 + d[i + 2] * 29) >> 8;
+  }
+  const findstatus = $('findstatus');
+  // Play the clip once, muted, and keep a thumbnail per presented frame. Rate starts at 4× and halves whenever the
+  // display stops presenting every frame (mediaTime jumping by more than one frame), restarting the read so the
+  // early frames are not missing; without frame callbacks it reads at 1× from timeupdate/animation frames.
+  async function captureFeatures() {
+    looping = false; fpsEstimating = false; v.pause(); $('loop').textContent = '▶ Preview loop';
+    const fps = fpsVal(); const total = Math.max(1, Math.round(duration * fps));
+    const stride = Math.max(1, Math.ceil(total / 4000));      // keep every stride-th frame on long clips
+    const cap = Math.ceil(total / stride) + 8;
+    const raw = new Uint8Array(cap * FD), times = new Float32Array(cap);
+    let n = 0, skipped = 0, seen = 0, lastT = -1, rate = hasRVFC ? 4 : 1, restarts = 0;
+    v.muted = true;
+    findstatus.textContent = 'Reading frames…';
+    const readAll = () => new Promise((resolve, reject) => {
+      let finished = false, demote = false;
+      const finish = () => { if (finished) return; finished = true; v.pause(); v.removeEventListener('ended', finish); v.removeEventListener('timeupdate', onTime); resolve(demote); };
+      const sample = (t) => {
+        if (t === lastT) return;
+        if (lastT >= 0) { const gapFrames = Math.round((t - lastT) * fps); if (gapFrames > 1) skipped += gapFrames - 1; seen++; }
+        lastT = t;
+        const idx = Math.round(t * fps);
+        if (idx % stride === 0 && n < cap) { lumaOf(v, raw, n * FD); times[n] = t; n++; }
+        if (n % 20 === 0) findstatus.textContent = `Reading frames… ${Math.round(t / duration * 100)}% at ${rate}×`;
+        // the display is skipping too many frames at this rate: halve it and start over (judged over the first second)
+        if (rate > 1 && t >= Math.min(1, duration * 0.25) && t < Math.max(1, duration * 0.25) && seen + skipped >= 20 && skipped / (seen + skipped) > 0.4) { demote = true; finish(); }
+      };
+      const onTime = () => { if (!finished && !hasRVFC) sample(v.currentTime); };
+      const tick = (now, md) => {
+        if (finished) return;
+        if (v.ended || (md && md.mediaTime >= duration - 1e-3)) { finish(); return; }
+        sample(md ? md.mediaTime : v.currentTime);
+        if (finished) return;
+        if (hasRVFC) v.requestVideoFrameCallback(tick); else requestAnimationFrame(() => tick(0, null));
+      };
+      v.addEventListener('ended', finish); v.addEventListener('timeupdate', onTime);
+      seekTo(v, 0).then(() => { v.playbackRate = rate; return v.play(); }).then(() => tick(0, null)).catch(err => { finish(); reject(err); });
+    });
+    while (true) {
+      n = 0; skipped = 0; seen = 0; lastT = -1;
+      const demote = await readAll();
+      if (!demote) break;
+      rate = rate > 2 ? 2 : 1; restarts++;
+    }
+    v.playbackRate = 1; v.currentTime = 0;
+    if (n < 8) throw new Error('too few frames captured');
+    // resample onto a uniform grid (step = stride / fps) by nearest captured frame, so loop lengths are exact frame counts
+    const step = stride / fps; const grid = Math.max(2, Math.floor((duration - times[0]) / step + 1e-3));
+    const data = new Uint8Array(grid * FD), gtimes = new Float32Array(grid), gaps = [];
+    let k = 0;
+    for (let g = 0; g < grid; g++) {
+      const t = times[0] + g * step;
+      while (k + 1 < n && Math.abs(times[k + 1] - t) <= Math.abs(times[k] - t)) k++;
+      data.set(raw.subarray(k * FD, (k + 1) * FD), g * FD); gtimes[g] = t;
+      if (Math.abs(times[k] - t) > step * 0.5) gaps.push(g);
+    }
+    // slots the display skipped hold a neighbour's frame: fill them exactly by seeking the offscreen video to the frame centre
+    for (const [j, g] of gaps.entries()) {
+      if (j % 10 === 0) findstatus.textContent = `Filling ${gaps.length - j} skipped frames…`;
+      await frameAt(gtimes[g] + 0.5 / fps); lumaOf(hidden, data, g * FD);
+    }
+    features = { data, times: gtimes, n: grid, step, fps, stride, captured: n, skipped, filled: gaps.length, rate, restarts };
+    findstatus.textContent = `${n} frames read at ${rate}×${gaps.length ? `, ${gaps.length} filled by seeking` : ''}; grid of ${grid} at ${(step * 1000).toFixed(1)} ms.`;
+    return features;
+  }
+
+  // ------------------------------------------------------------ worker: rhythm curve and loop candidates
+  const workerSrc = `
+    self.onmessage = (e) => {
+      const m = e.data; const f = m.data, n = m.n, D = m.dim;
+      const dist = (a, b) => { let s = 0; const oa = a * D, ob = b * D; for (let k = 0; k < D; k++) s += Math.abs(f[oa + k] - f[ob + k]); return s / D; };
+      if (m.type === 'curve') {
+        const curve = new Float32Array(m.Lmax + 1).fill(NaN);
+        for (let L = m.Lmin; L <= m.Lmax; L++) {
+          const count = n - L; if (count < 4) break;
+          const stepI = Math.max(1, Math.floor(count / 300));
+          let s = 0, c = 0;
+          for (let i = 0; i < count; i += stepI) { s += dist(i, i + L); c++; }
+          curve[L] = s / c;
+          if (L % 20 === 0) self.postMessage({ type: 'progress', L, Lmax: m.Lmax });
+        }
+        self.postMessage({ type: 'curve', curve }, [curve.buffer]);
+      } else if (m.type === 'candidates') {
+        const lam = m.lambda, out = [];
+        const motion = (i, j) => {
+          let s = 0; const oi = i * D, oi1 = (i + 1) * D, oj = j * D, oj1 = (j + 1) * D;
+          for (let k = 0; k < D; k++) s += Math.abs((f[oi1 + k] - f[oi + k]) - (f[oj1 + k] - f[oj + k]));
+          return s / D;
+        };
+        for (let L = m.L - m.dL; L <= m.L + m.dL; L++) {
+          if (L < m.Lmin) continue;
+          for (let i = 0; i + L + 1 < n; i++) {
+            const seam = dist(i, i + L); const mo = motion(i, i + L);
+            out.push([i, L, seam + lam * mo, seam, mo]);
+          }
+        }
+        out.sort((a, b) => a[2] - b[2]);
+        // keep the best start in each neighbourhood so the refine pass sees distinct loops, not one start's ±1 shifts
+        const sep = Math.max(2, Math.round(m.L / 8)), kept = [];
+        for (const c of out) { if (kept.length >= 200) break; if (kept.every(k => Math.abs(k[0] - c[0]) >= sep)) kept.push(c); }
+        self.postMessage({ type: 'candidates', top: kept });
+      }
+    };`;
+  const workerUrl = URL.createObjectURL(new Blob([workerSrc], { type: 'text/javascript' }));
+  function runWorker(msg) {
+    return new Promise((resolve, reject) => {
+      const w = new Worker(workerUrl);
+      w.onmessage = e => {
+        if (e.data.type === 'progress') { findstatus.textContent = `Rhythm… ${Math.round(e.data.L / e.data.Lmax * 100)}%`; return; }
+        w.terminate(); resolve(e.data);
+      };
+      w.onerror = err => { w.terminate(); reject(err); };
+      w.postMessage(msg);
+    });
+  }
+
+  // ------------------------------------------------------------ rhythm curve plot
+  let curve = null, curveL = { min: 0, max: 0 }, minima = [], chosenL = null;
+  const curveC = $('curve');
+  function resetFind() {
+    curve = null; minima = []; chosenL = null; features = null; candRun++;
+    curveC.hidden = true; $('periods').innerHTML = ''; $('cands').innerHTML = ''; $('candstatus').textContent = ''; findstatus.textContent = '';
+  }
+  window.addEventListener('resize', () => { if (curve && !curveC.hidden) drawCurve(chosenL); });
+  function drawCurve(highlight) {
+    const dpr = window.devicePixelRatio || 1; const w = curveC.clientWidth || 600, h = 120;
+    curveC.width = w * dpr; curveC.height = h * dpr; const ctx = curveC.getContext('2d'); ctx.scale(dpr, dpr);
+    ctx.fillStyle = '#0d0d12'; ctx.fillRect(0, 0, w, h);
+    const vals = []; for (let L = curveL.min; L <= curveL.max; L++) if (!isNaN(curve[L])) vals.push(curve[L]);
+    if (!vals.length) return;
+    const lo = Math.min(...vals), hi = Math.max(...vals) || 1;
+    const x = L => 30 + (L - curveL.min) / Math.max(1, curveL.max - curveL.min) * (w - 40);
+    const y = val => 8 + (1 - (val - lo) / (hi - lo || 1)) * (h - 28);
+    ctx.strokeStyle = '#2a2a33'; ctx.beginPath(); ctx.moveTo(30, h - 20); ctx.lineTo(w - 10, h - 20); ctx.stroke();
+    ctx.fillStyle = '#8b857a'; ctx.font = '11px ui-monospace, Menlo, monospace';
+    const step = features.step;
+    const secMax = curveL.max * step; const tickEvery = secMax > 8 ? 2 : 1;
+    for (let s = 0; s <= secMax; s += tickEvery) { const L = s / step; if (L < curveL.min) continue; ctx.fillText(s + 's', x(L) - 6, h - 6); }
+    ctx.strokeStyle = '#7cc4ff'; ctx.lineWidth = 1.5; ctx.beginPath(); let first = true;
+    for (let L = curveL.min; L <= curveL.max; L++) { if (isNaN(curve[L])) continue; const px = x(L), py = y(curve[L]); if (first) { ctx.moveTo(px, py); first = false; } else ctx.lineTo(px, py); }
+    ctx.stroke();
+    minima.forEach((L, i) => { ctx.fillStyle = i < 3 ? '#9be39b' : '#8b857a'; ctx.beginPath(); ctx.arc(x(L), y(curve[L]), 3.5, 0, Math.PI * 2); ctx.fill(); });
+    if (highlight !== null && !isNaN(curve[highlight])) { ctx.fillStyle = '#ffb26b'; ctx.beginPath(); ctx.arc(x(highlight), y(curve[highlight]), 5, 0, Math.PI * 2); ctx.fill(); }
+    ctx.fillStyle = 'rgba(13,13,18,.8)'; ctx.fillRect(w - 100, 3, 92, 14); ctx.fillStyle = '#8b857a'; ctx.fillText('loop length →', w - 96, 14);
+  }
+  function findMinima() {
+    const out = []; const Lmin = curveL.min, Lmax = curveL.max; const win = Math.max(2, Math.round(0.15 / features.step));
+    const vals = []; for (let L = Lmin; L <= Lmax; L++) if (!isNaN(curve[L])) vals.push(curve[L]);
+    if (!vals.length) return out;
+    const sorted = [...vals].sort((a, b) => a - b); const median = sorted[Math.floor(sorted.length / 2)];
+    // a dip needs both sides: the ends of the range are not periods
+    for (let L = Lmin + win; L <= Lmax - win; L++) {
+      const c = curve[L]; if (isNaN(c) || c > median) continue;
+      let ok = true;
+      for (let k = L - win; k <= L + win; k++) { if (k !== L && !isNaN(curve[k]) && curve[k] < c) { ok = false; break; } }
+      if (ok) out.push(L);
+    }
+    out.sort((a, b) => curve[a] - curve[b]);
+    // a loop that repeats every L also scores well at 2L, 3L…: prefer the shortest period that is nearly as clean as the best
+    if (out.length > 1) {
+      const best = out[0], tol = curve[best] * 0.25 + (sorted[sorted.length - 1] - sorted[0]) * 0.05;
+      let pick = best;
+      for (const L of out) { if (L < pick && curve[L] <= curve[best] + tol) { const k = Math.round(best / L); if (k >= 2 && Math.abs(best - k * L) <= Math.max(1, win)) pick = L; } }
+      if (pick !== best) { out.splice(out.indexOf(pick), 1); out.unshift(pick); }
+    }
+    return out;
+  }
+  // a tap picks the nearest marked minimum when one is close, otherwise the length under the finger
+  curveC.addEventListener('click', ev => {
+    if (!curve) return;
+    const rect = curveC.getBoundingClientRect(); const px = ev.clientX - rect.left; const w = rect.width;
+    const Lat = clamp(Math.round(curveL.min + (px - 30) / (w - 40) * (curveL.max - curveL.min)), curveL.min, curveL.max);
+    let best = Lat, bd = Math.max(2, (curveL.max - curveL.min) * 0.03); minima.forEach(L => { const d = Math.abs(L - Lat); if (d < bd) { bd = d; best = L; } });
+    if (isNaN(curve[best])) return;
+    chooseL(best);
+  });
+  function chooseL(L) {
+    chosenL = L; drawCurve(L);
+    const secs = L * features.step;
+    $('periods').querySelectorAll('button').forEach(b => b.style.borderColor = parseInt(b.dataset.l) === L ? 'var(--acc)' : '');
+    endI.value = fmt(clamp(start() + secs, 0, duration)); updateSel();
+    findCandidates(L);
+  }
+
+  // ------------------------------------------------------------ candidates
+  let candRun = 0;
+  function findCandidates(L) {
+    return scoreCandidates(L).catch(err => { $('candstatus').textContent = 'Candidates failed: ' + (err && err.message || err); });
+  }
+  async function scoreCandidates(L) {
+    const run = ++candRun;
+    const f = features; const candsEl = $('cands'); candsEl.innerHTML = '';
+    $('candstatus').textContent = 'Scoring starts…';
+    const res = await runWorker({ type: 'candidates', data: f.data, n: f.n, dim: FD, L, dL: Math.min(3, Math.max(1, Math.round(L * 0.05))), lambda: 1.0, Lmin: Math.max(2, Math.round(0.3 / f.step)) });
+    if (run !== candRun) return;
+    // refine the best 20 by seeking the real video and recomputing the seam at 160×90
+    const top = res.top.slice(0, 20); const refined = [];
+    for (const [i, Lc, coarse, seamC, mo] of top) {
+      if (run !== candRun) return;
+      const s = f.times[i], e = f.times[i + Lc];
+      try { const d = await seamScore(s, e); refined.push({ i, L: Lc, s, e, score: d + 1.0 * mo, seam: d, motion: mo, coarse }); }
+      catch (err) { refined.push({ i, L: Lc, s, e, score: coarse, seam: seamC, motion: mo, coarse }); }
+      $('candstatus').textContent = `Refining… ${refined.length}/${top.length}`;
+    }
+    refined.sort((a, b) => a.score - b.score);
+    // best 8 that do not overlap; then fill with well-separated starts
+    const chosen = [];
+    for (const c of refined) { if (chosen.length >= 8) break; if (chosen.every(o => c.e <= o.s || c.s >= o.e)) chosen.push(c); }
+    if (chosen.length < 8) for (const c of refined) { if (chosen.length >= 8) break; if (!chosen.includes(c) && chosen.every(o => Math.abs(o.s - c.s) >= Math.max(0.5, (c.e - c.s) / 4))) chosen.push(c); }
+    chosen.sort((a, b) => a.score - b.score);
+    for (const c of chosen) {
+      const el = document.createElement('div'); el.className = 'cand'; el.dataset.s = c.s; el.dataset.e = c.e; el.dataset.l = c.L;
+      const pair = document.createElement('div'); pair.className = 'pair';
+      const ce = document.createElement('canvas'), cs = document.createElement('canvas'); const arrow = document.createElement('span'); arrow.textContent = '→'; arrow.style.color = 'var(--dim)';
+      pair.append(ce, arrow, cs); el.appendChild(pair);
+      const m = document.createElement('div'); m.className = 'm'; m.innerHTML = `<b>${fmt(c.s)}</b> → <b>${fmt(c.e)}</b><br>${c.L} fr · seam ${c.seam.toFixed(1)} · motion ${c.motion.toFixed(1)}`; el.appendChild(m);
+      el.onclick = () => { startI.value = fmt(c.s); endI.value = fmt(c.e); updateSel(); candsEl.querySelectorAll('.cand').forEach(x => x.classList.remove('on')); el.classList.add('on'); $('seam').click(); };
+      candsEl.appendChild(el);
+    }
+    $('candstatus').textContent = chosen.length ? `${chosen.length} candidate loops of ${L} frames (±): lowest score first; tap one to use it.` : 'No candidates.';
+    for (const [idx, c] of chosen.entries()) {
+      if (run !== candRun) return;
+      const el = candsEl.children[idx]; if (!el) break;
+      const [ce, , cs] = el.querySelector('.pair').children;
+      try { await frameAt(c.e - frame() / 2); draw(ce, 96, 54); await frameAt(c.s + frame() / 2); draw(cs, 96, 54); } catch (err) { /* thumbnails are optional */ }
+    }
+  }
+
+  $('find').onclick = async () => {
+    if (!duration) return;
+    $('find').disabled = true;
+    try {
+      const f = await captureFeatures();
+      const Lmin = Math.max(2, Math.round(0.3 / f.step)), Lmax = Math.max(Lmin + 1, Math.min(Math.floor((f.n - 4) / 2), Math.round(20 / f.step)));
+      findstatus.textContent = 'Rhythm…';
+      const res = await runWorker({ type: 'curve', data: f.data, n: f.n, dim: FD, Lmin, Lmax });
+      curve = res.curve; curveL = { min: Lmin, max: Lmax }; minima = findMinima();
+      $('curve').hidden = false; drawCurve(null);
+      const per = $('periods'); per.innerHTML = '';
+      minima.slice(0, 3).forEach((L, i) => {
+        const b = document.createElement('button'); b.className = 'b small'; b.dataset.l = L;
+        b.textContent = `${i === 0 ? 'period ' : ''}${(L * f.step).toFixed(3)} s (${L} fr) · ${curve[L].toFixed(1)}`;
+        b.onclick = () => chooseL(L); per.appendChild(b);
+      });
+      findstatus.textContent = minima.length ? `Top periods: ${minima.slice(0, 3).map(L => (L * f.step).toFixed(3) + ' s').join(', ')}. Tap one, or a dot on the curve.` : 'No clear period found; the curve is still yours to tap.';
+      if (minima.length) chooseL(minima[0]);
+    } catch (err) { findstatus.textContent = 'Find loops failed: ' + (err && err.message || err); }
+    $('find').disabled = false;
+  };
+
+  // ------------------------------------------------------------ renderer: segments → canvas → MediaRecorder
+  const rv = document.createElement('video'); rv.muted = true; rv.playsInline = true; rv.preload = 'auto';
+  function pickMime() { return ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'].find(m => MediaRecorder.isTypeSupported(m)) || ''; }
+  async function loadInto(el, src) {
+    if (el.src !== src) { el.src = src; el.load(); }
+    if (el.readyState < 1) await new Promise((res, rej) => {
+      const off = () => { el.removeEventListener('loadedmetadata', ok); el.removeEventListener('error', bad); };
+      const ok = () => { off(); res(); }, bad = () => { off(); rej(new Error('a clip could not be loaded; re-pick its file')); };
+      el.addEventListener('loadedmetadata', ok); el.addEventListener('error', bad); if (el.error) bad();
+    });
+    if (!isFinite(el.duration)) { await seekTo(el, 1e101); await seekTo(el, 0); }
+  }
+  // segments: [{src, in, out, repeats, speed, xfade, fps}]; onProgress(fraction, text)
+  async function renderSegments(segments, onProgress) {
+    if (!('MediaRecorder' in window)) throw new Error('This browser cannot record video (no MediaRecorder). Use the ffmpeg line on a computer.');
+    await loadInto(rv, segments[0].src);
+    const cw = rv.videoWidth || 640, ch = rv.videoHeight || 360;
+    const canvas = document.createElement('canvas'); canvas.width = cw; canvas.height = ch;
     const ctx = canvas.getContext('2d');
+    const fps = segments[0].fps || 30;
     const stream = canvas.captureStream(fps);
-    const mime = ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'].find(m => MediaRecorder.isTypeSupported(m)) || '';
+    const mime = pickMime();
     const rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 8e6 } : { videoBitsPerSecond: 8e6 });
     const chunks = []; rec.ondataavailable = ev => { if (ev.data.size) chunks.push(ev.data); };
-    const done = new Promise(res => rec.onstop = res);
-    let played = 0, total = reps * (e - s);
-    $('export').disabled = true; setStatus(`Recording ${reps}× ${fmt(e - s)} s as ${mime || 'default'}…`);
-    v.muted = true; v.currentTime = s; await new Promise(r => v.addEventListener('seeked', r, { once: true }));
+    const stopped = new Promise(res => rec.onstop = res);
+    const totalSecs = segments.reduce((a, s) => a + s.repeats * (s.out - s.in) / (s.speed || 1), 0);
+    let doneSecs = 0;
+    const fit = (el) => { // letterbox into the canvas
+      const vw = el.videoWidth || cw, vh = el.videoHeight || ch; const sc = Math.min(cw / vw, ch / vh); const dw = vw * sc, dh = vh * sc;
+      return [(cw - dw) / 2, (ch - dh) / 2, dw, dh];
+    };
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, cw, ch);
     rec.start(200);
-    await v.play();
-    let rep = 0;
-    await new Promise(resolve => {
-      const tick = () => {
-        ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
-        const t = v.currentTime;
-        if (t >= e - frame() / 2) { rep++; played = rep * (e - s); if (rep >= reps) { v.pause(); resolve(); return; } v.currentTime = s; }
-        setStatus(`Recording… ${Math.min(100, Math.round(played / total * 100))}%`);
-        if (hasRVFC) v.requestVideoFrameCallback(tick); else requestAnimationFrame(tick);
-      };
-      if (hasRVFC) v.requestVideoFrameCallback(tick); else requestAnimationFrame(tick);
-    });
-    rec.stop(); await done;
-    const blob = new Blob(chunks, { type: rec.mimeType || mime || 'video/webm' });
+    try {
+      for (const seg of segments) {
+        await loadInto(rv, seg.src);
+        const f = 1 / (seg.fps || fps); const k = clamp(seg.xfade | 0, 0, 15);
+        // crossfade: keep the first k loop frames (seeking to frame centres) to blend over the last k with a linear ramp;
+        // they are held at up to 960 px so fifteen of them stay small enough for a phone (a dissolve hides the softness)
+        const firsts = []; const fs = Math.min(1, 960 / Math.max(cw, ch)); const fw = Math.round(cw * fs), fh = Math.round(ch * fs);
+        for (let j = 0; j < k; j++) {
+          await frameAt(seg.in + (j + 0.5) * f, rv, seg.src);
+          const c = document.createElement('canvas'); c.width = fw; c.height = fh; const cx = c.getContext('2d');
+          cx.fillStyle = '#000'; cx.fillRect(0, 0, fw, fh); cx.drawImage(rv, ...fit(rv).map(x => x * fs)); firsts.push(c);
+        }
+        const box = fit(rv); const fadeFrom = seg.out - k * f;
+        for (let rep = 0; rep < seg.repeats; rep++) {
+          rv.playbackRate = clamp(seg.speed || 1, 0.25, 4);
+          await frameAt(seg.in, rv, seg.src);
+          await rv.play();
+          const segStart = doneSecs;
+          await new Promise(resolve => {
+            let finished = false;
+            const fin = () => { if (finished) return; finished = true; rv.pause(); rv.removeEventListener('ended', fin); resolve(); };
+            rv.addEventListener('ended', fin);
+            const tick = (now, md) => {
+              if (finished) return;
+              const t = md ? md.mediaTime : rv.currentTime;
+              ctx.fillStyle = '#000'; ctx.fillRect(0, 0, cw, ch); ctx.drawImage(rv, ...box);
+              if (k > 0) { const idx = Math.floor((t - fadeFrom) / f + 0.5); if (idx >= 0 && idx < k) { ctx.globalAlpha = (idx + 1) / (k + 1); ctx.drawImage(firsts[idx], 0, 0, cw, ch); ctx.globalAlpha = 1; } }
+              doneSecs = segStart + Math.max(0, t - seg.in) / (seg.speed || 1);
+              onProgress && onProgress(Math.min(1, doneSecs / totalSecs), `Recording… ${Math.round(Math.min(1, doneSecs / totalSecs) * 100)}%`);
+              if (t >= seg.out - f / 2 || rv.ended) { fin(); return; }
+              if (hasRVFC) rv.requestVideoFrameCallback(tick); else requestAnimationFrame(() => tick(0, null));
+            };
+            if (hasRVFC) rv.requestVideoFrameCallback(tick); else requestAnimationFrame(() => tick(0, null));
+          });
+          doneSecs = segStart + (seg.out - seg.in) / (seg.speed || 1);
+        }
+      }
+    } finally { rv.pause(); rv.playbackRate = 1; }
+    // one last frame so the recorder flushes, then stop
+    await new Promise(r => setTimeout(r, 120));
+    rec.stop(); await stopped;
+    const type = rec.mimeType || mime || 'video/webm';
+    return { blob: new Blob(chunks, { type }), ext: type.includes('mp4') ? 'mp4' : 'webm', seconds: totalSecs };
+  }
+  function offerFile(blob, name, outEl, shareBtn) {
     if (blobUrl) URL.revokeObjectURL(blobUrl); blobUrl = URL.createObjectURL(blob);
-    const ext = (rec.mimeType || mime).includes('mp4') ? 'mp4' : 'webm';
-    const out = $('out'); out.src = blobUrl; out.hidden = false; out.loop = true;
-    const a = document.createElement('a'); a.href = blobUrl; a.download = `loop-${fmt(s)}-${fmt(e)}.${ext}`; document.body.appendChild(a); a.click(); a.remove();
-    const file = new File([blob], a.download, { type: blob.type });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      $('share').hidden = false; $('share').onclick = () => navigator.share({ files: [file], title: 'loop' }).catch(() => {});
-    }
-    setStatus(`Done: ${blob.size > 1e6 ? (blob.size / 1e6).toFixed(1) + ' MB' : Math.round(blob.size / 1e3) + ' KB'} ${ext}. If the download did not appear, use Share… or long-press the preview below.`);
+    outEl.src = blobUrl; outEl.hidden = false; outEl.loop = true;
+    const a = document.createElement('a'); a.href = blobUrl; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    const file = new File([blob], name, { type: blob.type });
+    if (shareBtn && navigator.canShare && navigator.canShare({ files: [file] })) { shareBtn.hidden = false; shareBtn.onclick = () => navigator.share({ files: [file], title: 'loop' }).catch(() => {}); }
+    return `${blob.size > 1e6 ? (blob.size / 1e6).toFixed(1) + ' MB' : Math.round(blob.size / 1e3) + ' KB'}`;
+  }
+
+  $('export').onclick = async () => {
+    const s = start(), e = end(), reps = clamp(parseInt($('repeats').value) || 1, 1, 50), k = clamp(parseInt($('xfade').value) || 0, 0, 15);
+    if (e <= s + frame()) { setStatus('End must be after start.', true); return; }
+    looping = false; v.pause(); $('loop').textContent = '▶ Preview loop';
+    $('export').disabled = true; setStatus(`Recording ${reps}× ${fmt(e - s)} s${k ? ` with a ${k}-frame crossfade` : ''}…`);
+    try {
+      const r = await renderSegments([{ src: v.src, in: s, out: e, repeats: reps, speed: 1, xfade: k, fps: fpsVal() }], (p, txt) => setStatus(txt));
+      const size = offerFile(r.blob, `loop-${fmt(s)}-${fmt(e)}.${r.ext}`, $('out'), $('share'));
+      setStatus(`Done: ${size} ${r.ext}, ${fmt(r.seconds)} s. If the download did not appear, use Share… or long-press the preview below.`);
+    } catch (err) { setStatus('Export failed: ' + (err && err.message || err), true); }
     $('export').disabled = false;
   };
+
+  // ------------------------------------------------------------ sequence editor (god's smallest VSE)
+  const clips = []; // {id, name, size, in, out, repeats, speed, xfade, fps, file, src}
+  const seqEl = $('seq'), clipsEl = $('clips');
+  function saveProject() {
+    try { localStorage.setItem('h-loop-project', JSON.stringify(clips.map(c => ({ id: c.id, name: c.name, size: c.size, in: c.in, out: c.out, repeats: c.repeats, speed: c.speed, xfade: c.xfade, fps: c.fps })))); } catch (err) { /* storage may be unavailable */ }
+  }
+  function loadProject() {
+    try { const raw = localStorage.getItem('h-loop-project'); if (!raw) return; JSON.parse(raw).forEach(c => clips.push({ ...c, file: null, src: null })); } catch (err) { /* ignore */ }
+  }
+  function totalSeconds() { return clips.reduce((a, c) => a + c.repeats * Math.max(0, c.out - c.in) / (c.speed || 1), 0); }
+  // each clip owns its object URL: the picker's own URL is revoked whenever another file is chosen
+  function attachFile(c, f) { c.file = f; if (c.src) URL.revokeObjectURL(c.src); c.src = URL.createObjectURL(f); c.name = f.name; c.size = f.size; }
+  function dropClip(c) { if (c.src) URL.revokeObjectURL(c.src); c.src = null; c.file = null; }
+  function renderClips() {
+    clipsEl.innerHTML = ''; seqEl.hidden = clips.length === 0;
+    clips.forEach((c, idx) => {
+      const el = document.createElement('div'); el.className = 'clip';
+      const left = document.createElement('div');
+      const name = document.createElement('div'); name.className = 'name' + (c.src ? '' : ' missing');
+      name.textContent = `${idx + 1}. ${c.name}` + (c.src ? '' : ' — file missing');
+      left.appendChild(name);
+      if (!c.src) {
+        const rp = document.createElement('label'); rp.className = 'repick'; rp.textContent = 'Re-pick this file';
+        const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'video/*';
+        inp.onchange = () => { if (inp.files[0]) { attachFile(c, inp.files[0]); saveProject(); renderClips(); } };
+        rp.appendChild(inp); left.appendChild(rp);
+      }
+      const fields = document.createElement('div'); fields.className = 'fields';
+      const num = (key, label, step, min, max) => {
+        const l = document.createElement('label'); l.textContent = label;
+        const i = document.createElement('input'); i.type = 'number'; i.step = step; i.min = min; if (max) i.max = max; i.value = c[key]; i.inputMode = 'decimal';
+        i.oninput = () => { c[key] = parseFloat(i.value) || 0; if (key === 'repeats') c.repeats = clamp(Math.round(c.repeats) || 1, 1, 50); if (key === 'speed') c.speed = clamp(c.speed || 1, 0.25, 4); if (key === 'xfade') c.xfade = clamp(Math.round(c.xfade) || 0, 0, 15); saveProject(); $('seqtotal').textContent = `· ${fmt(totalSeconds())} s`; };
+        l.appendChild(i); return l;
+      };
+      fields.append(num('in', 'in (s)', '0.001', 0), num('out', 'out (s)', '0.001', 0), num('repeats', 'repeats', '1', 1, 50), num('speed', 'speed', '0.25', 0.25, 4), num('xfade', 'crossfade fr', '1', 0, 15));
+      left.appendChild(fields); el.appendChild(left);
+      const ops = document.createElement('div'); ops.className = 'ops';
+      const op = (txt, fn, title) => { const b = document.createElement('button'); b.className = 'b small'; b.textContent = txt; b.title = title || ''; b.onclick = fn; ops.appendChild(b); };
+      op('↑', () => { if (idx > 0) { [clips[idx - 1], clips[idx]] = [clips[idx], clips[idx - 1]]; saveProject(); renderClips(); } }, 'move up');
+      op('↓', () => { if (idx < clips.length - 1) { [clips[idx + 1], clips[idx]] = [clips[idx], clips[idx + 1]]; saveProject(); renderClips(); } }, 'move down');
+      op('⧉', () => { const d = { ...c, id: Date.now() + Math.random(), src: null }; if (c.file) attachFile(d, c.file); clips.splice(idx + 1, 0, d); saveProject(); renderClips(); }, 'duplicate');
+      op('✕', () => { dropClip(c); clips.splice(idx, 1); saveProject(); renderClips(); }, 'remove');
+      el.appendChild(ops); clipsEl.appendChild(el);
+    });
+    $('seqtotal').textContent = clips.length ? `· ${fmt(totalSeconds())} s` : '';
+  }
+  $('addclip').onclick = () => {
+    if (!currentFile) return;
+    const c = { id: Date.now() + Math.random(), name: currentFile.name, size: currentFile.size, in: start(), out: end(), repeats: clamp(parseInt($('repeats').value) || 1, 1, 50), speed: 1, xfade: clamp(parseInt($('xfade').value) || 0, 0, 15), fps: fpsVal(), file: null, src: null };
+    attachFile(c, currentFile);
+    clips.push(c); saveProject(); renderClips(); seqEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+  $('clearseq').onclick = () => { clips.forEach(dropClip); clips.length = 0; saveProject(); renderClips(); };
+  $('exportseq').onclick = async () => {
+    const missing = clips.filter(c => !c.src);
+    if (!clips.length) return;
+    if (missing.length) { $('seqstatus').textContent = `Re-pick ${missing.length} missing file(s) first.`; $('seqstatus').className = 'status warn'; return; }
+    $('exportseq').disabled = true; $('seqstatus').className = 'status'; $('seqstatus').textContent = 'Recording sequence…';
+    looping = false; v.pause(); $('loop').textContent = '▶ Preview loop';
+    try {
+      const segs = clips.map(c => ({ src: c.src, in: c.in, out: c.out, repeats: c.repeats, speed: c.speed, xfade: c.xfade, fps: c.fps || fpsVal() }));
+      const r = await renderSegments(segs, (p, txt) => { $('seqstatus').textContent = txt; });
+      const size = offerFile(r.blob, `sequence-${clips.length}clips.${r.ext}`, $('seqout'), null);
+      $('seqstatus').textContent = `Done: ${size} ${r.ext}, ${fmt(r.seconds)} s.`;
+    } catch (err) { $('seqstatus').textContent = 'Sequence export failed: ' + (err && err.message || err); $('seqstatus').className = 'status warn'; }
+    $('exportseq').disabled = false;
+  };
+  // when a file is picked, attach it to any clip that remembers the same name and size
+  $('file').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; let hit = false; clips.forEach(c => { if (!c.src && c.name === f.name && c.size === f.size) { attachFile(c, f); hit = true; } }); if (hit) { saveProject(); renderClips(); } });
+  loadProject(); renderClips();
+  // read-only view of the analysis for tests and curious consoles
+  window.hloop = { get features() { return features; }, get curve() { return curve; }, get minima() { return minima; }, get chosenL() { return chosenL; }, get clips() { return clips; } };
 })();
 </script>
 </body>
