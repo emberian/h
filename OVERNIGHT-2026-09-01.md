@@ -460,3 +460,6 @@ New main line, h first:
 - 03:33: corpus-v1.3-room built (417,906,970 tokens; 137,078 room docs, 10.4%; 13,962 scene copies) and uploading as
   a new private dataset; room05b-e2-v3 generated (branch from e1 pre-cooldown, same as e2, dataset v1.3) and
   queued behind e2 (queue10).
+- 03:36: corpus-v1.3-room is on Kaggle (private, ready). Writer 02 rewrote its part in place to 248 whole-sentence
+  scenes; writers 00 and 01 redoing 49 and 201 fragments. If the redos land before e2 finishes (~04:45), v1.3
+  gets a version 2 and e2-v3 (queued behind e2) picks it up at push time.
