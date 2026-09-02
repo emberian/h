@@ -252,6 +252,34 @@ def put_replicated(tree):
     return jax.device_put(tree, REPLICATED)
 
 
+# "replicated": every chip holds FP32 masters + AdamW state; "fsdp": each parameter and its optimizer
+# moments are sharded along the largest axis divisible by the chip count (XLA gathers weights as used).
+PARAM_SHARDING = os.environ.get("HGHOST_PARAM_SHARDING", "fsdp")
+
+
+def sharding_for(array) -> NamedSharding:
+    shape = getattr(array, "shape", ())
+    n = mesh.devices.size
+    if PARAM_SHARDING != "fsdp" or not shape:
+        return REPLICATED
+    axis = max(range(len(shape)), key=lambda i: (shape[i] % n == 0, shape[i]))
+    if shape[axis] % n != 0:
+        return REPLICATED
+    spec = [None] * len(shape)
+    spec[axis] = "data"
+    return NamedSharding(mesh, P(*spec))
+
+
+def tree_shardings(tree):
+    return jax.tree_util.tree_map(sharding_for, tree) if PARAM_SHARDING == "fsdp" else REPLICATED
+
+
+def put_params(tree):
+    if PARAM_SHARDING == "fsdp":
+        return jax.tree_util.tree_map(lambda a, sh: jax.device_put(a, sh), tree, tree_shardings(tree))
+    return jax.device_put(tree, REPLICATED)
+
+
 def put_sharded(array):
     return jax.device_put(array, SHARDED)
 
@@ -273,7 +301,7 @@ def make_optimizer(learning_rate: float):
     )
 
 
-def make_train_step(optimizer, remat: bool):
+def make_train_step(optimizer, remat: bool, param_shardings, opt_shardings):
     def loss_fn(params, tokens):
         return causal_lm_loss(
             params,
@@ -294,8 +322,8 @@ def make_train_step(optimizer, remat: bool):
 
     return jax.jit(
         step,
-        in_shardings=(REPLICATED, REPLICATED, SHARDED),
-        out_shardings=(REPLICATED, REPLICATED, REPLICATED),
+        in_shardings=(param_shardings, opt_shardings, SHARDED),
+        out_shardings=(param_shardings, opt_shardings, REPLICATED),
         donate_argnums=(0, 1),
     )
 
@@ -313,7 +341,7 @@ def eval_loss_fn(params, tokens):
 
 
 eval_step = jax.jit(
-    eval_loss_fn, in_shardings=(REPLICATED, SHARDED), out_shardings=REPLICATED
+    eval_loss_fn, in_shardings=(tree_shardings(host_params), SHARDED), out_shardings=REPLICATED
 )
 
 # ----------------------------------------------------------------------------- data
@@ -401,7 +429,7 @@ report: dict[str, Any] = {
     "components": {},
 }
 
-params = put_replicated(host_params)
+params = put_params(host_params)
 eval_rows = host_batch(validation_stream, 0, EVAL_SEQUENCES, EVAL_SEQUENCE_LENGTH)
 eval_started = time.perf_counter()
 eval_metrics = jax.device_get(eval_step(params, put_sharded(eval_rows)))
@@ -457,9 +485,12 @@ for spec in shape_specs:
         "shape_start",
         **{k: v for k, v in result.items() if k != "analytic_flops_per_token"},
     )
-    params = put_replicated(host_params)
-    opt_state = put_replicated(throughput_optimizer.init(host_params))
-    train_step = make_train_step(throughput_optimizer, remat)
+    params = put_params(host_params)
+    host_opt = throughput_optimizer.init(host_params)
+    opt_state = put_params(host_opt)
+    train_step = make_train_step(
+        throughput_optimizer, remat, tree_shardings(host_params), tree_shardings(host_opt)
+    )
     try:
         first = put_sharded(
             host_batch(train_stream, data_offset, global_batch, seq_len)
@@ -751,9 +782,12 @@ if best_shape is not None and SANITY_STEPS > 0:
     )
     global_batch = per_chip * DEVICE_COUNT
     sanity_optimizer = make_optimizer(SANITY_LR)
-    sanity_step = make_train_step(sanity_optimizer, remat)
-    params = put_replicated(host_params)
-    opt_state = put_replicated(sanity_optimizer.init(host_params))
+    host_opt = sanity_optimizer.init(host_params)
+    sanity_step = make_train_step(
+        sanity_optimizer, remat, tree_shardings(host_params), tree_shardings(host_opt)
+    )
+    params = put_params(host_params)
+    opt_state = put_params(host_opt)
     losses = []
     grad_norms = []
     started = time.perf_counter()

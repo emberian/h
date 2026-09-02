@@ -131,6 +131,10 @@ ROLE_WEIGHTS = [
 ]
 WEIGHTS_FILE = os.environ.get("HGHOST_CPT_WEIGHTS_FILE", "train-weights.bin")
 EXTRA_WEIGHTS_FILE = os.environ.get("HGHOST_CPT_EXTRA_WEIGHTS_FILE", "room-validation-weights.bin")
+# Parameter placement: "replicated" (every chip holds FP32 masters + AdamW state) or "fsdp" (each parameter
+# and its optimizer moments are sharded along the largest axis divisible by the chip count; XLA gathers
+# weights as they are used). fsdp is required for models whose replicated state exceeds a chip's HBM.
+PARAM_SHARDING = os.environ.get("HGHOST_CPT_PARAM_SHARDING", "replicated")
 HBOX_BASE_EVAL = {"loss": 3.745613, "accuracy": 0.349426}
 ROLLOUT_STEPS = int(
     os.environ.get("HGHOST_CPT_ROLLOUT_STEPS", "64")
@@ -311,6 +315,7 @@ resume_settings = {
     "simreg_weight": SIMREG_WEIGHT,
     "extra_validation": EXTRA_VALIDATION,
     "role_weights": ROLE_WEIGHTS,
+    "param_sharding": PARAM_SHARDING,
     "simreg_temperature": SIMREG_TEMPERATURE,
     "ssd_implementation": os.environ.get("H1JAX_SSD", "v1"),
     "remat_policy": os.environ.get("H1JAX_REMAT_POLICY", ""),
@@ -443,8 +448,37 @@ if resume_dir is not None:
         host_opt_state, (resume_dir / "optimizer.msgpack").read_bytes()
     )
 
-params = jax.device_put(host_params, REPLICATED)
-opt_state = jax.device_put(host_opt_state, REPLICATED)
+
+
+def fsdp_sharding(array) -> NamedSharding:
+    """Shard the largest axis divisible by the chip count; scalars and awkward shapes stay replicated."""
+    shape = getattr(array, "shape", ())
+    n = mesh.devices.size
+    if not shape:
+        return REPLICATED
+    axis = max(range(len(shape)), key=lambda i: (shape[i] % n == 0, shape[i]))
+    if shape[axis] % n != 0:
+        return REPLICATED
+    spec = [None] * len(shape)
+    spec[axis] = "data"
+    return NamedSharding(mesh, P(*spec))
+
+
+if PARAM_SHARDING == "fsdp":
+    PARAM_SHARDINGS = jax.tree_util.tree_map(fsdp_sharding, host_params)
+    OPT_SHARDINGS = jax.tree_util.tree_map(fsdp_sharding, host_opt_state)
+    params = jax.tree_util.tree_map(lambda a, sh: jax.device_put(a, sh), host_params, PARAM_SHARDINGS)
+    opt_state = jax.tree_util.tree_map(lambda a, sh: jax.device_put(a, sh), host_opt_state, OPT_SHARDINGS)
+    emit("param_sharding", mode="fsdp",
+         sharded_parameters=sum(1 for sh in jax.tree_util.tree_leaves(PARAM_SHARDINGS) if sh.spec != P()),
+         replicated_parameters=sum(1 for sh in jax.tree_util.tree_leaves(PARAM_SHARDINGS) if sh.spec == P()))
+elif PARAM_SHARDING == "replicated":
+    PARAM_SHARDINGS = REPLICATED
+    OPT_SHARDINGS = REPLICATED
+    params = jax.device_put(host_params, REPLICATED)
+    opt_state = jax.device_put(host_opt_state, REPLICATED)
+else:
+    raise ValueError(f"unknown HGHOST_CPT_PARAM_SHARDING {PARAM_SHARDING!r}")
 del host_params, host_opt_state
 
 
@@ -608,15 +642,15 @@ def _train_step_weighted(p, s, tokens, classes, step):
 if ROLE_WEIGHTS:
     train_step = jax.jit(
         _train_step_weighted,
-        in_shardings=(REPLICATED, REPLICATED, SHARDED, SHARDED, REPLICATED),
-        out_shardings=(REPLICATED, REPLICATED, REPLICATED),
+        in_shardings=(PARAM_SHARDINGS, OPT_SHARDINGS, SHARDED, SHARDED, REPLICATED),
+        out_shardings=(PARAM_SHARDINGS, OPT_SHARDINGS, REPLICATED),
         donate_argnums=(0, 1),
     )
 else:
     train_step = jax.jit(
         _train_step,
-        in_shardings=(REPLICATED, REPLICATED, SHARDED, REPLICATED),
-        out_shardings=(REPLICATED, REPLICATED, REPLICATED),
+        in_shardings=(PARAM_SHARDINGS, OPT_SHARDINGS, SHARDED, REPLICATED),
+        out_shardings=(PARAM_SHARDINGS, OPT_SHARDINGS, REPLICATED),
         donate_argnums=(0, 1),
     )
 
@@ -641,11 +675,11 @@ def _eval_positions(p, tokens):
     return jax.nn.logsumexp(logits, axis=-1) - jnp.take_along_axis(logits, labels[..., None], axis=-1)[..., 0]
 
 
-eval_positions = jax.jit(_eval_positions, in_shardings=(REPLICATED, SHARDED), out_shardings=SHARDED)
+eval_positions = jax.jit(_eval_positions, in_shardings=(PARAM_SHARDINGS, SHARDED), out_shardings=SHARDED)
 
 
 eval_step = jax.jit(
-    _eval_step, in_shardings=(REPLICATED, SHARDED), out_shardings=REPLICATED
+    _eval_step, in_shardings=(PARAM_SHARDINGS, SHARDED), out_shardings=REPLICATED
 )
 
 
@@ -664,7 +698,7 @@ def _rollout_logits(p, tokens):
 
 
 rollout_logits = jax.jit(
-    _rollout_logits, in_shardings=(REPLICATED, SHARDED), out_shardings=SHARDED
+    _rollout_logits, in_shardings=(PARAM_SHARDINGS, SHARDED), out_shardings=SHARDED
 )
 
 

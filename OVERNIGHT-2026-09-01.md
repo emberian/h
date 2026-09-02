@@ -542,3 +542,7 @@ New main line, h first:
   re-tokenized for the 65,536 vocab (369.1M tokens), room mix + sidecars rebuilt (412.3M tokens, 10.5% rooms), gate
   kernel copied and CPU-rehearsed. Blocker: replicated FP32 params + AdamW = 18.66 GB per chip > 16 GiB HBM; the
   kernel needs sharded parameters/optimizer state (FSDP-style NamedSharding) before any 1.5B run. Next kernel task.
+- 15:24: FSDP parameter/optimizer sharding added to the CPT kernel (HGHOST_CPT_PARAM_SHARDING=fsdp; default replicated,
+  unchanged) and to the 1.5B gate (default fsdp). CPU rehearsal on 8 simulated devices: fsdp vs replicated losses agree
+  to ~3e-3 per step (5.311 vs 5.309; final val 4.856 vs 4.858), checkpoints save. 1.5B gate rehearsal running; the two
+  1.5B datasets uploading.
