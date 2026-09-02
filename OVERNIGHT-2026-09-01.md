@@ -448,3 +448,6 @@ New main line, h first:
   the frame lines get quoted back.
 - 02:59: first words of the 0.5B in the room ("hi h, are you the new one?"): "The New One is not so sure at first."
   Pushed room05b-e2: a second epoch of the mix branched from the pre-cooldown checkpoint, cooled; queue9 waits.
+- 03:03: activation policy unchanged: h replies only when named (reply_on_name, no random replies). Random
+  participation is a later lever. Scene set B (856 passages, 40% greeting / 40% deflect) being written by
+  three agents, single-writer each; room05b-e2 queued on the TPU.

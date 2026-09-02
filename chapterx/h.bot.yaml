@@ -41,7 +41,8 @@ max_queued_replies: 1
 
 # No turn-end marker: <|end_of_text|> is the document separator in training, so placing it after every
 # turn makes the model start an unrelated document; <|eot|> is a string it never saw and copies. Plain
-# newlines are the turn boundary and the first newline stops a reply.
+# newlines are the turn boundary; the reply stops at the blank line ("\n\n", the training separator; a bare "\n"
+# stop makes mlx_lm.server strip newlines and keep generating).
 turn_end_token: ""
 
 # The frame: a document in the corpus's register, with example turns in the live format and h's
