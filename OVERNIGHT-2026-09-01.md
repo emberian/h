@@ -557,3 +557,7 @@ New main line, h first:
   silence 67, repair 200, bridge 220; modes cite 1,751 / compose 479 / bridge 220). Renderer: stitching shuffles scenes,
   keeps pair halves in different rooms, drops the checker-only h turn of silence scenes, and asserts verbatim only for
   cite turns. Building corpus-v1.4-room (A x6 + B x8 + C x8, stitched 4/4/3) with role sidecars.
+- 15:28: TPU pipeline chained: weighting arms (3 x 66 min, running) -> 1.5B-deep FSDP gate (~20 min; queue13 waits on the
+  last arm, gated on the CPU rehearsal and the dataset uploads) -> room05b-e2-v4 (second epoch on corpus-v1.4-room,
+  matched to e2-v3; queue14 waits on the gate). After that about 4 TPU hours remain for the week. corpus-v1.4-room is
+  building (A x6 + B x8 + C x8, stitched).
