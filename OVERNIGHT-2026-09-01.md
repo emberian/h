@@ -498,3 +498,6 @@ New main line, h first:
 - 06:15: quota after e2-v3 and with e3 running: TPU 10.08 h used / 9.92 left; GPU 9.17 h used / 20.83 left (refresh
   2026-09-05 00:00). e3 will bring TPU use to ~11.2 h; no further TPU runs planned before ember wakes.
 - 07:08: GPU eval v4 (e2) complete and consistent with hbox/TPU; v5 pushed over e2-v3 (kernel idle, no clobbering).
+- 07:21: e3 COMPLETE (66 min): cooled library 2.848 (e2-v3 2.852), room 2.576 (2.581), fixed-32 3.019 (3.011); train loss
+  2.35 (2.48): the train/val gap widens from 0.37 to 0.50. The multi-epoch curve flattens at epoch 3 and memorization
+  begins; two epochs is the recipe. e3 is evaluated (harvest/hbox/judge/read armed) but not switched into Discord.
