@@ -23,4 +23,6 @@ spend in bounded, reported increments; never launch a run whose worst case excee
 
 | 2026-09-01 19:03 | h-ghost-h1jax-tpu-profile-gate | v1 | 11 | TPU acquired; base eval parity 3.7456 = hbox; host `Killed` compiling the unrolled 24-layer train step |
 | 2026-09-01 19:25 | h-ghost-h1jax-tpu-profile-gate | v2 | 18 | **PASS**: 64x512 remat 219,722 tok/s, 9.5% MFU, 28 min/pass; no-remat shapes OOM (24-49 GB HBM); base eval 3.7458; 10.5M-token sanity loss 3.75→3.41 |
-| 2026-09-01 19:39 | h-ghost-h1jax-cpt-91m | v1 | (running) | WSD trunk, LR 1e-4, 64x512 remat, 4 epochs (1.498B tokens), saves at 10M/30M/100M/200M/1e/2e/3e/4e |
+
+| 2026-09-01 21:42 | h-ghost-h1jax-leaf-e1-decay10 | v1 | 3 | ERROR: branch glob named the checkpoint by requested tokens, not batch-aligned tokens (fixed) |
+| 2026-09-01 19:39 | h-ghost-h1jax-cpt-91m | v1 | 122 | **COMPLETE** 21:41: 4-epoch WSD trunk, 8 checkpoints (analysis pending) |

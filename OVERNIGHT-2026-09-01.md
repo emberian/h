@@ -213,3 +213,37 @@ Evaluate everything with `hghost-evalpack` (subagent building it) plus the haunt
   Transformers 5); fixed at the source (integer 2, matching the official config); the pack repairs old
   checkpoints on load. Tonight's TPU checkpoints carry the old value and are repaired the same way.
 - Committed 527e557. Morning command: add one `--checkpoint NAME=DIR` per TPU checkpoint, `--parallel 4`.
+
+## 21:46 — trunk complete; leaves queued
+
+- `h-ghost-h1jax-cpt-91m` completed at 21:41 after ~122 TPU minutes: the 4-epoch WSD trunk with eight
+  checkpoints (10M, 30M, 100M, 200M, epochs 1-4), downloading to the session scratchpad (linked at
+  `artifacts/checkpoints/trunk-wsd-lr1e-4-seed0`). Loss curve pending the log download.
+- The first leaf push failed in 3 minutes on my naming bug (checkpoints are named by batch-aligned
+  tokens, e.g. `tokens-000374603776` for the epoch-1 save); regenerated both leaves and restarted the
+  queue: leaf-e1 → leaf-e4 → SSD bench.
+
+## 21:58 — trunk curve and the first leaf
+
+- Trunk (`research/results/tpu-h1jax-trunk/trunk-wsd-lr1e-4-seed0-loss.png`): validation 3.787 → 3.280
+  (epoch 1) → 3.220 → 3.188 → 3.163 (epoch 4), accuracy 31.5% → 40.2%, still falling with the LR flat;
+  train/validation gap grows 0.15 → 0.27 across the repeats (memorization signal); 219K tok/s throughout.
+- Leaf e1 (cool from epoch 1 over 37.4M tokens): validation 3.280 → 3.234, i.e. a 10%-of-an-epoch decay is
+  worth about an extra epoch. 8 TPU minutes. Checkpoint linked at `artifacts/checkpoints/leaf-e1-decay10`.
+- Downloaded checkpoints' `mamba_expand` repaired to the integer form locally.
+
+## 22:02 — disk nearly full (not ours, but ours added to it)
+
+- The Mac's data volume was at 26 GB free of 7.3 TB. Freed ~22 GB of my own scratch (CPU-rehearsal
+  checkpoints, redundant Kaggle downloads after copying them to `artifacts/checkpoints/tpu/`, fp32/q4 base
+  ONNX). Now ~50 GB free. Durable checkpoint copies: `artifacts/checkpoints/tpu/` (9.3 GB). ember: the rest
+  of the 7.2 TB is other work; anything heavy tonight (more checkpoints, exports) needs headroom.
+
+## 22:08 — both leaves cooled; the site now loads h
+
+- Leaf e4 (cool from epoch 4 over 37.4M tokens): validation 3.163 → **3.136**, fixed slice 3.215 → 3.191,
+  accuracy 40.8%. Leaf e1: 3.280 → 3.234. Both checkpoints durable under `artifacts/checkpoints/tpu/`.
+- Leaf e1 exported to ONNX (8-bit KL 0.00047, greedy identical), published as
+  `emberian/h-leaf-e1-decay10-onnx`; `site/config.js` points at it, so **https://h.fg-goose.online/ now
+  murmurs with h** (epoch-1, cooled) once Pages redeploys. Leaf e4 export next.
+- SSD bench running on the TPU (v1 / v2 / v2-bf16 / v2 + selective remat).

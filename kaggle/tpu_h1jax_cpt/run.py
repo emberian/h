@@ -29,6 +29,10 @@ from typing import Any
 LOCAL = os.environ.get("HGHOST_LOCAL") == "1"
 if not LOCAL:
     os.environ.setdefault("JAX_COMPILATION_CACHE_DIR", "/kaggle/working/jax-cache")
+# SSD implementation and rematerialization policy for h1jax (read at its import).
+os.environ.setdefault("H1JAX_SSD", os.environ.get("HGHOST_CPT_SSD", "v1"))
+if os.environ.get("HGHOST_CPT_REMAT_POLICY", ""):
+    os.environ.setdefault("H1JAX_REMAT_POLICY", os.environ["HGHOST_CPT_REMAT_POLICY"])
 
 RUN_NAME = os.environ.get("HGHOST_CPT_RUN_NAME", "trunk-wsd-lr1e-4-seed0")
 OUTPUT = Path(os.environ.get("HGHOST_CPT_OUTPUT", f"/kaggle/working/{RUN_NAME}"))
@@ -237,6 +241,8 @@ resume_settings = {
     "decay_tokens": DECAY_TOKENS,
     "mir_weight": MIR_WEIGHT,
     "mir_max_ratio": MIR_MAX_RATIO,
+    "ssd_implementation": os.environ.get("H1JAX_SSD", "v1"),
+    "remat_policy": os.environ.get("H1JAX_REMAT_POLICY", ""),
 }
 
 # ----------------------------------------------------------------------------- resume discovery

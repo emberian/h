@@ -14,7 +14,7 @@ export const config = {
     // A Hugging Face Hub id (default) or, if `localPath` is set, a folder name
     // under that path. The project's own checkpoint — a Falcon-H1 causal LM
     // exported to ONNX in the same layout — drops in here.
-    id: "onnx-community/Falcon-H1-Tiny-Multilingual-100M-Instruct-ONNX",
+    id: "emberian/h-leaf-e1-decay10-onnx",
 
     // Weight file variant: "q8" → onnx/model_quantized.onnx (+ _data). Others in
     // the same layout: "fp32" (model.onnx), "q4" (model_q4), "fp16", "q4f16".

@@ -76,7 +76,7 @@ from jax.sharding import PartitionSpec as P
 PER_CHIP = int(os.environ.get("HGHOST_CPT_PER_CHIP", "64"))
 SEQ_LEN = int(os.environ.get("HGHOST_CPT_SEQ", "512"))
 REMAT = os.environ.get("HGHOST_CPT_REMAT", "1") == "1"
-TOTAL_TOKENS = int(os.environ.get("HGHOST_CPT_TOTAL_TOKENS", "411845733"))
+TOTAL_TOKENS = int(os.environ.get("HGHOST_CPT_TOTAL_TOKENS", "412044297"))
 LEARNING_RATE = float(os.environ.get("HGHOST_CPT_LR", "1e-4"))
 WARMUP_TOKENS = int(os.environ.get("HGHOST_CPT_WARMUP_TOKENS", "10000000"))
 MIN_LR_RATIO = float(os.environ.get("HGHOST_CPT_MIN_LR_RATIO", "0.1"))
@@ -102,7 +102,7 @@ DECAY_TOKENS = int(
     os.environ.get("HGHOST_CPT_DECAY_TOKENS", "37440521")
 )  # wsd: decay over the last N tokens
 BRANCH_FROM = os.environ.get(
-    "HGHOST_CPT_BRANCH_FROM", "/kaggle/input/**/trunk-wsd-lr1e-4-seed0/tokens-000374405212/trainer_state.json"
+    "HGHOST_CPT_BRANCH_FROM", "/kaggle/input/**/trunk-wsd-lr1e-4-seed0/tokens-000374603776/trainer_state.json"
 )  # trunk checkpoint dir to branch from
 REQUIRE_TPU = os.environ.get("HGHOST_REQUIRE_TPU", "0" if LOCAL else "1") == "1"
 LAYER_SCAN = os.environ.get("HGHOST_LAYER_SCAN", "1") == "1"
