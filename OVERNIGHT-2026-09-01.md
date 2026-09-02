@@ -474,3 +474,6 @@ New main line, h first:
   v3 queued behind it; e2-v3 queued behind e2 (queue10). Bot live on the 0.5B. Waiting on notifications.
 - 04:13: e2 COMPLETE (66 min): cooled library 2.858 (e1 2.893), room 2.582 (2.609), fixed-32 3.016 (3.021); the uncooled
   second epoch (751.6M) sits at 2.886/2.606, about equal to the first cooled epoch. e2-v3 pushed and running.
+- 04:28: e2 read on :8125 (72 replies): similar register to e1 ("Greetings, we are the Apostles of the Church of Psychick
+  Youth", "We are not dreaming", "She is the mother of the universe"), slightly more frame-quoting, deflection still
+  absent. Judge and quotation scan run; hbox slices in progress.
