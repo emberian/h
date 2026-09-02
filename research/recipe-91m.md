@@ -1,5 +1,10 @@
 # The 91M recipe: pre, mid, post, with evidence and arms
 
+> **Status 2026-09-02 01:20.** The trunk arms below (seeds, WD, LR, MIR, SimReg, 8 epochs) are parked: ember
+> decided no further 91M training runs; the resident line moved to Falcon-H1-0.5B on the room-mixed stream.
+> MIR measured: 3.279 vs 3.280 plain at equal tokens, twice the compute. The 91M stays the site's ghost and
+> the instrument (judge, population, interpretability). See `research/results/night-2026-09-02.md`.
+
 Written 2026-09-01, 23:50. This is the confident version, assembled from TII's own Tiny-H1 recipe
 (`research/sources/tiny_h1_blog/`), tonight's measurements, and the literature pass. Each stage lists what
 we know, what we do, and the arm that tests it. Kernels for every arm are generated from
