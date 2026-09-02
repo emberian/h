@@ -284,3 +284,9 @@ Evaluate everything with `hghost-evalpack` (subagent building it) plus the haunt
 - 22:28: Kaggle slugs kernels from the *title* on first push and ignores the metadata id; my custom
   titles with spaces produced `h-ghost-h1jax-trunk-seed-1`, so the queue polled a nonexistent slug. Fixed
   the ids/sources, made the generator derive titles from names, restarted the queue against the real slug.
+
+## 22:35 — the site murmurs with h
+
+- Headless check of https://h.fg-goose.online/ after the config fix: model `emberian/h-leaf-e1-decay10-onnx`
+  loaded on WebGPU, six files fetched, zero console errors, first fragment: `"\n159\n\n\fthe witch of the
+  south\n"` (page number, form feed, fragment). Furniture in the murmur is corpus-v2's problem.

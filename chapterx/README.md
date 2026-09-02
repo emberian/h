@@ -29,7 +29,20 @@ so it survives the shell that started it.
 See `vendors.h.yaml`. The vendor name starts with `openaicompletion-`, the base URL points at the local
 server, and `provides` routes any model name matching `h-.*` to it.
 
-## 3. Bot config
+## 3. Bot config (installed 2026-09-01 22:40)
+
+`config/bots/h.yaml` and `config/shared.yaml` (with the `openaicompletion-h` vendor) are now in
+`~/dev/chapterx`. The epoch-1 leaf is being served on port 8124 (`tmux hghost-serve`).
+
+To bring h into a Discord server:
+
+1. Create a Discord application and bot user (any username; `BOT_NAME=h` selects the config), enable the
+   Message Content intent, and invite it to the server with Send Messages and Read Message History.
+2. Put the bot token in `~/dev/chapterx/config/bots/h_discord_token`.
+3. `./chapterx/run-h-bot.sh` (tmux session `hghost-chapterx`, log `~/dev/chapterx/logs/h-bot.log`).
+4. Mention the bot in a channel; it replies on name only (`reply_on_random: 0`) with short base-model
+   continuations rendered from the channel transcript. Change the served checkpoint with `serve-h.sh`.
+
 
 `h.bot.yaml` is a starting `config/bots/h.yaml`: `mode: base-model`, tools disabled, images off, reply on
 name only, low queued-reply cap, participant-name stop sequences, short continuations. The Discord bot
