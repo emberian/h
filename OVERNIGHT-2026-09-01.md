@@ -508,3 +508,6 @@ New main line, h first:
   request -> "It is an easy function to write."), judge -0.20, longest quotation 15 tokens, but more OCR-noise artifacts
   in replies ("Greetings in the e d i t i o n of the N ig h t M a s t e r s"): the memorization the widening gap
   predicted. Discord stays on e2-v3.
+- 07:50: e3 on hbox: first-512 2.848 (better) but clean-512 2.651 (e2-v3 2.626), furniture-free clean 2.774 (2.747),
+  retention 3.163 (3.146): the third epoch memorizes; it improves only the leaky slice and degrades the clean and
+  out-of-corpus ones. e2-v3 is the right resident. Night's TPU work ends here; ~8.9 TPU h left for the week.
