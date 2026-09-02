@@ -368,3 +368,8 @@ New main line, h first:
 3. Sweep trimmed: queue4 stops after trunk-mir and plain32 (already pushed / next); seed2, wd0.3, lr3e-4,
    SimReg, 8-epoch continuation are parked as generated kernels for later weeks. SimReg stays rehearsed
    (CPU: finite, total = loss + 0.1*simreg) but its wheel is not uploaded tonight.
+- 00:20 (Sep 2): OCR tranche finished at 23:41: 46/46 documents, 0 errors, 833,561 tokens (log
+  `artifacts/paddle-ocr/logs/resume2-20260901.log`); the worker tmux session exited normally. MLX server still up.
+- 00:40: CPU rehearsal of the room kernel passed: tiny trunk (1,024 tokens), branch onto a different 3M-token
+  stream, pre-cooldown checkpoint at 2,560 and final at 3,072, validation emitted. Sweep cancelled
+  (plain32, seed2, wd0.3, lr3e-4 never pushed); trunk-mir finishing.

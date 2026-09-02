@@ -30,11 +30,11 @@ LOCAL = os.environ.get("HGHOST_LOCAL") == "1"
 if not LOCAL:
     os.environ.setdefault("JAX_COMPILATION_CACHE_DIR", "/kaggle/working/jax-cache")
 # SSD implementation and rematerialization policy for h1jax (read at its import).
-os.environ.setdefault("H1JAX_SSD", os.environ.get("HGHOST_CPT_SSD", "v1"))
+os.environ.setdefault("H1JAX_SSD", os.environ.get("HGHOST_CPT_SSD", "v2"))
 if os.environ.get("HGHOST_CPT_REMAT_POLICY", ""):
     os.environ.setdefault("H1JAX_REMAT_POLICY", os.environ["HGHOST_CPT_REMAT_POLICY"])
 
-RUN_NAME = os.environ.get("HGHOST_CPT_RUN_NAME", "trunk-wsd-lr1e-4-seed0")
+RUN_NAME = os.environ.get("HGHOST_CPT_RUN_NAME", "room-e5-decay10")
 OUTPUT = Path(os.environ.get("HGHOST_CPT_OUTPUT", f"/kaggle/working/{RUN_NAME}"))
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
@@ -80,7 +80,7 @@ from jax.sharding import PartitionSpec as P
 PER_CHIP = int(os.environ.get("HGHOST_CPT_PER_CHIP", "64"))
 SEQ_LEN = int(os.environ.get("HGHOST_CPT_SEQ", "512"))
 REMAT = os.environ.get("HGHOST_CPT_REMAT", "1") == "1"
-TOTAL_TOKENS = int(os.environ.get("HGHOST_CPT_TOTAL_TOKENS", "1497620848"))
+TOTAL_TOKENS = int(os.environ.get("HGHOST_CPT_TOTAL_TOKENS", "1912620848"))
 LEARNING_RATE = float(os.environ.get("HGHOST_CPT_LR", "1e-4"))
 WARMUP_TOKENS = int(os.environ.get("HGHOST_CPT_WARMUP_TOKENS", "10000000"))
 MIN_LR_RATIO = float(os.environ.get("HGHOST_CPT_MIN_LR_RATIO", "0.1"))
@@ -90,7 +90,7 @@ SAVE_TOKENS = [
     int(v)
     for v in os.environ.get(
         "HGHOST_CPT_SAVE_TOKENS",
-        "10000000,30000000,100000000,200000000,374405212,748810424,1123215636",
+        "1871120848",
     ).split(",")
     if v
 ]
@@ -98,15 +98,15 @@ EVAL_EVERY_TOKENS = int(os.environ.get("HGHOST_CPT_EVAL_EVERY_TOKENS", "25000000
 EVAL_SEQUENCES = int(os.environ.get("HGHOST_CPT_EVAL_SEQUENCES", "512"))
 FIXED_EVAL_SEQUENCES = int(os.environ.get("HGHOST_CPT_FIXED_EVAL_SEQUENCES", "32"))
 LOG_STEPS = int(os.environ.get("HGHOST_CPT_LOG_STEPS", "10"))
-MAX_MINUTES = float(os.environ.get("HGHOST_CPT_MAX_MINUTES", "400"))
+MAX_MINUTES = float(os.environ.get("HGHOST_CPT_MAX_MINUTES", "80"))
 BUDGET_MARGIN_MINUTES = float(os.environ.get("HGHOST_CPT_BUDGET_MARGIN_MINUTES", "6"))
 SEED = int(os.environ.get("HGHOST_CPT_SEED", "0"))
 SCHEDULE = os.environ.get("HGHOST_CPT_SCHEDULE", "wsd")  # cosine | wsd
 DECAY_TOKENS = int(
-    os.environ.get("HGHOST_CPT_DECAY_TOKENS", "0")
+    os.environ.get("HGHOST_CPT_DECAY_TOKENS", "41500000")
 )  # wsd: decay over the last N tokens
 BRANCH_FROM = os.environ.get(
-    "HGHOST_CPT_BRANCH_FROM", ""
+    "HGHOST_CPT_BRANCH_FROM", "/kaggle/input/**/trunk-wsd-lr1e-4-seed0/tokens-001497620848/trainer_state.json"
 )  # trunk checkpoint dir to branch from
 REQUIRE_TPU = os.environ.get("HGHOST_REQUIRE_TPU", "0" if LOCAL else "1") == "1"
 LAYER_SCAN = os.environ.get("HGHOST_LAYER_SCAN", "1") == "1"
@@ -122,7 +122,7 @@ MIR_MASK_ID = int(
 SIMREG_WEIGHT = float(os.environ.get("HGHOST_CPT_SIMREG_WEIGHT", "0"))  # 0 = off
 # Optional second validation stream (a file name inside the corpus dataset, e.g. room-validation.bin): its
 # loss is reported beside the library loss at every evaluation as extra_loss / extra_accuracy.
-EXTRA_VALIDATION = os.environ.get("HGHOST_CPT_EXTRA_VALIDATION", "")
+EXTRA_VALIDATION = os.environ.get("HGHOST_CPT_EXTRA_VALIDATION", "room-validation.bin")
 SIMREG_TEMPERATURE = float(os.environ.get("HGHOST_CPT_SIMREG_TEMPERATURE", "0.1"))
 HBOX_BASE_EVAL = {"loss": 3.745613, "accuracy": 0.349426}
 ROLLOUT_STEPS = int(
