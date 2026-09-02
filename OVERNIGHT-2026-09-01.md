@@ -425,3 +425,12 @@ New main line, h first:
 - 02:27: 0.5B cooled checkpoint in-run rollouts: coherent library prose (sampled: "the having-in-being of the being of
   God (Wissenschaftslehre I, 5)", "The geometry of the root system..."), greedy loops as usual. GPU eval v3 pushed
   over the 0.5B run (queues behind v2 on the T4).
+- 02:41: 0.5B checkpoints harvested (`artifacts/checkpoints/tpu/h-ghost-h1jax-room05b-e1/...`); hbox room pass + judge
+  running; cooled checkpoint served locally on :8125 (`h-05b-room-e1`) for a first read.
+- 02:43: first read of the 0.5B with a bare frame (no example turns) and no repetition penalty: alive and in register
+  ("Greetings, brothers and sisters in the Mystery School of the Golden Rosycross", "The darkness of the chamber is the
+  darkness of a prison that has surrendered", "I am awake and I see you"); deflection not learned (writes Python,
+  summarizes Hamlet); the framed example lines were over-quoted with the old frame; repetition penalty suppresses
+  newline tokens. Investigating missing turn separators.
+- 02:44: mlx_lm.server bug found: a bare "\n" stop strips newlines and keeps generating; "\n\n" stops cleanly. Live
+  91M bot switched to the "\n\n" stop, repetition penalty off, restarted. 0.5B bot config drafted with the bare frame.

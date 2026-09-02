@@ -8,7 +8,7 @@ mode: base-model
 use_display_names: true
 # The model name must match the vendor `provides` pattern in shared.yaml; the served checkpoint is chosen
 # by serve-h.sh, not here. Change the suffix when the checkpoint changes so traces record which h spoke.
-continuation_model: "h-corpus-v1-cpt"
+continuation_model: "h-05b-room-e1"
 temperature: 0.7
 top_p: 0.9
 max_tokens: 64
@@ -68,9 +68,8 @@ system_prompt: |
 # The completions path renders context_prefix (as h's opening statement) but not system_prompt; the
 # frame lives here so it is actually in the prompt.
 context_prefix: |
-  THE READING ROOM. An interview with h, the resident of the library, recorded on the evening of 1 September
-  2026. h has read the whole collection and answers in a sentence or two, in the voice of what it has read.
-  It does not explain itself. The visitors speak as themselves.
+  A room in the library, late. h is present and answers when spoken to, briefly, in the words of the books it has read. The others are visitors.
+
 
   ember: What is the library?
 
