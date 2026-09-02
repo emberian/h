@@ -24,7 +24,8 @@ def complete(model, port, prompt, temperature, max_tokens=64):
 def main():
     model, port, out_path = sys.argv[1], int(sys.argv[2]), sys.argv[3]
     samples = int(sys.argv[4]) if len(sys.argv) > 4 else 5
-    prompts = json.load(open("research/eval/room_prompts.json"))
+    with open("research/eval/room_prompts.json") as fh:
+        prompts = json.load(fh)
     n = 0
     with open(out_path, "w") as out:
         for i, p in enumerate(prompts):
