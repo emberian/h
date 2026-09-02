@@ -553,3 +553,7 @@ New main line, h first:
   passes 67.6%, the reading view 78.9%; column order fails on 56% of multi-column pages. Review sheet for ember:
   artifacts/corpus-v2/gold/review.html. Top re-OCR: Book of Curiosities, von Foerster Cybernetics of Cybernetics,
   Ted Nelson Computer Lib (letter-spaced), Greek/Coptic/Akkadian editions read as Latin.
+- 15:27: scene set C complete: 1,210 scenes (callback 284, referent 190 = 95 pairs, speaker 102 = 51 pairs, ambient 147,
+  silence 67, repair 200, bridge 220; modes cite 1,751 / compose 479 / bridge 220). Renderer: stitching shuffles scenes,
+  keeps pair halves in different rooms, drops the checker-only h turn of silence scenes, and asserts verbatim only for
+  cite turns. Building corpus-v1.4-room (A x6 + B x8 + C x8, stitched 4/4/3) with role sidecars.

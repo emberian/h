@@ -55,7 +55,7 @@ def sentence_shaped(text: str) -> bool:
     return bool(re.match(r"^[\"'“‘(\[A-Z0-9]", t)) and bool(re.search(r"[.!?…]['\"”’)\]]*$", t))
 
 norm = lambda s: " ".join(s.split())
-n = 0; kinds = {}; dropped = 0; pending = []
+n = 0; kinds = {}; dropped = 0; pool = []
 with open(sys.argv[2], "w") as out:
     for path in sys.argv[3:]:
         with open(path) as fh:
@@ -63,7 +63,7 @@ with open(sys.argv[2], "w") as out:
         for line in lines:
             line = line.strip()
             if not line: continue
-            s = json.loads(line); p = norm(passages[s["id"]])
+            s = json.loads(line); p = norm(passages[s["id"].split("#")[0]])
             turns = [(name, norm(text)) for name, text in s["turns"]]
             # drop trailing pairs whose h line is a fragment; skip the scene if nothing sentence-shaped is left
             while turns and turns[-1][0] == "h" and not sentence_shaped(turns[-1][1]):
@@ -72,21 +72,35 @@ with open(sys.argv[2], "w") as out:
             if not turns or bad:
                 dropped += 1
                 continue
-            assert all(p.find(t) >= 0 for name, t in turns if name == "h"), s["id"]
+            modes = s.get("modes") or {}
+            for i, (name, t) in enumerate(turns):
+                if name == "h" and modes.get(str(i), s.get("mode", "cite")) == "cite":
+                    assert p.find(t) >= 0, (s["id"], i)
             if s.get("silent"):
                 turns = turns[:-1]  # silence scenes: the appended h turn was for the checker only
             frame = random.choice([0, 0, 1, 2, 3, None, None])
             if STITCH > 1:
-                pending.append((s, turns))
-                if len(pending) >= STITCH:
-                    flush_group(pending, out); pending.clear()
+                pool.append((s, turns))
                 n += 1; kinds[s.get("kind", "talk")] = kinds.get(s.get("kind", "talk"), 0) + 1
                 continue
             body = "\n\n".join(f"{name}: {text}" for name, text in turns)
             text = (FRAMES[frame] + "\n\n" + body) if frame is not None else body
             out.write(json.dumps({"id": s["id"], "kind": s.get("kind", "talk"), "frame": frame, "text": text}, ensure_ascii=False) + "\n")
             n += 1; kinds[s.get("kind", "talk")] = kinds.get(s.get("kind", "talk"), 0) + 1
-if STITCH > 1 and pending:
+if STITCH > 1 and pool:
+    random.shuffle(pool)
     with open(sys.argv[2], "a") as out:
-        flush_group(pending, out)
+        group, deferred = [], []
+        for item in pool + [None]:
+            if item is not None:
+                pair = item[0].get("pair")
+                if pair and any(g[0].get("pair") == pair for g in group):
+                    deferred.append(item); continue
+                group.append(item)
+            if len(group) >= STITCH or (item is None and group):
+                flush_group(group, out); group = []
+                while deferred and len(group) < STITCH:
+                    group.append(deferred.pop())
+        for k in range(0, len(deferred), STITCH):
+            flush_group(deferred[k:k + STITCH], out)
 print(json.dumps({"scenes": n, "stitch": STITCH, "kinds": kinds, "dropped_fragment_scenes": dropped}))
