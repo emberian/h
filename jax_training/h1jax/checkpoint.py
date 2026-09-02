@@ -38,7 +38,7 @@ def load_hf_params(
     params: dict[str, jax.Array] = {}
     for path in _checkpoint_files(root):
         with safe_open(path, framework="flax") as handle:
-            for key in handle.keys():
+            for key in handle.keys():  # noqa: SIM118 (safetensors handle, not a dict)
                 if key in params:
                     raise ValueError(f"Duplicate checkpoint tensor: {key}")
                 params[key] = jnp.asarray(handle.get_tensor(key), dtype=dtype)
@@ -76,7 +76,9 @@ def write_hf_config(cfg: FalconH1Config, output: str | Path, *, dtype: str = "fl
             "model_type": "falcon_h1",
             "dtype": dtype,
             "expansion_factor": cfg.mamba_d_ssm / cfg.hidden_size,
-            "mamba_expand": cfg.mamba_d_ssm / cfg.hidden_size,
+            # Transformers and mlx-lm require an integer here; it is unused when mamba_d_ssm is
+            # explicit, and the official configs carry 2 for both Tiny (768/512) and 0.5B.
+            "mamba_expand": max(1, -(-cfg.mamba_d_ssm // cfg.hidden_size)),
             "use_cache": True,
         }
     )

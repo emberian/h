@@ -186,3 +186,30 @@ Evaluate everything with `hghost-evalpack` (subagent building it) plus the haunt
   session scratchpad; stops at the first failure. Log: scratchpad `tpu-queue/queue.log`.
 - `h1jax` 0.1.6 adds `H1JAX_REMAT_POLICY` (selective rematerialization: keep batch-free matmul outputs);
   the bench compares v1, v2, v2-bf16, and v2 + selective remat on the full training step.
+
+## 21:20 — ONNX export of our checkpoints works; 4-bit is out
+
+- `site/export/export_onnx.py`: neither optimum nor optimum-onnx knows `falcon_h1`, so the exporter
+  re-implements the forward as a trace-friendly module with the flat cache interface transformers.js
+  4.2.0 feeds; fp32 parity 1.3e-4 with identical greedy decoding; headless Chromium loads the local export
+  on WebGPU with zero errors and murmurs.
+- **4-bit round-to-nearest destroys the 90M model** (KL 0.61 nats, every weight group alone costs
+  0.05–0.14 nats), so the public Hub q4 export the site loaded until now is badly degraded. 8-bit is
+  near-lossless (KL 0.0014) at 125 MB. The deployed config now asks for q8. Committed as 889cbac.
+- `site/export/publish_hf.py` uploads an export to the Hub with the Falcon license files and a card (HF
+  auth works as `emberian`). Plan: export the first cooled leaf, upload, point the site at it.
+
+## 21:35 — evaluation pack done; the hbox 10M "gain" was furniture
+
+- `hghost-evalpack` (`research/results/evalpack-baseline.md`): three validation slices (reference first-32,
+  first-512, 512 sequences inside the 12 family-clean documents), each plain and furniture-free (haunting
+  index mask), an out-of-corpus English retention proxy (Tom Sawyer, 14.6K tokens, verified 0% ≥32-token
+  overlap), blind fixed-seed mlx-lm generations, memorization scan. Base reproduces 3.7456.
+- **hbox 10M:** −0.130 on the reference slice, all of it from the 15% furniture positions (JSTOR notices:
+  2.30 → 0.61); +0.154 on the other 85%, +0.20 on clean documents, retention perplexity 36 → 50. The
+  BF16-frozen run did not learn the library; it learned the scanner's boilerplate. CODEXOUT's headline
+  number is retracted.
+- The pack found that `h1jax.write_hf_config` wrote `mamba_expand` as 1.5 (rejected by mlx-lm and
+  Transformers 5); fixed at the source (integer 2, matching the official config); the pack repairs old
+  checkpoints on load. Tonight's TPU checkpoints carry the old value and are repaired the same way.
+- Committed 527e557. Morning command: add one `--checkpoint NAME=DIR` per TPU checkpoint, `--parallel 4`.
