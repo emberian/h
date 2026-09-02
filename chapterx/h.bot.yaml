@@ -1,0 +1,34 @@
+# Starting config/bots/h.yaml for ChapterX (the Discord bot username must be "h").
+name: h
+innerName: h
+
+mode: base-model
+# The model name must match the vendor `provides` pattern in shared.yaml; the served checkpoint is chosen
+# by serve-h.sh, not here. Change the suffix when the checkpoint changes so traces record which h spoke.
+continuation_model: "h-corpus-v1-cpt"
+temperature: 0.9
+top_p: 0.95
+max_tokens: 96
+
+recency_window_messages: 60
+recency_window_characters: 6000
+hard_max_characters: 12000
+rolling_threshold: 20
+recent_participant_count: 8
+
+include_images: false
+max_images: 0
+
+tools_enabled: false
+tool_output_visible: false
+max_tool_depth: 0
+tool_plugins: []
+
+stop_sequences:
+  - "\n\n"
+llm_retries: 2
+discord_backoff_max: 32000
+
+reply_on_random: 0
+reply_on_name: true
+max_queued_replies: 1

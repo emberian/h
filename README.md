@@ -4,6 +4,12 @@ Dataset preparation and training support for a tiny Falcon-H1 model that will li
 
 The selected starting checkpoint is [`tiiuae/Falcon-H1-Tiny-90M-Base`](https://huggingface.co/tiiuae/Falcon-H1-Tiny-90M-Base). The primary experiment is full-weight causal-language-model continued pretraining, not instruction tuning and not LoRA. A LoRA-CPT run and a random-initialized H1 run can follow as controls.
 
+**Status 2026-09-01 evening:** the exact `h1jax` port trains on Kaggle TPU v5e-8 at ~220K tokens/s (one
+corpus pass in 28 minutes; `research/results/tpu-h1jax-gate.md`); a 4-epoch warmup-stable-decay trunk with
+developmental checkpoints is running (`kaggle/TPU_LEDGER.md`, `OVERNIGHT-2026-09-01.md`). The review that led
+there, including corrections to `CODEXOUT.md`, is `FABLETHOUGHT.md`. The exact-match provenance index over
+corpus-v1 is `hghost-haunt` (`research/results/haunting-index.md`).
+
 The 90M checkpoint remains the active baseline. The next accelerator gate compares it with the deployable
 [`Falcon-H1-0.5B-Base`](https://huggingface.co/tiiuae/Falcon-H1-0.5B-Base) before assigning the remaining
 TPU budget. The verified literature bundle, claims audit, and staged experiment plan are in

@@ -1,0 +1,8 @@
+# Append under `vendors:` in ChapterX config/shared.yaml
+vendors:
+  openaicompletion-h:
+    config:
+      openai_compatible_api_key: "not-needed"
+      openai_compatible_base_url: "http://127.0.0.1:8124/v1"
+    provides:
+      - "h-.*"
