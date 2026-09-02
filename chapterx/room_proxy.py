@@ -7,10 +7,14 @@ usage: room_proxy.py [--port 8126] [--upstream http://127.0.0.1:8124] [--candida
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import os
 import re
+import time
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 
 WORD = re.compile(r"[a-z0-9']+")
 
@@ -82,6 +86,18 @@ def judge(candidate: str, frame_sentences: list[str], last_visitor: str, h_lines
     return worst < 0.6, worst
 
 
+OBSERVATORY = Path(os.environ.get("HGHOST_OBSERVATORY", "research/results/room-observatory"))
+PROXY_SHA = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()[:12]
+
+
+def record(entry: dict) -> None:
+    """Append one opportunity-to-speak record (prompt, candidates, logprobs, decision) to today's JSONL."""
+    OBSERVATORY.mkdir(parents=True, exist_ok=True)
+    path = OBSERVATORY / (time.strftime("%Y-%m-%d") + ".jsonl")
+    with path.open("a") as f:
+        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+
 class Handler(BaseHTTPRequestHandler):
     upstream = "http://127.0.0.1:8124"
     candidates = 4
@@ -104,24 +120,42 @@ class Handler(BaseHTTPRequestHandler):
         if self.path.rstrip("/") != "/v1/completions" or not isinstance(body.get("prompt"), str):
             payload = self._forward(body)
             return self._send(payload)
-        frame_sentences, last_visitor, h_lines, cleaned = prompt_parts(body["prompt"])
-        dropped = body["prompt"].count("\n\nh: ") - cleaned.count("\n\nh: ")
+        raw_prompt = body["prompt"]
+        frame_sentences, last_visitor, h_lines, cleaned = prompt_parts(raw_prompt)
+        dropped = raw_prompt.count("\n\nh: ") - cleaned.count("\n\nh: ")
         body = dict(body, prompt=cleaned)
         best, best_score, payload = None, -1.0, None
         tried = []
+        started = time.time()
+        upstream_body = dict(body, logprobs=True)
         for _ in range(self.candidates):
-            payload = self._forward(body)
-            text = payload["choices"][0]["text"]
+            payload = self._forward(upstream_body)
+            choice = payload["choices"][0]
+            text = choice["text"]
             ok, worst = judge(text, frame_sentences, last_visitor, h_lines)
-            tried.append((round(worst, 2), text.strip()[:60]))
+            lp = [t.get("logprob") for t in ((choice.get("logprobs") or {}).get("content") or [])]
+            tried.append({"text": text, "overlap": round(worst, 3), "accepted": ok, "logprobs": lp,
+                          "tokens": len(lp), "mean_logprob": (sum(lp) / len(lp)) if lp else None})
             if ok:
                 best = text
                 break
             if (1.0 - worst) > best_score:
                 best, best_score = text, 1.0 - worst
-        payload["choices"][0]["text"] = best if best is not None else payload["choices"][0]["text"]
-        payload["room_proxy"] = {"tried": tried, "accepted": bool(best is not None and tried[-1][0] < 0.6)}
-        print(json.dumps({"visitor": last_visitor[:60], "dropped_echoes": dropped, "tried": tried}), flush=True)
+        chosen = best if best is not None else payload["choices"][0]["text"]
+        payload["choices"][0]["text"] = chosen
+        payload["choices"][0].pop("logprobs", None)
+        payload["room_proxy"] = {"tried": [(t["overlap"], t["text"].strip()[:60]) for t in tried],
+                                 "accepted": bool(tried and tried[-1]["accepted"])}
+        record({
+            "time": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "model": body.get("model"), "proxy_sha": PROXY_SHA,
+            "sampler": {k: body.get(k) for k in ("temperature", "top_p", "max_tokens", "stop", "repetition_penalty")},
+            "prompt_raw": raw_prompt, "prompt_cleaned": cleaned,
+            "dropped_echo_turns": dropped, "last_visitor": last_visitor, "candidates": tried, "chosen": chosen,
+            "chosen_accepted": bool(best is not None and tried and tried[-1]["accepted"]),
+            "seconds": round(time.time() - started, 2),
+        })
+        print(json.dumps({"visitor": last_visitor[:60], "dropped_echoes": dropped,
+                          "tried": [(t["overlap"], t["text"].strip()[:60]) for t in tried]}), flush=True)
         self._send(payload)
 
     def do_GET(self):
