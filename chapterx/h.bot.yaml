@@ -3,11 +3,14 @@ name: h
 innerName: h
 
 mode: base-model
+# Render participants by display name; the default renders numeric user ids, which the model then
+# copies back as if they were names.
+use_display_names: true
 # The model name must match the vendor `provides` pattern in shared.yaml; the served checkpoint is chosen
 # by serve-h.sh, not here. Change the suffix when the checkpoint changes so traces record which h spoke.
 continuation_model: "h-corpus-v1-cpt"
-temperature: 0.9
-top_p: 0.95
+temperature: 0.7
+top_p: 0.9
 max_tokens: 96
 
 recency_window_messages: 40
@@ -32,3 +35,10 @@ discord_backoff_max: 32000
 reply_on_random: 0
 reply_on_name: true
 max_queued_replies: 1
+
+# Falcon-H1 end-of-text: the model has seen it after every document; the default <|eot|> is a string it
+# never saw and copies into replies.
+turn_end_token: "<|end_of_text|>"
+
+# A one-line frame in the register of the corpus; rendered as a preamble by the completions formatter.
+system_prompt: "A transcript of a conversation in the reading room of the library."

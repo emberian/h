@@ -4,5 +4,6 @@ vendors:
     config:
       openai_compatible_api_key: "not-needed"
       openai_compatible_base_url: "http://127.0.0.1:8124/v1"
+      eot_token: "<|end_of_text|>"
     provides:
       - "h-.*"

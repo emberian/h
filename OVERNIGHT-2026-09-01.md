@@ -308,3 +308,15 @@ Evaluate everything with `hghost-evalpack` (subagent building it) plus the haunt
   `serve-h.sh` now exposes the checkpoint as `artifacts/serving/<name>` and runs the server there, so the
   routed name `h-corpus-v1-cpt` resolves locally and traces keep the checkpoint identity. Resident context
   trimmed to 40 messages / 4,000 characters.
+
+## 23:07 — first conversation, and what was wrong with it
+
+- In a dormant channel ChapterX handed the model 30 messages from 2021 and none of ember's; in a fresh
+  channel it replied "W@" / "Sir :D<eot>" / "3221229683". Reading the rendered prompt explained all three:
+  the participant label for ember was their numeric id (`3221229683:`), so the model addressed them by it;
+  the turn marker `<|eot|>` is a string the model never saw, so it quoted it; and an empty context plus
+  temperature 0.9 made the first junk reply self-reinforcing. Fixes: `use_display_names: true`, vendor
+  `eot_token: "<|end_of_text|>"` (the renderer reads it there), temperature 0.7 / top-p 0.9, and a
+  one-line frame ("A transcript of a conversation in the reading room of the library."). Bot restarted.
+- The dormant-channel fetch (newest messages missing from the prompt) is a ChapterX pipeline issue to
+  look at separately.
