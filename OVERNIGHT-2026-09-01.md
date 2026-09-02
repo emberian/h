@@ -519,3 +519,12 @@ New main line, h first:
   `chapterx/room_proxy.py` on :8126 between ChapterX and mlx (samples up to 4, rejects echoes of the visitor line,
   copies of earlier h lines, empties and frame sentences; drops earlier echo turns from the context). ChapterX now
   points at :8126. Bot restarted.
+- 14:37: ember: "together you and i are like a team of ten... we don't need to scope down". Full programme launched as six
+  lanes: explorer v0 (loom/provenance/observatory/compare), scene set C (counterfactual pairs, callbacks, cite/compose/
+  bridge modes; two writers), persistent-state room server on hbox (fork/commit/rollback of the Falcon-H1 cache),
+  corpus-v2 admission (fidelity vs value, gold set), room evaluation bank + context-lift metric, and my lane: role masks
+  + response-span weighting arms, then the 1.5B-deep gate and canonical-view self-distillation.
+- 14:42: role-weighted loss added to the CPT kernel (HGHOST_CPT_ROLE_WEIGHTS over a uint8 class sidecar: library /
+  room-other / h utterance / h label; reports unweighted loss, weighted loss, h-span loss, and h-span loss on the room
+  holdout). Sidecars built for v1.3 (h utterances 2.97M tokens = 0.7%, labels 302K) and uploading as dataset v3. Three
+  arms generated at matched compute to e2-v3: h x8; visitors x0.25 + h x4; visitors x0 + h x4. CPU rehearsal running.
