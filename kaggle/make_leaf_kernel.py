@@ -78,7 +78,13 @@ def main() -> None:
     metadata = json.loads(SOURCE_METADATA.read_text())
     slug = f"h-ghost-h1jax-{args.name}"
     metadata["id"] = f"emberian64/{slug}"
-    metadata["title"] = args.title or f"H Ghost h1jax {args.name}"
+    # Kaggle derives the kernel slug from the TITLE on first push, ignoring the metadata id, so the
+    # title must slugify to the id: keep it "H Ghost h1jax <name>" (names are hyphenated, no spaces).
+    metadata["title"] = f"H Ghost h1jax {args.name}"
+    if args.title:
+        print(
+            f"note: --title ignored ({args.title!r}); Kaggle slugs come from the title"
+        )
     metadata["kernel_sources"] = list(args.kernel_source)
     if args.dataset_source:
         metadata["dataset_sources"] = list(args.dataset_source)

@@ -281,3 +281,6 @@ Evaluate everything with `hghost-evalpack` (subagent building it) plus the haunt
 - Queue 3 (tmux `hghost-tpu-queue3`, all with SSD v2): seed-1 trunk (4 epochs) → its two leaves → MIR arm
   (1 epoch, 32 × 512) → batch-matched plain control → seed-2 trunk → 0.5B pilot (last, riskiest).
   Expected ~4.5 TPU hours; ledger will be at ~9 h by morning.
+- 22:28: Kaggle slugs kernels from the *title* on first push and ignores the metadata id; my custom
+  titles with spaces produced `h-ghost-h1jax-trunk-seed-1`, so the queue polled a nonexistent slug. Fixed
+  the ids/sources, made the generator derive titles from names, restarted the queue against the real slug.
