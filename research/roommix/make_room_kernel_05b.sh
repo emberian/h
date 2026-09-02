@@ -3,7 +3,9 @@
 # straight from the base checkpoint, WSD with the last 10% cooled, uncooled checkpoints at quarter points,
 # room loss reported beside library loss.
 #
-# usage: research/roommix/make_room_kernel_05b.sh <stream-train-tokens> <per-chip-batch> [lr] [dataset-id] [name]
+# usage: [SAVES=t1,t2] research/roommix/make_room_kernel_05b.sh <stream-train-tokens> <per-chip-batch> [lr] [dataset-id] [name]
+# Default saves: the pre-cooldown checkpoint only (plus the final one); a 0.5B checkpoint with optimizer state is
+# ~6.3 GB and Kaggle caps kernel output at 20 GB.
 set -eu
 STREAM="$1"; PER_CHIP="$2"; LR="${3:-5e-5}"
 DATASET="${4:-emberian64/hghost-curated-tokens-v1-2-room}"
@@ -16,7 +18,7 @@ python3 kaggle/make_leaf_kernel.py \
   --set SSD=v2 --set PER_CHIP="$PER_CHIP" --set LR="$LR" \
   --set BRANCH_FROM= \
   --set TOTAL_TOKENS="$STREAM" --set DECAY_TOKENS="$DECAY" \
-  --set SAVE_TOKENS="$Q1,$Q2,$Q3,$PRE" \
+  --set SAVE_TOKENS="${SAVES:-$PRE}" \
   --set MAX_MINUTES=300 --set EXTRA_VALIDATION=room-validation.bin \
   --dataset-source emberian64/hghost-jax-code-public \
   --dataset-source emberian64/hghost-falcon-h1-0-5b-base-public \

@@ -141,15 +141,15 @@ for name, path in targets:
     summary = json.loads(summary_path.read_text()) if summary_path.exists() else None
     results[name] = {"returncode": proc.returncode, "seconds": round(time.time() - started, 1), "summary": summary}
     emit("evaluate_done", name=name, returncode=proc.returncode, seconds=results[name]["seconds"],
-         slices={k: round(v["mean_loss"], 4) for k, v in (summary or {}).get("slices", {}).items()
-                 if isinstance(v, dict) and "mean_loss" in v})
+         slices={k: round(v["loss"], 4) for k, v in (summary or {}).get("slices", {}).items()
+                 if isinstance(v, dict) and isinstance(v.get("loss"), float)})
     if proc.returncode != 0:
         print(proc.stderr[-3000:], flush=True)
 
 # ------------------------------------------------------------------ table
 def cell(summary, key):
     try:
-        return f"{summary['slices'][key]['mean_loss']:.4f}"
+        return f"{summary['slices'][key]['loss']:.4f}"
     except (KeyError, TypeError):
         return "-"
 

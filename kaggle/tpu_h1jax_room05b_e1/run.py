@@ -90,7 +90,7 @@ SAVE_TOKENS = [
     int(v)
     for v in os.environ.get(
         "HGHOST_CPT_SAVE_TOKENS",
-        "104383290,208766581,313149871,375779846",
+        "375779846",
     ).split(",")
     if v
 ]

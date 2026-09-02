@@ -35,3 +35,5 @@ spend in bounded, reported increments; never launch a run whose worst case excee
 | 2026-09-01 23:50 | h-ghost-h1jax-leaf-s1-e4 | v1 | 9 | COMPLETE: seed-1 cooled epoch-4 leaf, val 3.164 → 3.134 (seed 0: 3.136) |
 | 2026-09-02 00:38 | h-ghost-gpu-room-eval (GPU) | v1 | 5 | ERROR: P100 unsupported by image torch + cuda_sync recursion; v2 on T4 | evaluator over 91M trunk + leaves + 0.5B base; GPU quota |
 | 2026-09-01 23:59 | h-ghost-h1jax-trunk-mir | v1 | 39 | COMPLETE: MIR 0.4 at 32x512, one epoch, val 3.279 (plain 64x512 trunk at the same 374M tokens: 3.280); 194K tok/s. No gain at 2x compute. |
+| 2026-09-02 00:39 | h-ghost-h1jax-profile-gate-0-5b | v1 | 37 | **PASS** 0.5B: 16x512 remat 100,191 tok/s, 22.0% MFU, one 417M-token pass ~70 min; 8x512 93.5K, 32x512 93.4K (94% HBM); compile ~7 min/shape; base eval on the fixed slice 3.490 (91M base 3.746); sanity 30 steps finite |
+| 2026-09-02 01:19 | h-ghost-h1jax-room05b-e1 | v1 | (running, est 90) | 0.5B base, one epoch of corpus-v1.2-room v2 (417.5M tokens, 10.3% rooms incl. 1,710 scenes x6), 16x512 remat, LR 1e-4 WSD decay 10%, WD 0.1; saves at pre-cooldown and final; room loss beside library loss |

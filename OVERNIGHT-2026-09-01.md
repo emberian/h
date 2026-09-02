@@ -414,3 +414,8 @@ New main line, h first:
 - 00:50: LR for the 0.5B room run set to 1e-4: the Falcon-H1 paper (arXiv 2507.22448) reports its SFT stage at 128e-6 with
   WSD (50MT warmup, decay to eta/8, AdamW beta2 0.95, no WD) and pretraining at 256e-6 under muP; our WSD decays to
   0.1x with WD 0.1. Batch per chip stays a placeholder (16) until the 0.5B gate reports.
+- 01:17: 0.5B gate PASSED: best 16x512 remat at 100,191 tok/s (22.0% MFU), ~70 min per 417M-token pass, compile
+  ~7 min per shape, 0.5B base already at 3.490 on the fixed library slice (91M base 3.746). Sanity finite.
+- 01:19: pushed the 0.5B room run (`h-ghost-h1jax-room05b-e1`, private): one epoch of the v2 stream from the 0.5B
+  base, 16x512 remat, LR 1e-4, WSD with the last 10% cooled, checkpoints at pre-cooldown and final (6.3 GB each).
+  Expected ~90 min including compile and evals. queue8 waits and downloads.
