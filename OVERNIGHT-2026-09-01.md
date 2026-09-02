@@ -538,3 +538,7 @@ New main line, h first:
   direct (+0.46) and ambient (+0.47), ~0 on request, negative on silence states; 34% of replies echo a room line at
   >=0.6 overlap (45% on direct states, mostly copying the 91M-era "W@" lines still in trace histories). This is the
   baseline for the weighting arms. hghost-roombank: build / sample / lift / pairs.
+- 15:21: 1.5B-deep audition prepared (nothing uploaded or pushed): base pinned (e975d35c), parity 2.42e-4, corpus
+  re-tokenized for the 65,536 vocab (369.1M tokens), room mix + sidecars rebuilt (412.3M tokens, 10.5% rooms), gate
+  kernel copied and CPU-rehearsed. Blocker: replicated FP32 params + AdamW = 18.66 GB per chip > 16 GiB HBM; the
+  kernel needs sharded parameters/optimizer state (FSDP-style NamedSharding) before any 1.5B run. Next kernel task.
