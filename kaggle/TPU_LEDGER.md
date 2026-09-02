@@ -43,3 +43,4 @@ spend in bounded, reported increments; never launch a run whose worst case excee
 | 2026-09-02 04:44 | h-ghost-gpu-room-eval (GPU) | v4 | (running) | e2 checkpoints |
 | 2026-09-02 04:46 | h-ghost-gpu-room-eval-91m (GPU) | v1 | (queued, est 200) | re-run of the lost v2: 91M trunk checkpoints + leaves with the 90M base, own kernel id |
 | 2026-09-02 04:12 | h-ghost-h1jax-room05b-e2-v3 | v1 | 66 | **COMPLETE** 05:38: second epoch on corpus-v1.3-room (scenes A x6 + B x8) from the e1 pre-cooldown; library 2.852 (e2 2.858), room 2.581 (2.582), fixed-32 3.011 (3.016); 131K tok/s |
+| 2026-09-02 05:55 | h-ghost-h1jax-room05b-e3 | v1 | (running, est 70) | third epoch on corpus-v1.3-room from the e2-v3 pre-cooldown (752.2M), cooled: the multi-epoch curve 1/2/3 |

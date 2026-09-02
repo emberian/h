@@ -490,3 +490,7 @@ New main line, h first:
   behind v4 (e2). e2-v3 running on the TPU; its post-run chain is armed.
 - 05:39: e2-v3 COMPLETE (66 min): cooled library 2.852 (e2 2.858), room 2.581 (2.582), fixed-32 3.011 (3.016). Scene set B
   costs nothing on the guardrails; the read (deflection) decides. Download + harvest + hbox + judge + room read armed.
+- 05:55: e2-v3 read: deflection LEARNED (Python request -> "It is an old myth that programming must be an error prone,
+  cut-and-try process of frustration and anxiety."; Hamlet -> prose about the play, no bullets); judge delta -0.18
+  (e1 -0.06, e2 -0.04): the most library-like replies yet; quotation: one 18-token match among 72, none at 32.
+  Pushed e3 (third epoch on v1.3 from the e2-v3 pre-cooldown); queue11 waits. hbox chain for e2-v3 running.
