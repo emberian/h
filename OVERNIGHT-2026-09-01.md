@@ -257,3 +257,27 @@ Evaluate everything with `hghost-evalpack` (subagent building it) plus the haunt
   `[0.0, Infinity]`, which Python's json accepts and JavaScript's rejects. Fixed at the source (the field is
   omitted when it is the Transformers default), repaired every local config, replaced the Hub config;
   re-check running.
+
+## 22:22 — what h says now (temperature 0.8, top-p 0.95, seed 7, mlx-lm)
+
+- base, "Consciousness is not an object because": "...it is a state of awareness or perception. It does not
+  have external references or representations. 4. **Q: What is the difference between consciousness and
+  awareness?** **A:** ..."
+- leaf e1: "...the antinomies they relate to are statements which, though true, cannot be true; it is a
+  concept which, though true, has no reality. The antinomies of consciousness are connected with a serious
+  phenomenon called the disenchanted state of mind."
+- leaf e4: "...of the object, the objects can exist as well as the consciousness. Only the latter is
+  self-aware, for there is no way to know whether it is or is not self-aware. No consciousness can exist but
+  consciousness exists in consciousness."
+- leaf e4, "In the beginning was neither being nor nothing, but": "...neither standing nor standing on the
+  one edge of the lake, but on the other, and no one having any word of expression could name the formed.
+  The lake was covered with blank space, and there were no lakes in the world except the lake of the..."
+- Blind, systematic generations with memorization scans are the evaluation pack's job; these are a taste.
+
+## 22:25 — SSD v2: 1.64×; overnight queue launched
+
+- Bench: v1 219,716 → **v2 359,360 tok/s** (15.5% MFU) → v2-bf16 369,196; selective remat slower. Bare SSD
+  layer 24.4 → 7.2 ms. One pass = 17 min. Details in `research/results/tpu-h1jax-gate.md`.
+- Queue 3 (tmux `hghost-tpu-queue3`, all with SSD v2): seed-1 trunk (4 epochs) → its two leaves → MIR arm
+  (1 epoch, 32 × 512) → batch-matched plain control → seed-2 trunk → 0.5B pilot (last, riskiest).
+  Expected ~4.5 TPU hours; ledger will be at ~9 h by morning.

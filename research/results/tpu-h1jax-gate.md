@@ -87,3 +87,19 @@ group state across 24 heads, chunk reshapes, cumsum-based segment sums). A rewri
 broadcasts B/C inside the einsums instead of repeating them, computes segment sums with a triangular
 matmul, and keeps chunk tensors in the layout the MXU wants is the cheapest next 15-25%; a Pallas kernel is
 the step after that. Neither is needed for tonight's runs.
+
+## SSD implementations on the full training step (bench kernel, 22:04)
+
+Same shape as the trunk (64 × 512 per chip, remat, layer scan), 15 asynchronously dispatched warm steps
+after 3 warm-ups; the first-batch loss is identical across variants to four decimals.
+
+| Variant | tok/s | MFU | step | bare SSD fwd+bwd, one layer |
+|---|---:|---:|---:|---:|
+| v1 (reference chunked form) | 219,716 | 9.5% | 1.193 s | 24.4 ms |
+| **v2** (group-shaped B/C, cumsum decay, two matmuls, chunk scan) | **359,360** | **15.5%** | 0.729 s | 7.2 ms |
+| v2 + bf16 matmul inputs | 369,196 | 15.9% | 0.710 s | 6.4 ms |
+| v2 + selective remat (keep batch-free dot outputs) | 338,226 | 14.6% | 0.775 s; temp 21.9 GB | |
+
+One corpus pass is now ~17 minutes. v2 (fp32 matmul inputs) is the default for every run after the
+seed-0 trunk (`HGHOST_CPT_SSD=v2`); the bf16 variant's 3% is not worth a precision question. A fused
+kernel remains the route past this.

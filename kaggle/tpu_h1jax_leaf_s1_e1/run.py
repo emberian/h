@@ -34,7 +34,7 @@ os.environ.setdefault("H1JAX_SSD", os.environ.get("HGHOST_CPT_SSD", "v2"))
 if os.environ.get("HGHOST_CPT_REMAT_POLICY", ""):
     os.environ.setdefault("H1JAX_REMAT_POLICY", os.environ["HGHOST_CPT_REMAT_POLICY"])
 
-RUN_NAME = os.environ.get("HGHOST_CPT_RUN_NAME", "trunk-wsd-lr1e-4-seed0-b32")
+RUN_NAME = os.environ.get("HGHOST_CPT_RUN_NAME", "leaf-s1-e1-decay10")
 OUTPUT = Path(os.environ.get("HGHOST_CPT_OUTPUT", f"/kaggle/working/{RUN_NAME}"))
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
@@ -77,10 +77,10 @@ from jax.sharding import PartitionSpec as P
 
 # ----------------------------------------------------------------------------- settings
 
-PER_CHIP = int(os.environ.get("HGHOST_CPT_PER_CHIP", "32"))
+PER_CHIP = int(os.environ.get("HGHOST_CPT_PER_CHIP", "64"))
 SEQ_LEN = int(os.environ.get("HGHOST_CPT_SEQ", "512"))
 REMAT = os.environ.get("HGHOST_CPT_REMAT", "1") == "1"
-TOTAL_TOKENS = int(os.environ.get("HGHOST_CPT_TOTAL_TOKENS", "374405212"))
+TOTAL_TOKENS = int(os.environ.get("HGHOST_CPT_TOTAL_TOKENS", "412044297"))
 LEARNING_RATE = float(os.environ.get("HGHOST_CPT_LR", "1e-4"))
 WARMUP_TOKENS = int(os.environ.get("HGHOST_CPT_WARMUP_TOKENS", "10000000"))
 MIN_LR_RATIO = float(os.environ.get("HGHOST_CPT_MIN_LR_RATIO", "0.1"))
@@ -90,23 +90,23 @@ SAVE_TOKENS = [
     int(v)
     for v in os.environ.get(
         "HGHOST_CPT_SAVE_TOKENS",
-        "10000000,30000000,100000000,200000000",
+        "",
     ).split(",")
     if v
 ]
-EVAL_EVERY_TOKENS = int(os.environ.get("HGHOST_CPT_EVAL_EVERY_TOKENS", "25000000"))
+EVAL_EVERY_TOKENS = int(os.environ.get("HGHOST_CPT_EVAL_EVERY_TOKENS", "5000000"))
 EVAL_SEQUENCES = int(os.environ.get("HGHOST_CPT_EVAL_SEQUENCES", "512"))
 FIXED_EVAL_SEQUENCES = int(os.environ.get("HGHOST_CPT_FIXED_EVAL_SEQUENCES", "32"))
 LOG_STEPS = int(os.environ.get("HGHOST_CPT_LOG_STEPS", "10"))
-MAX_MINUTES = float(os.environ.get("HGHOST_CPT_MAX_MINUTES", "90"))
+MAX_MINUTES = float(os.environ.get("HGHOST_CPT_MAX_MINUTES", "60"))
 BUDGET_MARGIN_MINUTES = float(os.environ.get("HGHOST_CPT_BUDGET_MARGIN_MINUTES", "6"))
-SEED = int(os.environ.get("HGHOST_CPT_SEED", "0"))
+SEED = int(os.environ.get("HGHOST_CPT_SEED", "1"))
 SCHEDULE = os.environ.get("HGHOST_CPT_SCHEDULE", "wsd")  # cosine | wsd
 DECAY_TOKENS = int(
-    os.environ.get("HGHOST_CPT_DECAY_TOKENS", "0")
+    os.environ.get("HGHOST_CPT_DECAY_TOKENS", "37440521")
 )  # wsd: decay over the last N tokens
 BRANCH_FROM = os.environ.get(
-    "HGHOST_CPT_BRANCH_FROM", ""
+    "HGHOST_CPT_BRANCH_FROM", "/kaggle/input/**/trunk-wsd-lr1e-4-seed1/tokens-000374603776/trainer_state.json"
 )  # trunk checkpoint dir to branch from
 REQUIRE_TPU = os.environ.get("HGHOST_REQUIRE_TPU", "0" if LOCAL else "1") == "1"
 LAYER_SCAN = os.environ.get("HGHOST_LAYER_SCAN", "1") == "1"

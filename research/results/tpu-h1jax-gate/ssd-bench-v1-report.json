@@ -1,0 +1,85 @@
+{
+  "jax": "0.10.2",
+  "backend": "tpu",
+  "device_count": 8,
+  "device_kind": "TPU v5 lite",
+  "per_chip": 64,
+  "seq_len": 512,
+  "remat": true,
+  "variants": {
+    "v1": {
+      "compile_seconds": 185.41522170100006,
+      "temp_bytes": 8434673152,
+      "first_loss": 3.530761957168579,
+      "loss_delta_vs_first_variant": 0.0,
+      "sync_step_seconds": [
+        3.2389638780000496,
+        1.2481005459999324,
+        1.2157756800000925
+      ],
+      "async_step_seconds": 1.1931032399999972,
+      "tokens_per_second": 219716.10771922857,
+      "mfu": 0.0946489881351949,
+      "last_loss": 3.4773881435394287
+    },
+    "v2": {
+      "compile_seconds": 163.7389471030001,
+      "temp_bytes": 8489231872,
+      "first_loss": 3.5307865142822266,
+      "loss_delta_vs_first_variant": 2.4557113647460938e-05,
+      "sync_step_seconds": [
+        0.745501294000178,
+        0.7451326650000283,
+        0.7454772339999636
+      ],
+      "async_step_seconds": 0.7294743051999982,
+      "tokens_per_second": 359360.15584281425,
+      "mfu": 0.15480464987161086,
+      "last_loss": 3.4775214195251465
+    },
+    "v2bf16": {
+      "compile_seconds": 164.52279584500002,
+      "temp_bytes": 8488748032,
+      "first_loss": 3.5308029651641846,
+      "loss_delta_vs_first_variant": 4.100799560546875e-05,
+      "sync_step_seconds": [
+        0.7271002800000588,
+        0.7263510799998585,
+        0.7265628499999366
+      ],
+      "async_step_seconds": 0.7100406415333358,
+      "tokens_per_second": 369195.76805335947,
+      "mfu": 0.15904162072041134,
+      "last_loss": 3.477482557296753
+    },
+    "v2_dotsave": {
+      "compile_seconds": 160.925386764,
+      "temp_bytes": 21916372480,
+      "first_loss": 3.530768871307373,
+      "loss_delta_vs_first_variant": 6.9141387939453125e-06,
+      "sync_step_seconds": [
+        0.7957496889998765,
+        0.7957350990000123,
+        0.7970547079999051
+      ],
+      "async_step_seconds": 0.7750550825333449,
+      "tokens_per_second": 338226.2834057628,
+      "mfu": 0.1457006307702833,
+      "last_loss": 3.4775562286376953
+    },
+    "components": {
+      "ssd_v1_fwd_bwd": {
+        "first_call_seconds": 13.335921632000009,
+        "seconds": 0.02442792950000694
+      },
+      "ssd_v2_fwd_bwd": {
+        "first_call_seconds": 1.6759406480000507,
+        "seconds": 0.007241860199997063
+      },
+      "ssd_v2bf16_fwd_bwd": {
+        "first_call_seconds": 1.8988306549999834,
+        "seconds": 0.006392762299992682
+      }
+    }
+  }
+}

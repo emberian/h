@@ -29,6 +29,10 @@ from typing import Any
 LOCAL = os.environ.get("HGHOST_LOCAL") == "1"
 if not LOCAL:
     os.environ.setdefault("JAX_COMPILATION_CACHE_DIR", "/kaggle/working/jax-cache")
+# SSD implementation and rematerialization policy for h1jax (read at its import).
+os.environ.setdefault("H1JAX_SSD", os.environ.get("HGHOST_CPT_SSD", "v2"))
+if os.environ.get("HGHOST_CPT_REMAT_POLICY", ""):
+    os.environ.setdefault("H1JAX_REMAT_POLICY", os.environ["HGHOST_CPT_REMAT_POLICY"])
 
 RUN_NAME = os.environ.get("HGHOST_CPT_RUN_NAME", "trunk-wsd-lr1e-4-seed1")
 OUTPUT = Path(os.environ.get("HGHOST_CPT_OUTPUT", f"/kaggle/working/{RUN_NAME}"))
@@ -94,7 +98,7 @@ EVAL_EVERY_TOKENS = int(os.environ.get("HGHOST_CPT_EVAL_EVERY_TOKENS", "25000000
 EVAL_SEQUENCES = int(os.environ.get("HGHOST_CPT_EVAL_SEQUENCES", "512"))
 FIXED_EVAL_SEQUENCES = int(os.environ.get("HGHOST_CPT_FIXED_EVAL_SEQUENCES", "32"))
 LOG_STEPS = int(os.environ.get("HGHOST_CPT_LOG_STEPS", "10"))
-MAX_MINUTES = float(os.environ.get("HGHOST_CPT_MAX_MINUTES", "400"))
+MAX_MINUTES = float(os.environ.get("HGHOST_CPT_MAX_MINUTES", "240"))
 BUDGET_MARGIN_MINUTES = float(os.environ.get("HGHOST_CPT_BUDGET_MARGIN_MINUTES", "6"))
 SEED = int(os.environ.get("HGHOST_CPT_SEED", "1"))
 SCHEDULE = os.environ.get("HGHOST_CPT_SCHEDULE", "wsd")  # cosine | wsd
@@ -237,6 +241,8 @@ resume_settings = {
     "decay_tokens": DECAY_TOKENS,
     "mir_weight": MIR_WEIGHT,
     "mir_max_ratio": MIR_MAX_RATIO,
+    "ssd_implementation": os.environ.get("H1JAX_SSD", "v1"),
+    "remat_policy": os.environ.get("H1JAX_REMAT_POLICY", ""),
 }
 
 # ----------------------------------------------------------------------------- resume discovery
