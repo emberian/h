@@ -189,6 +189,8 @@ def summarize_losses(
         "accuracy": float(correct.mean()) if total else None,
     }
     if furniture is not None:
+        if furniture.shape[0] > losses.shape[0] and furniture.shape[1:] == losses.shape[1:]:
+            furniture = furniture[: losses.shape[0]]  # rehearsals score a prefix of the slice
         if furniture.shape != losses.shape:
             raise ValueError(
                 f"furniture mask {furniture.shape} != losses {losses.shape}"
@@ -199,6 +201,8 @@ def summarize_losses(
         summary["furniture_free_accuracy"] = masked_mean(correct, keep)
         summary["furniture_loss"] = masked_mean(losses, ~keep)
     if matched is not None:
+        if matched.shape[0] > losses.shape[0] and matched.shape[1:] == losses.shape[1:]:
+            matched = matched[: losses.shape[0]]
         if matched.shape != losses.shape:
             raise ValueError(f"matched mask {matched.shape} != losses {losses.shape}")
         keep = ~np.asarray(matched, dtype=bool)
