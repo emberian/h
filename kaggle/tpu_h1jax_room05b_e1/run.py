@@ -81,7 +81,7 @@ PER_CHIP = int(os.environ.get("HGHOST_CPT_PER_CHIP", "16"))
 SEQ_LEN = int(os.environ.get("HGHOST_CPT_SEQ", "512"))
 REMAT = os.environ.get("HGHOST_CPT_REMAT", "1") == "1"
 TOTAL_TOKENS = int(os.environ.get("HGHOST_CPT_TOTAL_TOKENS", "417533162"))
-LEARNING_RATE = float(os.environ.get("HGHOST_CPT_LR", "5e-5"))
+LEARNING_RATE = float(os.environ.get("HGHOST_CPT_LR", "1e-4"))
 WARMUP_TOKENS = int(os.environ.get("HGHOST_CPT_WARMUP_TOKENS", "10000000"))
 MIN_LR_RATIO = float(os.environ.get("HGHOST_CPT_MIN_LR_RATIO", "0.1"))
 WEIGHT_DECAY = float(os.environ.get("HGHOST_CPT_WEIGHT_DECAY", "0.1"))

@@ -411,3 +411,6 @@ New main line, h first:
   made cuda_sync recurse. Fixed the recursion, re-uploaded the code dataset, re-pushed as v2 with
   `--accelerator NvidiaTeslaT4`. Quota now: TPU 6.32 h used / 13.68 h left, GPU 0.08 h used / 29.92 h left
   (refresh 2026-09-05 00:00).
+- 00:50: LR for the 0.5B room run set to 1e-4: the Falcon-H1 paper (arXiv 2507.22448) reports its SFT stage at 128e-6 with
+  WSD (50MT warmup, decay to eta/8, AdamW beta2 0.95, no WD) and pretraining at 256e-6 under muP; our WSD decays to
+  0.1x with WD 0.1. Batch per chip stays a placeholder (16) until the 0.5B gate reports.
