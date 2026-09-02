@@ -567,3 +567,6 @@ New main line, h first:
   labels 341K; sidecars built with 0 fallbacks. e2-v4 kernel generation and queue14 (after the 1.5B gate) are armed.
 - 15:59: the 1.5B corpus dataset had failed to create (title 53 chars > Kaggle's 50); title shortened and re-uploaded.
   The gate queue (queue13) pushes only after the last arm, so no time is lost.
+- 16:28: arm h x8 (w-hup) complete: cooled library 2.864 (e2-v3 2.852), fixed-32 3.019 (3.011), room 2.599 (2.581),
+  room h-span 2.579 vs other 2.601 (in-kernel, first 512 holdout seqs). Upweighting h costs a little on every slice;
+  the question is echo rate and context lift, evaluated when the download lands. Arm 2 (visitors x0.25, h x4) running.
