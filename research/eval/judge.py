@@ -15,37 +15,32 @@ from pathlib import Path
 os.environ.setdefault("JAX_PLATFORM_NAME", "cpu")
 os.environ.setdefault("H1JAX_SSD", "v2")
 
-import jax
+import sys
+
 import jax.numpy as jnp
 import numpy as np
 from h1jax.checkpoint import load_hf_params
 from h1jax.config import FalconH1Config
-from h1jax.model import falcon_h1_forward
 from tokenizers import Tokenizer
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
+from hghost.evalpack_jax import per_token_losses  # the one h1jax forward shared with evalpack and roombank
 
 BOS_PREFIX = "\n"  # score each text as a fresh document after a newline
 
 
-def nll_per_text(params, cfg, ids: list[list[int]], length: int) -> list[float]:
+def nll_per_text(params, cfg, ids: list[list[int]], length: int, batch_size: int = 8) -> list[float]:
     """Mean next-token NLL per text; inputs padded to one fixed length so the model compiles once."""
-    forward = jax.jit(
-        lambda p, t: falcon_h1_forward(p, t, cfg, compute_dtype=jnp.float32, layer_scan=True)
-    )
-    out = []
-    for seq in ids:
+    rows = np.zeros((len(ids), length + 1), dtype=np.int32)
+    valid = np.zeros((len(ids), length), dtype=np.float32)
+    for i, seq in enumerate(ids):
         seq = seq[: length + 1]
-        padded = np.zeros((1, length + 1), dtype=np.int32)
-        padded[0, : len(seq)] = seq
-        valid = np.zeros((1, length), dtype=np.float32)
-        valid[0, : len(seq) - 1] = 1.0
-        tokens = jnp.asarray(padded)
-        logits = forward(params, tokens[:, :-1]).astype(jnp.float32)
-        labels = tokens[:, 1:]
-        logz = jax.nn.logsumexp(logits, axis=-1)
-        sel = jnp.take_along_axis(logits, labels[..., None], axis=-1)[..., 0]
-        nll = (logz - sel) * jnp.asarray(valid)
-        out.append(float(jnp.sum(nll) / jnp.sum(jnp.asarray(valid))))
-    return out
+        rows[i, : len(seq)] = seq
+        valid[i, : len(seq) - 1] = 1.0
+    if not len(ids):
+        return []
+    losses, _ = per_token_losses(params, cfg, rows, batch_size=batch_size)
+    return [float(np.sum(losses[i] * valid[i]) / np.sum(valid[i])) for i in range(len(ids))]
 
 
 def main() -> None:

@@ -38,6 +38,8 @@ hghost-beliefgeo = "hghost.beliefgeo:main"
 hghost-evalpack = "hghost.evalpack:main"
 hghost-ocr-view = "hghost.ocr_viewer:main"
 hghost-roommix = "hghost.roommix:main"
+hghost-admission = "hghost.admission:main"
+hghost-roombank = "hghost.roombank:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/hghost"]
