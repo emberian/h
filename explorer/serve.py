@@ -52,6 +52,17 @@ CFG = {
     "serving": ROOT / "artifacts/serving",
     "checkpoints": ROOT / "artifacts/checkpoints/tpu",
     "venv_python": ROOT / ".venv/bin/python",
+    "jax_python": ROOT / ".venv-jax/bin/python",
+    "labels": ROOT / "research/results/room-labels",
+    "roombank_results": ROOT / "research/results/roombank",
+    "roombank_bank": ROOT / "research/eval/roombank/bank.jsonl",
+    "roomstate": "http://127.0.0.1:8140",
+    "scorers": [ROOT / "kaggle/base_model_dataset_public", ROOT / "artifacts/kaggle/base_model_05b"],
+    "judge_leaf": ROOT / "artifacts/checkpoints/tpu/h-ghost-h1jax-leaf-s1-e4/leaf-s1-e4-decay10/tokens-001535061369",
+    "judge_base": ROOT / "kaggle/base_model_dataset_public",
+    "serve_port": 8125,
+    "serve_session": "hghost-serve05b",
+    "mlx_python": Path.home() / ".cache/h1-distributed/venv/bin/python",
 }
 SERVER_URLS: list[str] = ["http://127.0.0.1:8124", "http://127.0.0.1:8125"]
 SERVER_NAMES: dict[str, str] = {}  # url -> model name override (--server name@url)
@@ -154,6 +165,291 @@ DEC: Decoder | None = None
 ENC: Encoder | None = None
 
 
+def git_rev() -> str:
+    try:
+        return subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=str(ROOT), capture_output=True, text=True,
+                              timeout=5, check=False).stdout.strip() or "unknown"
+    except Exception:  # noqa: BLE001
+        return "unknown"
+
+
+def file_sha(path: Path) -> str | None:
+    try:
+        return hashlib.sha256(path.read_bytes()).hexdigest()[:16]
+    except Exception:  # noqa: BLE001
+        return None
+
+
+VERSION: dict = {}
+
+
+def version_info() -> dict:
+    if not VERSION:
+        VERSION.update({"explorer": git_rev(), "tokenizer_sha": file_sha(CFG["tokenizer"]),
+                        "proxy_sha": file_sha(ROOT / "chapterx/room_proxy.py"), "python": sys.version.split()[0]})
+    return VERSION
+
+
+# ----------------------------------------------------------------------------------------------- scoring
+
+class Scorer:
+    """Fixed-text scoring (per-token logprob + rank under a context) through score_worker.py in the JAX venv."""
+
+    def __init__(self, python: Path, tokenizer: Path):
+        self.python, self.tokenizer = python, tokenizer
+        self.proc: subprocess.Popen | None = None
+        self.lock = threading.Lock()
+        self.failed: str | None = None
+        self.cache: dict[str, dict] = {}
+
+    def _start(self) -> bool:
+        if self.proc and self.proc.poll() is None:
+            return True
+        if not self.python.exists():
+            self.failed = f"no JAX venv at {self.python}"
+            return False
+        env = dict(os.environ, PYTHONPATH=str(ROOT / "jax_training"), JAX_PLATFORM_NAME="cpu")
+        try:
+            self.proc = subprocess.Popen(
+                [str(self.python), str(HERE / "score_worker.py"), str(self.tokenizer)],
+                stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, env=env,
+                cwd=str(ROOT))
+            self.proc.stdin.write(json.dumps({"ping": 1}) + "\n")
+            self.proc.stdin.flush()
+            ready = json.loads(self.proc.stdout.readline() or "{}")
+            if "pong" not in ready:
+                raise RuntimeError("worker did not answer")
+            self.failed = None
+            return True
+        except Exception as e:  # noqa: BLE001
+            self.failed = f"score worker unavailable: {e}"
+            return False
+
+    @staticmethod
+    def key(checkpoint: str, context: str, text: str) -> str:
+        return hashlib.sha256(f"{checkpoint}\x00{context}\x00{text}".encode()).hexdigest()[:24]
+
+    def score(self, checkpoint: str, items: list[dict], ranks: bool = True) -> dict:
+        ck = str(Path(checkpoint).resolve())
+        out, todo = {}, []
+        for it in items:
+            k = self.key(ck, it.get("context", ""), it.get("text", ""))
+            if k in self.cache:
+                out[it["id"]] = dict(self.cache[k], id=it["id"], cached=True)
+            else:
+                todo.append(it)
+        seconds = loaded = 0.0
+        if todo:
+            with self.lock:
+                if not self._start():
+                    raise RuntimeError(self.failed or "score worker unavailable")
+                try:
+                    self.proc.stdin.write(json.dumps({"checkpoint": ck, "items": todo, "ranks": ranks}) + "\n")
+                    self.proc.stdin.flush()
+                    resp = json.loads(self.proc.stdout.readline() or "{}")
+                except Exception as e:  # noqa: BLE001
+                    self.proc = None
+                    raise RuntimeError(f"score worker died: {e}")
+            if "error" in resp:
+                raise RuntimeError(resp["error"])
+            seconds, loaded = resp.get("seconds", 0), resp.get("loaded", 0)
+            by_id = {r["id"]: r for r in resp.get("results", [])}
+            for it in todo:
+                r = by_id.get(it["id"])
+                if r is None:
+                    continue
+                self.cache[self.key(ck, it.get("context", ""), it.get("text", ""))] = r
+                out[it["id"]] = dict(r, cached=False)
+        return {"checkpoint": ck, "results": out, "seconds": seconds, "loaded": loaded}
+
+
+SCORER: Scorer | None = None
+
+
+def scorer_checkpoints() -> list[dict]:
+    """Checkpoint dirs the scorer can load: the two bases plus every TPU checkpoint."""
+    out = []
+    for p in CFG["scorers"]:
+        if (Path(p) / "config.json").exists():
+            out.append({"path": str(p), "name": Path(p).name, "kind": "base"})
+    for d in checkpoint_dirs():
+        parts = Path(d).parts
+        out.append({"path": d, "name": f"{parts[-2]}/{parts[-1]}", "kind": "checkpoint"})
+    return out
+
+
+# ----------------------------------------------------------------------------------------------- labels
+
+LABELS = ["KEEP", "echo", "self-copy", "false speak", "missed intervention", "wrong addressee", "missed callback",
+          "generic assistant", "frame leak", "OCR corruption", "dead strangeness", "overquotation",
+          "proxy false positive", "other"]
+LABEL_LOCK = threading.Lock()
+
+
+def append_label(record: dict) -> dict:
+    """Append one failure/keep label to research/results/room-labels/YYYY-MM-DD.jsonl (schema in README)."""
+    if record.get("label") not in LABELS:
+        raise ValueError(f"label must be one of {LABELS}")
+    if not isinstance(record.get("candidate"), str):
+        raise ValueError("candidate text required")
+    rec = {
+        "time": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+        "who": str(record.get("who") or "ember"),
+        "label": record["label"],
+        "correction": record.get("correction") or None,
+        "note": record.get("note") or None,
+        "source": record.get("source") or {},
+        "context": record.get("context") or "",
+        "candidate": record["candidate"],
+        "checkpoint": record.get("checkpoint"),
+        "model": record.get("model"),
+        "server": record.get("server"),
+        "sampler": record.get("sampler"),
+        "proxy_sha": record.get("proxy_sha"),
+        "explorer": version_info()["explorer"],
+    }
+    CFG["labels"].mkdir(parents=True, exist_ok=True)
+    path = CFG["labels"] / (time.strftime("%Y-%m-%d") + ".jsonl")
+    with LABEL_LOCK, path.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    return {"ok": True, "path": str(path), "record": rec}
+
+
+def label_summary(limit: int = 200) -> dict:
+    d = CFG["labels"]
+    counts: Counter = Counter()
+    recent = []
+    if d.is_dir():
+        for p in sorted(d.glob("*.jsonl")):
+            for line in p.open(encoding="utf-8"):
+                if not line.strip():
+                    continue
+                try:
+                    r = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                counts[r.get("label")] += 1
+                recent.append(r)
+    return {"labels": LABELS, "counts": dict(counts), "total": sum(counts.values()), "recent": recent[-limit:],
+            "dir": str(d)}
+
+
+# ----------------------------------------------------------------------------------------------- roombank pairs
+
+def roombank_pairs() -> dict:
+    """Blind pairwise sheets from `hghost-roombank pairs`: items rebuilt from the key file's state ids and each
+    model's replies.jsonl, with the model identities removed. The key is never sent."""
+    res = CFG["roombank_results"]
+    sheets = []
+    if (res / "pairs").is_dir():
+        for key_path in sorted((res / "pairs").glob("*-key.json")):
+            sheets.append({"stem": key_path.name[: -len("-key.json")], "modified": key_path.stat().st_mtime})
+    return {"sheets": sheets, "dir": str(res / "pairs")}
+
+
+def roombank_sheet(stem: str) -> dict:
+    if not re.match(r"^[A-Za-z0-9._-]{1,120}$", stem):
+        raise ValueError("bad sheet name")
+    res = CFG["roombank_results"]
+    key = json.loads((res / "pairs" / f"{stem}-key.json").read_text(encoding="utf-8"))
+    replies = {}
+    for model in (key["a"], key["b"]):
+        path = res / model / "replies.jsonl"
+        if path.exists():
+            for line in path.open(encoding="utf-8"):
+                if line.strip():
+                    r = json.loads(line)
+                    replies[(model, r.get("state_id"), r.get("mode"), r.get("sample"))] = r.get("text", "")
+    states = {}
+    if CFG["roombank_bank"].exists():
+        for line in CFG["roombank_bank"].open(encoding="utf-8"):
+            if line.strip():
+                st = json.loads(line)
+                states[st.get("id")] = st
+    mode, sa, sb = key.get("mode", "sample"), key.get("sample_a", 0), key.get("sample_b", 0)
+    items = []
+    for it in key["items"]:
+        sid = it["state_id"]
+        left_model, right_model = it["left"], it["right"]
+        st = states.get(sid, {})
+        left_text = (replies.get((left_model, sid, mode, sa if left_model == key["a"] else sb)) or "").strip()
+        right_text = (replies.get((right_model, sid, mode, sa if right_model == key["a"] else sb)) or "").strip()
+        items.append({"n": it.get("n"), "state_id": sid, "kind": st.get("kind"), "frame": st.get("frame"),
+                      "turns": st.get("turns"), "left": left_text, "right": right_text})
+    items.sort(key=lambda x: x.get("n") or 0)
+    return {"stem": stem, "a_b_hidden": True, "mode": mode, "items": items,
+            "questions": ["Which would you keep in the room?", "Which makes you want to answer?",
+                          "Which sounds specifically like h?"]}
+
+
+# ----------------------------------------------------------------------------------------------- room-state server (hbox forward)
+
+def roomstate(method: str, path: str, body: dict | None = None, timeout: float = 300.0) -> dict:
+    url = CFG["roomstate"] + path
+    data = json.dumps(body).encode() if body is not None else None
+    req = urllib.request.Request(url, data=data, method=method,
+                                 headers={"Content-Type": "application/json"} if data else {})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return json.loads(r.read())
+
+
+def roomstate_status() -> dict:
+    try:
+        h = roomstate("GET", "/health", timeout=4)
+        return {"up": True, "url": CFG["roomstate"], "health": h}
+    except Exception as e:  # noqa: BLE001
+        return {"up": False, "url": CFG["roomstate"], "error": str(e),
+                "hint": "hbox_training/run_room_state_server.sh forward  (or launch) to bring the tunnel up"}
+
+
+# ----------------------------------------------------------------------------------------------- serving a checkpoint on :8125
+
+SERVE_LOCK = threading.Lock()
+SERVE_STATE: dict = {"switching": False, "target": None, "error": None, "since": None}
+
+
+def serve_checkpoint(path: str, name: str | None = None) -> dict:
+    """Point artifacts/serving/<name> at the checkpoint and restart mlx_lm.server on CFG['serve_port'] (the
+    second server, never :8124). Blocks until the port answers or 180 s pass."""
+    ck = Path(path).resolve()
+    if not (ck / "config.json").exists() or not str(ck).startswith(str(ROOT)):
+        raise ValueError("checkpoint must be a config-bearing directory under the project")
+    if not name:
+        name = "x-" + hashlib.sha256(str(ck).encode()).hexdigest()[:10]
+    if not re.match(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,60}$", name):
+        raise ValueError("bad serving name")
+    port, session = CFG["serve_port"], CFG["serve_session"]
+    with SERVE_LOCK:
+        SERVE_STATE.update({"switching": True, "target": str(ck), "error": None, "since": time.time()})
+        try:
+            CFG["serving"].mkdir(parents=True, exist_ok=True)
+            link = CFG["serving"] / name
+            if link.is_symlink() or link.exists():
+                link.unlink()
+            link.symlink_to(ck)
+            subprocess.run(["tmux", "kill-session", "-t", session], capture_output=True, check=False)
+            cmd = (f"{CFG['mlx_python']} -m mlx_lm.server --model {name} --host 127.0.0.1 --port {port} "
+                   f">> /tmp/hghost-serve-{port}.log 2>&1")
+            subprocess.run(["tmux", "new-session", "-d", "-s", session, "-c", str(CFG["serving"]), cmd], check=True,
+                           capture_output=True)
+            deadline = time.time() + 180
+            while time.time() < deadline:
+                try:
+                    http_json(f"http://127.0.0.1:{port}/v1/models", timeout=3)
+                    break
+                except Exception:  # noqa: BLE001
+                    time.sleep(1.5)
+            else:
+                raise RuntimeError(f"server on :{port} did not come up in 180 s (see /tmp/hghost-serve-{port}.log)")
+            return {"ok": True, "name": name, "path": str(ck), "url": f"http://127.0.0.1:{port}",
+                    "seconds": round(time.time() - SERVE_STATE["since"], 1)}
+        except Exception as e:
+            SERVE_STATE["error"] = str(e)
+            raise
+        finally:
+            SERVE_STATE["switching"] = False
+
+
 # ----------------------------------------------------------------------------------------------- servers
 
 def http_json(url: str, body: dict | None = None, timeout: float = 600.0) -> dict:
@@ -233,7 +529,7 @@ def haunt(items: list[dict], thresholds: str | None = None) -> dict:
                    "--tokenizer", str(CFG["tokenizer"]), "--output", str(outp), "--decode"]
             if thresholds:
                 cmd += ["--thresholds", thresholds]
-            proc = subprocess.run(cmd, capture_output=True, text=True, cwd=str(ROOT), timeout=600)
+            proc = subprocess.run(cmd, capture_output=True, text=True, cwd=str(ROOT), timeout=600, check=False)
             if proc.returncode != 0:
                 raise RuntimeError(f"haunt scan failed: {proc.stderr.strip()[-2000:]}")
             for line in proc.stdout.splitlines():
@@ -264,7 +560,7 @@ TURN = re.compile(r"^(.{1,40}?): (.*)$", re.DOTALL)
 
 def prompt_blocks(raw: str, cleaned: str) -> list[dict]:
     """Blank-line blocks of the raw prompt, flagged `dropped` when the proxy's cleaned prompt lacks them."""
-    split = lambda s: [b.strip() for b in s.rstrip().split("\n\n") if b.strip()]  # noqa: E731
+    split = lambda s: [b.strip() for b in s.rstrip().split("\n\n") if b.strip()]
     have = Counter(split(cleaned))
     out = []
     for b in split(raw):
@@ -337,7 +633,7 @@ def observatory_day(date: str) -> dict:
             records.append(r)
     align_candidate_tokens(records)
     n = len(records)
-    mean = lambda xs: (sum(xs) / len(xs)) if xs else None  # noqa: E731
+    mean = lambda xs: (sum(xs) / len(xs)) if xs else None
     chosen_lp = []
     for r in records:
         for c in r.get("candidates", []):
@@ -428,6 +724,16 @@ def list_weaves() -> list[dict]:
     return out
 
 
+def delete_weave(name: str) -> dict:
+    if not WEAVE_NAME.match(name):
+        raise ValueError("bad weave name")
+    p = WEAVES / f"{name}.json"
+    if not p.exists():
+        raise ValueError("no such weave")
+    p.unlink()
+    return {"ok": True, "name": name}
+
+
 def save_weave(name: str, weave: dict) -> dict:
     if not WEAVE_NAME.match(name):
         raise ValueError("weave name must match [A-Za-z0-9][A-Za-z0-9._-]{0,63}")
@@ -515,7 +821,33 @@ class Handler(BaseHTTPRequestHandler):
                 return self._static(path[len("/static/"):])
             if path == "/api/servers":
                 return self._json({"servers": probe_servers(), "serving": serving_links(),
-                                   "checkpoints": checkpoint_dirs(), "root": str(ROOT)})
+                                   "checkpoints": checkpoint_dirs(), "root": str(ROOT), "version": version_info(),
+                                   "serve": dict(SERVE_STATE, port=CFG["serve_port"])})
+            if path == "/api/version":
+                return self._json(version_info())
+            if path == "/api/scorers":
+                return self._json({"checkpoints": scorer_checkpoints(), "judge": {"leaf": str(CFG["judge_leaf"]),
+                                   "base": str(CFG["judge_base"])}, "worker": (SCORER.failed if SCORER else "no scorer")})
+            if path == "/api/labels":
+                return self._json(label_summary())
+            if path == "/api/roombank":
+                stem = (q.get("sheet") or [None])[0]
+                if stem is None:
+                    return self._json(roombank_pairs())
+                try:
+                    return self._json(roombank_sheet(stem))
+                except (ValueError, FileNotFoundError) as e:
+                    return self._error(404, str(e))
+            if path == "/api/roomstate/status":
+                return self._json(roomstate_status())
+            if path.startswith("/api/roomstate/"):
+                sub = path[len("/api/roomstate"):]
+                try:
+                    return self._json(roomstate("GET", sub, timeout=60))
+                except urllib.error.HTTPError as e:
+                    return self._send(e.code, e.read())
+                except Exception as e:  # noqa: BLE001
+                    return self._error(502, f"room-state server: {e}")
             if path == "/api/observatory":
                 date = (q.get("date") or [None])[0]
                 if date is None:
@@ -571,6 +903,33 @@ class Handler(BaseHTTPRequestHandler):
                     return self._json(save_weave(name, weave))
                 except ValueError as e:
                     return self._error(400, str(e))
+            if path == "/api/weaves/delete":
+                try:
+                    return self._json(delete_weave(str(body.get("name") or "")))
+                except ValueError as e:
+                    return self._error(400, str(e))
+            if path == "/api/labels":
+                try:
+                    return self._json(append_label(body))
+                except ValueError as e:
+                    return self._error(400, str(e))
+            if path == "/api/score":
+                return self._score(body)
+            if path == "/api/serve":
+                try:
+                    return self._json(serve_checkpoint(str(body.get("checkpoint") or ""), body.get("name")))
+                except ValueError as e:
+                    return self._error(400, str(e))
+                except Exception as e:  # noqa: BLE001
+                    return self._error(500, str(e))
+            if path.startswith("/api/roomstate/"):
+                sub = path[len("/api/roomstate"):]
+                try:
+                    return self._json(roomstate("POST", sub, body, timeout=600))
+                except urllib.error.HTTPError as e:
+                    return self._send(e.code, e.read())
+                except Exception as e:  # noqa: BLE001
+                    return self._error(502, f"room-state server: {e}")
             return self._error(404, "not found")
         except json.JSONDecodeError as e:
             return self._error(400, f"bad JSON: {e}")
@@ -578,6 +937,45 @@ class Handler(BaseHTTPRequestHandler):
             return self._error(500, f"{type(e).__name__}: {e}")
         finally:
             print(f"POST {path} {int((time.time() - t0) * 1000)}ms", flush=True)
+
+    def do_DELETE(self):
+        path = urllib.parse.urlsplit(self.path).path
+        if path.startswith("/api/roomstate/"):
+            try:
+                return self._json(roomstate("DELETE", path[len("/api/roomstate"):], timeout=60))
+            except urllib.error.HTTPError as e:
+                return self._send(e.code, e.read())
+            except Exception as e:  # noqa: BLE001
+                return self._error(502, f"room-state server: {e}")
+        return self._error(404, "not found")
+
+    def _score(self, body: dict) -> None:
+        """Stream per-item scores: {type:'start'}, one {type:'result'} per item (worker calls are per item so the
+        first result lands early), then {type:'done'}."""
+        if SCORER is None:
+            return self._error(503, "scorer not configured")
+        checkpoint = body.get("checkpoint")
+        items = body.get("items")
+        if not isinstance(checkpoint, str) or not isinstance(items, list) or not items or len(items) > 200:
+            return self._error(400, "need checkpoint and 1..200 items of {id, context, text}")
+        for it in items:
+            if not isinstance(it, dict) or "id" not in it or not isinstance(it.get("text"), str):
+                return self._error(400, "each item needs id and text (context optional)")
+            it["context"] = it.get("context") or ""
+        ranks = bool(body.get("ranks", True))
+        self._stream_begin()
+        self._stream_line({"type": "start", "checkpoint": checkpoint, "n": len(items)})
+        for it in items:
+            try:
+                res = SCORER.score(checkpoint, [it], ranks)
+                r = res["results"].get(it["id"])
+                self._stream_line({"type": "result", "id": it["id"], "result": r, "seconds": res["seconds"],
+                                   "loaded": res["loaded"], "checkpoint": res["checkpoint"]})
+            except Exception as e:  # noqa: BLE001
+                self._stream_line({"type": "error", "id": it["id"], "message": str(e)})
+                break
+        self._stream_line({"type": "done"})
+        self._stream_end()
 
     def _static(self, rel: str) -> None:
         target = (STATIC / rel).resolve()
@@ -617,8 +1015,12 @@ class Handler(BaseHTTPRequestHandler):
             upstream["repetition_penalty"] = float(rp)
         sampler = {"temperature": temperature, "top_p": top_p, "max_tokens": max_tokens, "stop": stop,
                    "repetition_penalty": upstream.get("repetition_penalty")}
+        srv = next((x for x in probe_servers() if x["url"] == server), {})
+        repro = {"server": server, "model": model, "checkpoint": srv.get("path"), "backend": "mlx_lm.server",
+                 "tokenizer_sha": version_info()["tokenizer_sha"], "explorer": version_info()["explorer"],
+                 "stop": stop, "logprobs": True, "seed": None}
         self._stream_begin()
-        self._stream_line({"type": "start", "n": n, "server": server, "model": model, "sampler": sampler})
+        self._stream_line({"type": "start", "n": n, "server": server, "model": model, "sampler": sampler, "repro": repro})
         for i in range(n):
             t0 = time.time()
             try:
@@ -636,7 +1038,7 @@ class Handler(BaseHTTPRequestHandler):
                     "tokens": tokens, "finish_reason": choice.get("finish_reason"),
                     "mean_logprob": (sum(valid) / len(valid)) if valid else None,
                     "seconds": round(time.time() - t0, 3), "server": server, "model": model, "sampler": sampler,
-                    "created": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "usage": resp.get("usage"),
+                    "created": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "usage": resp.get("usage"), "repro": repro,
                 })
             except urllib.error.HTTPError as e:
                 detail = e.read().decode("utf-8", "replace")[:500]
@@ -658,11 +1060,14 @@ def main() -> None:
     ap.add_argument("--tokenizer", type=Path, default=CFG["tokenizer"])
     ap.add_argument("--haunt-index", type=Path, default=CFG["haunt_index"])
     ap.add_argument("--observatory", type=Path, default=CFG["observatory"])
+    ap.add_argument("--roomstate", default=CFG["roomstate"], help="room-state server (hbox forward) base URL")
     ap.add_argument("--verbose", action="store_true", help="log every HTTP request")
     args = ap.parse_args()
 
-    global DEC, ENC
+    global DEC, ENC, SCORER
     CFG["tokenizer"], CFG["haunt_index"], CFG["observatory"] = args.tokenizer, args.haunt_index, args.observatory
+    CFG["roomstate"] = args.roomstate.rstrip("/")
+    SCORER = Scorer(CFG["jax_python"], CFG["tokenizer"])
     if args.server:
         SERVER_URLS.clear()
         for s in args.server:
