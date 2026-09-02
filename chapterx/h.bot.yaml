@@ -10,8 +10,8 @@ temperature: 0.9
 top_p: 0.95
 max_tokens: 96
 
-recency_window_messages: 60
-recency_window_characters: 6000
+recency_window_messages: 40
+recency_window_characters: 4000
 hard_max_characters: 12000
 rolling_threshold: 20
 recent_participant_count: 8

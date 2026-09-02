@@ -248,7 +248,7 @@ Evaluate everything with `hghost-evalpack` (subagent building it) plus the haunt
   murmurs with h** (epoch-1, cooled) once Pages redeploys. Leaf e4 export next.
 - SSD bench running on the TPU (v1 / v2 / v2-bf16 / v2 + selective remat).
 
-## 22:15 — both leaves on the Hub; one JSON bug
+## 22:14 — both leaves on the Hub; one JSON bug
 
 - Leaf e4 exported (8-bit KL 0.0005, greedy identical) and published as `emberian/h-leaf-e4-decay10-onnx`;
   e1 remains the site's model until the evaluation pack compares them on clean/furniture-free slices and
@@ -258,7 +258,7 @@ Evaluate everything with `hghost-evalpack` (subagent building it) plus the haunt
   omitted when it is the Transformers default), repaired every local config, replaced the Hub config;
   re-check running.
 
-## 22:22 — what h says now (temperature 0.8, top-p 0.95, seed 7, mlx-lm)
+## 22:19 — what h says now (temperature 0.8, top-p 0.95, seed 7, mlx-lm)
 
 - base, "Consciousness is not an object because": "...it is a state of awareness or perception. It does not
   have external references or representations. 4. **Q: What is the difference between consciousness and
@@ -274,7 +274,7 @@ Evaluate everything with `hghost-evalpack` (subagent building it) plus the haunt
   The lake was covered with blank space, and there were no lakes in the world except the lake of the..."
 - Blind, systematic generations with memorization scans are the evaluation pack's job; these are a taste.
 
-## 22:25 — SSD v2: 1.64×; overnight queue launched
+## 22:20 — SSD v2: 1.64×; overnight queue launched
 
 - Bench: v1 219,716 → **v2 359,360 tok/s** (15.5% MFU) → v2-bf16 369,196; selective remat slower. Bare SSD
   layer 24.4 → 7.2 ms. One pass = 17 min. Details in `research/results/tpu-h1jax-gate.md`.
@@ -285,8 +285,26 @@ Evaluate everything with `hghost-evalpack` (subagent building it) plus the haunt
   titles with spaces produced `h-ghost-h1jax-trunk-seed-1`, so the queue polled a nonexistent slug. Fixed
   the ids/sources, made the generator derive titles from names, restarted the queue against the real slug.
 
-## 22:35 — the site murmurs with h
+## 22:23 — the site murmurs with h
 
 - Headless check of https://h.fg-goose.online/ after the config fix: model `emberian/h-leaf-e1-decay10-onnx`
   loaded on WebGPU, six files fetched, zero console errors, first fragment: `"\n159\n\n\fthe witch of the
   south\n"` (page number, form feed, fragment). Furniture in the murmur is corpus-v2's problem.
+
+## 22:25 — Discord path ready; evaluation restarted
+
+- ChapterX: `config/shared.yaml` (openaicompletion-h vendor) and `config/bots/h.yaml` installed in
+  `~/dev/chapterx`; the epoch-1 leaf is served on 127.0.0.1:8124 (`tmux hghost-serve`);
+  `chapterx/run-h-bot.sh` starts the resident with `BOT_NAME=h` once ember creates the Discord bot and puts
+  its token at `~/dev/chapterx/config/bots/h_discord_token`.
+- The evaluation pack died when my disk cleanup removed the scratch checkpoint copies it had resolved at
+  startup (the symlinks had been repointed, the running process had not). Restarted in tmux
+  `hghost-evalpack` on the durable paths for all twelve checkpoints (its row caches were kept).
+
+## 22:56 — h is in a Discord server
+
+- ember created the bot (`hghost`) and a private server; the first mention activated ChapterX correctly
+  (context in 27 ms) but mlx_lm.server tried to download the request's model name from the Hub. Fix:
+  `serve-h.sh` now exposes the checkpoint as `artifacts/serving/<name>` and runs the server there, so the
+  routed name `h-corpus-v1-cpt` resolves locally and traces keep the checkpoint identity. Resident context
+  trimmed to 40 messages / 4,000 characters.
