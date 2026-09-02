@@ -42,3 +42,4 @@ spend in bounded, reported increments; never launch a run whose worst case excee
 | 2026-09-02 03:20 | h-ghost-h1jax-room05b-e2 | v1 | 66 | **COMPLETE** 04:12: second epoch of the room mix from the e1 pre-cooldown checkpoint, cooled; library 2.893 -> 2.858, room 2.609 -> 2.582, fixed-32 3.021 -> 3.016; 131K tok/s |
 | 2026-09-02 02:27 | h-ghost-gpu-room-eval (GPU) | v3 | ~60 | COMPLETE: 0.5B base + e1 pre-cooldown + e1 cooled on a T4; agrees with hbox and the TPU to 4 decimals |
 | 2026-09-02 04:44 | h-ghost-gpu-room-eval (GPU) | v4 | (running) | e2 checkpoints |
+| 2026-09-02 04:46 | h-ghost-gpu-room-eval-91m (GPU) | v1 | (queued, est 200) | re-run of the lost v2: 91M trunk checkpoints + leaves with the 90M base, own kernel id |

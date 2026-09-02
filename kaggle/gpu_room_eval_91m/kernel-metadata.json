@@ -1,0 +1,24 @@
+{
+  "id": "emberian64/h-ghost-gpu-room-eval-91m",
+  "title": "H Ghost GPU room eval 91m",
+  "code_file": "run.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "dataset_sources": [
+    "emberian64/hghost-jax-code-public",
+    "emberian64/hghost-falcon-h1-90m-base-public",
+    "emberian64/hghost-curated-tokens-v1",
+    "emberian64/hghost-curated-tokens-v1-2-room"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [
+    "emberian64/h-ghost-h1jax-cpt-91m",
+    "emberian64/h-ghost-h1jax-leaf-e4-decay10",
+    "emberian64/h-ghost-h1jax-leaf-s1-e4"
+  ],
+  "model_sources": []
+}
