@@ -546,3 +546,10 @@ New main line, h first:
   unchanged) and to the 1.5B gate (default fsdp). CPU rehearsal on 8 simulated devices: fsdp vs replicated losses agree
   to ~3e-3 per step (5.311 vs 5.309; final val 4.856 vs 4.858), checkpoints save. 1.5B gate rehearsal running; the two
   1.5B datasets uploading.
+- 15:25: corpus-v2 admission delivered (hghost-admission; spec research/corpus-v2-admission.md; outputs artifacts/corpus-v2):
+  no engine confidence exists anywhere, so fidelity is text-only (noisy-OR of ramped signals); 2x2 at fidelity>=0.6 /
+  value>=0.5: main 334.9M tokens (88.4%), quarantine/re-OCR 41.3M (10.9%), specialist 1.2M, drop 1.5M; proposed
+  manifest with family-clean validation (2.96M) and test (2.54M). Gold set: 300 pages, 1,168 checks; current extraction
+  passes 67.6%, the reading view 78.9%; column order fails on 56% of multi-column pages. Review sheet for ember:
+  artifacts/corpus-v2/gold/review.html. Top re-OCR: Book of Curiosities, von Foerster Cybernetics of Cybernetics,
+  Ted Nelson Computer Lib (letter-spaced), Greek/Coptic/Akkadian editions read as Latin.
