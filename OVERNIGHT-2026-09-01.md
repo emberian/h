@@ -528,3 +528,8 @@ New main line, h first:
   room-other / h utterance / h label; reports unweighted loss, weighted loss, h-span loss, and h-span loss on the room
   holdout). Sidecars built for v1.3 (h utterances 2.97M tokens = 0.7%, labels 302K) and uploading as dataset v3. Three
   arms generated at matched compute to e2-v3: h x8; visitors x0.25 + h x4; visitors x0 + h x4. CPU rehearsal running.
+- 14:59: persistent-state room server delivered (hbox, :8140 via ssh forward): cache == re-render within bf16 noise;
+  fork/commit/rollback/snapshot verified; ~1 s per candidate. Finding: transformers 4.57.1 reference Mamba path ignores
+  the cache for multi-token forwards (handled with a chunked continuation). DATA FINDING: after two exchanges the model
+  emits EOS at p~0.99: scenes are two-exchange documents ending in EOS, so it learned that rooms end there. Fix for the
+  next mix: stitch scenes into longer rooms (3-6 scenes per document, one frame, consistent names).
