@@ -26,3 +26,6 @@ spend in bounded, reported increments; never launch a run whose worst case excee
 
 | 2026-09-01 21:42 | h-ghost-h1jax-leaf-e1-decay10 | v1 | 3 | ERROR: branch glob named the checkpoint by requested tokens, not batch-aligned tokens (fixed) |
 | 2026-09-01 19:39 | h-ghost-h1jax-cpt-91m | v1 | 122 | **COMPLETE** 21:41: 4-epoch WSD trunk, 8 checkpoints (analysis pending) |
+| 2026-09-01 21:46 | h-ghost-h1jax-leaf-e1-decay10 | v2 | 9 | COMPLETE: cooled epoch-1 checkpoint, val 3.280 → 3.234 |
+| 2026-09-01 21:55 | h-ghost-h1jax-leaf-e4-decay10 | v1 | 9 | COMPLETE: cooled epoch-4 checkpoint, val 3.163 → 3.136 |
+| 2026-09-01 22:04 | h-ghost-h1jax-ssd-bench | v1 | (running) | SSD v1 / v2 / v2-bf16 / v2+selective remat on the full step |

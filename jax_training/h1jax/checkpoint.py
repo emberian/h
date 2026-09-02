@@ -70,6 +70,11 @@ def write_hf_config(cfg: FalconH1Config, output: str | Path, *, dtype: str = "fl
     root = Path(output).expanduser().resolve()
     root.mkdir(parents=True, exist_ok=True)
     values = cfg.to_dict()
+    # JSON has no Infinity: JavaScript readers (transformers.js) reject it. The Transformers default for
+    # time_step_limit is (0, inf), so omit the field whenever it is the default.
+    limit = values.get("time_step_limit")
+    if limit is not None and (limit[1] == float("inf") or limit[1] is None):
+        values.pop("time_step_limit", None)
     values.update(
         {
             "architectures": ["FalconH1ForCausalLM"],

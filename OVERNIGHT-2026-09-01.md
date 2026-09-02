@@ -247,3 +247,13 @@ Evaluate everything with `hghost-evalpack` (subagent building it) plus the haunt
   `emberian/h-leaf-e1-decay10-onnx`; `site/config.js` points at it, so **https://h.fg-goose.online/ now
   murmurs with h** (epoch-1, cooled) once Pages redeploys. Leaf e4 export next.
 - SSD bench running on the TPU (v1 / v2 / v2-bf16 / v2 + selective remat).
+
+## 22:15 — both leaves on the Hub; one JSON bug
+
+- Leaf e4 exported (8-bit KL 0.0005, greedy identical) and published as `emberian/h-leaf-e4-decay10-onnx`;
+  e1 remains the site's model until the evaluation pack compares them on clean/furniture-free slices and
+  memorization.
+- The first live-site check failed: `h1jax.write_hf_config` serialized `time_step_limit` as
+  `[0.0, Infinity]`, which Python's json accepts and JavaScript's rejects. Fixed at the source (the field is
+  omitted when it is the Transformers default), repaired every local config, replaced the Hub config;
+  re-check running.
