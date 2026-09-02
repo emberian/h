@@ -533,3 +533,8 @@ New main line, h first:
   the cache for multi-token forwards (handled with a chunked continuation). DATA FINDING: after two exchanges the model
   emits EOS at p~0.99: scenes are two-exchange documents ending in EOS, so it learned that rooms end there. Fix for the
   next mix: stitch scenes into longer rooms (3-6 scenes per document, one frame, consistent names).
+- 15:10: room evaluation bank built (106 states: trace/observatory/variant/scenario; direct, ambient, callback,
+  disagreement, joke, silence, request). Live e2-v3: mean context lift +0.318 nats (median +0.285; 61% > 0); strongest on
+  direct (+0.46) and ambient (+0.47), ~0 on request, negative on silence states; 34% of replies echo a room line at
+  >=0.6 overlap (45% on direct states, mostly copying the 91M-era "W@" lines still in trace histories). This is the
+  baseline for the weighting arms. hghost-roombank: build / sample / lift / pairs.
