@@ -565,3 +565,5 @@ New main line, h first:
   sanity step finite (loss 3.81 on 512 tokens). Gate queued behind the last weighting arm once its datasets are visible.
 - 15:38: corpus-v1.4-room uploaded (private): 418,910,456 tokens; rooms 10.6%; h utterances 3.59M tokens (0.86%),
   labels 341K; sidecars built with 0 fallbacks. e2-v4 kernel generation and queue14 (after the 1.5B gate) are armed.
+- 15:59: the 1.5B corpus dataset had failed to create (title 53 chars > Kaggle's 50); title shortened and re-uploaded.
+  The gate queue (queue13) pushes only after the last arm, so no time is lost.
