@@ -441,3 +441,8 @@ New main line, h first:
 - 02:47: judge comparison: 91M leaf room replies NLL 4.567 (base) / 4.865 (leaf), delta +0.30; 0.5B room replies
   3.422 / 3.361, delta -0.06. The 0.5B replies are fluent under both models and lean library; the 91M replies are
   odd under both.
+- 02:59: GATE PASSED for the cooled 0.5B: library 2.893 (91M leaf 3.134), clean-512 2.624 (base05b 2.858),
+  furniture-free clean 2.743 (2.963), retention 3.142 (base05b 3.208, improved), room 2.609 (3.240), no quotation
+  at 16+, replies read alive with the bare frame. Served in Discord as `h-05b-room-e1` on :8124 with the bare
+  frame and the blank-line stop; the 91M bot config saved as h.yaml.pre-05b. hbox room table (old frame) confirms
+  the frame lines get quoted back.

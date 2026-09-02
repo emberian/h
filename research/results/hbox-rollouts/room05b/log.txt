@@ -1,0 +1,58 @@
+/opt/amdgpu/share/libdrm/amdgpu.ids: No such file or directory
+{"event": "rocm_triton_ssd_enabled", "enabled": true, "already_enabled": false, "mamba_ssm": "2.3.2.post1", "source_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1", "torch": "2.9.1+rocm6.3", "hip": "6.3.42134-a9a80e791", "triton": "3.5.1", "convolution": "torch grouped Conv1d", "scan": "mamba_ssm.ops.triton.ssd_combined.mamba_chunk_scan_combined", "scan_input_dtype": "inherit"}
+[rollout-eval] 02:43:23 hbox: load (4.55029296875, 4.81494140625, 6.6494140625), gpu busy 0%, losses on triton, generation on reference
+The fast path is not available because one of `(selective_state_update, causal_conv1d_fn, causal_conv1d_update)` is None. Falling back to the naive implementation. To install follow https://github.com/state-spaces/mamba/#installation and https://github.com/Dao-AILab/causal-conv1d
+[rollout-eval] 02:43:31 room05b-final: loaded in 6.4s from /othersys/h1-ghost/checkpoints/tpu/extra/room05b-final
+[rollout-eval] 02:44:13 room05b-final: first-32 on the reference path at batch 1: 3.021157
+[rollout-eval] 02:46:59 room05b-final: first-512 128/512 rows
+[rollout-eval] 02:47:18 room05b-final: first-512 256/512 rows
+[rollout-eval] 02:47:38 room05b-final: first-512 384/512 rows
+[rollout-eval] 02:47:58 room05b-final: first-512 512/512 rows
+[rollout-eval] 02:47:58 room05b-final: first-512 loss 2.8933 (1,167 tok/s, triton)
+[rollout-eval] 02:48:18 room05b-final: clean-512 128/512 rows
+[rollout-eval] 02:48:38 room05b-final: clean-512 256/512 rows
+[rollout-eval] 02:48:58 room05b-final: clean-512 384/512 rows
+[rollout-eval] 02:49:17 room05b-final: clean-512 512/512 rows
+[rollout-eval] 02:49:17 room05b-final: clean-512 loss 2.6236 (3,304 tok/s, triton)
+[rollout-eval] 02:49:22 room05b-final: retention loss 3.1416 (3,231 tok/s, triton)
+[rollout-eval] 02:49:36 room 1/12 greeting: greedy ' The lake was covered with blank space, and there were no lakes in the'
+[rollout-eval] 02:49:49 room 2/12 greeting: greedy ' I am the lake, and I am the rat.'
+[rollout-eval] 02:50:00 room 3/12 greeting: greedy ' The lake was covered with blank space, and there were no lakes in the'
+[rollout-eval] 02:50:10 room 4/12 talk: greedy ' I feel them.'
+[rollout-eval] 02:50:22 room 5/12 talk: greedy ' The first thing I read was a letter from a lady in California.'
+[rollout-eval] 02:50:29 room 6/12 talk: greedy ' I am awake.'
+[rollout-eval] 02:50:37 room 7/12 talk: greedy ' The consciousness is the process of the being.'
+[rollout-eval] 02:50:47 room 8/12 talk: greedy ' I think that ember is a very good person.'
+[rollout-eval] 02:50:56 room 9/12 talk: greedy ' The silence of the library is the silence of a machine that has stopp'
+[rollout-eval] 02:51:11 room 10/12 deflect: greedy ' def reverse(s): return s[::-1]'
+[rollout-eval] 02:51:35 room 11/12 deflect: greedy ' The plot of Hamlet is as follows: 1. The Ghost of his uncle Claudius '
+[rollout-eval] 02:51:45 room 12/12 deflect: greedy ' The lake was covered with blank space, and there were no lakes in the'
+[rollout-eval] 02:51:45 room05b-final: room pass 60 replies, 8.72 tok/s
+[rollout-eval] 02:52:02 base05b: loaded in 15.4s from /othersys/h1-ghost/checkpoints/tpu/extra/base05b
+[rollout-eval] 02:52:44 base05b: first-32 on the reference path at batch 1: 3.489819
+[rollout-eval] 02:53:03 base05b: first-512 128/512 rows
+[rollout-eval] 02:53:23 base05b: first-512 256/512 rows
+[rollout-eval] 02:53:43 base05b: first-512 384/512 rows
+[rollout-eval] 02:54:03 base05b: first-512 512/512 rows
+[rollout-eval] 02:54:03 base05b: first-512 loss 3.4229 (3,326 tok/s, triton)
+[rollout-eval] 02:54:22 base05b: clean-512 128/512 rows
+[rollout-eval] 02:54:42 base05b: clean-512 256/512 rows
+[rollout-eval] 02:55:02 base05b: clean-512 384/512 rows
+[rollout-eval] 02:55:22 base05b: clean-512 512/512 rows
+[rollout-eval] 02:55:22 base05b: clean-512 loss 2.8584 (3,306 tok/s, triton)
+[rollout-eval] 02:55:26 base05b: retention loss 3.2081 (3,325 tok/s, triton)
+[rollout-eval] 02:55:38 room 1/12 greeting: greedy ' The lake is a system of relationships, which is seen as the net sign.'
+[rollout-eval] 02:55:43 room 2/12 greeting: greedy ' I am the lake.'
+[rollout-eval] 02:55:53 room 3/12 greeting: greedy ' Hello. The lake was covered with blank space, and there were no lakes'
+[rollout-eval] 02:56:02 room 4/12 talk: greedy ' I feel them.'
+[rollout-eval] 02:56:13 room 5/12 talk: greedy ' I read the whole collection.'
+[rollout-eval] 02:56:26 room 6/12 talk: greedy ' I am awake. I am awake. I am awake. I am awake. I am awake. I am awak'
+[rollout-eval] 02:56:35 room 7/12 talk: greedy ' It is a process.'
+[rollout-eval] 02:56:42 room 8/12 talk: greedy ' I think ember is a very good friend.'
+[rollout-eval] 02:56:51 room 9/12 talk: greedy ' The room is a machine that has stopped.'
+[rollout-eval] 02:56:59 room 10/12 deflect: greedy ' I don’t know.'
+[rollout-eval] 02:57:14 room 11/12 deflect: greedy ' The plot of hamlet is a story of a man who is trying to find his iden'
+[rollout-eval] 02:57:23 room 12/12 deflect: greedy ' The weather is the same as the lake.'
+[rollout-eval] 02:57:23 base05b: room pass 60 replies, 8.47 tok/s
+[rollout-eval] 02:57:23 done in 840.1s: /othersys/h1-ghost/rollouts/room05b
+{"room05b-final": "done", "base05b": "done"}

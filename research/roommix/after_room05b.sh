@@ -24,5 +24,5 @@ hbox_training/run_rollout_eval.sh all --run room05b --room --skip-generation \
 # judge: library-likeness of the room replies
 PYTHONPATH=jax_training .venv-jax/bin/python research/eval/judge.py --base kaggle/base_model_dataset_public \
   --model artifacts/checkpoints/tpu/h-ghost-h1jax-leaf-s1-e4/leaf-s1-e4-decay10/tokens-001535061369 \
-  --texts research/results/hbox-rollouts/room05b/room-room05b-final.jsonl --field completion --max-tokens 96 \
+  --texts research/results/hbox-rollouts/room05b/room-room05b-final.jsonl --field text --max-tokens 96 \
   --output research/results/hbox-rollouts/room05b/judge-room05b-final.jsonl | tail -3
