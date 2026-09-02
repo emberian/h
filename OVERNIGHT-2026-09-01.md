@@ -561,3 +561,5 @@ New main line, h first:
   last arm, gated on the CPU rehearsal and the dataset uploads) -> room05b-e2-v4 (second epoch on corpus-v1.4-room,
   matched to e2-v3; queue14 waits on the gate). After that about 4 TPU hours remain for the week. corpus-v1.4-room is
   building (A x6 + B x8 + C x8, stitched).
+- 15:32: 1.5B-deep FSDP gate rehearsal passed on 8 simulated devices: argument size 2.33 GB per chip (18.66 GB replicated),
+  sanity step finite (loss 3.81 on 512 tokens). Gate queued behind the last weighting arm once its datasets are visible.
