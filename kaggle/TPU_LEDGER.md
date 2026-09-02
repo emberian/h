@@ -33,7 +33,8 @@ spend in bounded, reported increments; never launch a run whose worst case excee
 | 2026-09-01 22:20 | h-ghost-h1jax-trunk-seed-1 | v1 | 76 | COMPLETE 23:36: seed-1 replicate trunk, 4 epochs, SSD v2 |
 | 2026-09-01 23:36 | h-ghost-h1jax-leaf-s1-e1 | v1 | 9 | COMPLETE: seed-1 cooled epoch-1 leaf, val 3.285 → 3.235 (seed 0: 3.234) |
 | 2026-09-01 23:50 | h-ghost-h1jax-leaf-s1-e4 | v1 | 9 | COMPLETE: seed-1 cooled epoch-4 leaf, val 3.164 → 3.134 (seed 0: 3.136) |
-| 2026-09-02 00:38 | h-ghost-gpu-room-eval (GPU) | v1 | 5 | ERROR: P100 unsupported by image torch + cuda_sync recursion; v2 on T4 | evaluator over 91M trunk + leaves + 0.5B base; GPU quota |
+| 2026-09-02 00:38 | h-ghost-gpu-room-eval (GPU) | v1 | 5 | ERROR: P100 unsupported by image torch + cuda_sync recursion |
+| 2026-09-02 00:48 | h-ghost-gpu-room-eval (GPU) | v2 | ~210 | LOST: ran ~3.5 h over the 91M checkpoints, then v3 was pushed while it ran and its output is not retrievable | evaluator over 91M trunk + leaves + 0.5B base; GPU quota |
 | 2026-09-01 23:59 | h-ghost-h1jax-trunk-mir | v1 | 39 | COMPLETE: MIR 0.4 at 32x512, one epoch, val 3.279 (plain 64x512 trunk at the same 374M tokens: 3.280); 194K tok/s. No gain at 2x compute. |
 | 2026-09-02 00:39 | h-ghost-h1jax-profile-gate-0-5b | v1 | 37 | **PASS** 0.5B: 16x512 remat 100,191 tok/s, 22.0% MFU, one 417M-token pass ~70 min; 8x512 93.5K, 32x512 93.4K (94% HBM); compile ~7 min/shape; base eval on the fixed slice 3.490 (91M base 3.746); sanity 30 steps finite |
 | 2026-09-02 01:19 | h-ghost-h1jax-room05b-e1 | v1 | 68 | **COMPLETE** 02:25: 0.5B one epoch on corpus-v1.2-room v2, 131K tok/s; library val 3.423 -> 2.893, room val 3.240 -> 2.609, fixed-32 3.490 -> 3.021; checkpoints at 375.8M (pre-cooldown) and 417.5M (cooled) |

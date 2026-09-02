@@ -483,3 +483,6 @@ New main line, h first:
 - 04:44: GPU eval v3 complete on a T4: 0.5B base / e1 pre-cooldown / e1 cooled = first-512 3.423 / 2.931 / 2.893, room
   3.240 / 2.636 / 2.609, retention 3.209 / 3.166 / 3.142; agrees with hbox and the TPU to four decimals. v4 pushed over
   e2. v2 (91M checkpoints) output not retrievable as the latest version; will retry by version if the CLI allows.
+- 04:46: GPU eval v2 (91M checkpoints, ~3.5 h on the T4) is not retrievable: pushing v3 while v2 ran appears to have
+  discarded v2 (the by-version output fetch returns nothing). Lesson: one Kaggle kernel id per concurrent job; never
+  push a new version of a kernel while an earlier version runs. The 91M room-loss column is lost for now.
