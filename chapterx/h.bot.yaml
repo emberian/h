@@ -12,6 +12,9 @@ continuation_model: "h-corpus-v1-cpt"
 temperature: 0.7
 top_p: 0.9
 max_tokens: 64
+# CTRL-style penalty applied by mlx_lm.server over the last 20 tokens; damps the "i i i" and self-echo
+# failure of a 91M base model without changing its voice (1.0 = off).
+repetition_penalty: 1.15
 
 recency_window_messages: 40
 recency_window_characters: 4000
