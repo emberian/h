@@ -486,3 +486,5 @@ New main line, h first:
 - 04:46: GPU eval v2 (91M checkpoints, ~3.5 h on the T4) is not retrievable: pushing v3 while v2 ran appears to have
   discarded v2 (the by-version output fetch returns nothing). Lesson: one Kaggle kernel id per concurrent job; never
   push a new version of a kernel while an earlier version runs. The 91M room-loss column is lost for now.
+- 04:47: re-pushed the 91M GPU evaluation under its own kernel id (h-ghost-gpu-room-eval-91m, 90M base, T4); it queues
+  behind v4 (e2). e2-v3 running on the TPU; its post-run chain is armed.
