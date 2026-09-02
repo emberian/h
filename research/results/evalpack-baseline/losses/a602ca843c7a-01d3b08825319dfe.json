@@ -1,0 +1,15 @@
+{
+  "checkpoint": "/Users/ember/dev/h/kaggle/base_model_dataset_public",
+  "rows": 1018,
+  "sequence_length": 512,
+  "batch": 8,
+  "compute_dtype": "float32",
+  "parameter_dtype": "float32",
+  "jax_version": "0.11.1",
+  "devices": [
+    "cpu:0"
+  ],
+  "python": "3.12.13",
+  "load_seconds": 4.471,
+  "seconds": 3368.251
+}

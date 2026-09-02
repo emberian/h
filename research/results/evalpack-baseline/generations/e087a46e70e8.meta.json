@@ -1,0 +1,17 @@
+{
+  "checkpoint": "/Users/ember/dev/h/artifacts/checkpoints/hbox-full-cpt-v1-10m",
+  "prompts": 12,
+  "base_seed": 20260901,
+  "max_tokens": 128,
+  "temperature": 0.8,
+  "top_p": 0.95,
+  "repetition_penalty": 1.08,
+  "config_repairs": {
+    "weights": "float32"
+  },
+  "dtype": "float32",
+  "mlx_lm_version": "0.32.0",
+  "mlx_version": "0.32.2",
+  "python": "3.14.6",
+  "seconds": 80.086
+}

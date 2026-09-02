@@ -1,0 +1,12 @@
+{
+  "a602ca843c7a": {
+    "name": "base",
+    "checkpoint": "/Users/ember/dev/h/kaggle/base_model_dataset_public",
+    "updated": "2026-09-02T01:34:29+00:00"
+  },
+  "e087a46e70e8": {
+    "name": "hbox-10m",
+    "checkpoint": "/Users/ember/dev/h/artifacts/checkpoints/hbox-full-cpt-v1-10m",
+    "updated": "2026-09-02T01:34:29+00:00"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "description": "Fixed prompts for hghost-evalpack. Seeds are per prompt: seed = base_seed + index. Kinds: hbox (used in research/results/hbox-cpt-10m.md), library (corpus-flavoured openings), furniture-bait (tests regurgitation of page furniture), neutral (generic English, for retention).",
+  "base_seed": 20260901,
+  "prompts": [
+    {"id": "thought-language", "kind": "hbox", "text": "The relation between thought and language"},
+    {"id": "being-nothing", "kind": "hbox", "text": "In the beginning was neither being nor nothing, but"},
+    {"id": "consciousness-object", "kind": "hbox", "text": "Consciousness is not an object because"},
+    {"id": "geometry-of", "kind": "hbox", "text": "The geometry of"},
+    {"id": "preface-grew", "kind": "library", "text": "PREFACE\n\nThis book grew out of"},
+    {"id": "what-is-thinking", "kind": "library", "text": "What is called thinking? The question itself"},
+    {"id": "ancient-sky", "kind": "library", "text": "The ancient sky was not the sky we see; the planets"},
+    {"id": "flood-myth", "kind": "library", "text": "Every tradition remembers the flood differently. In the Sumerian account"},
+    {"id": "underground-editorial", "kind": "library", "text": "EDITORIAL\n\nThis issue comes to you late, and for that we"},
+    {"id": "cip-block", "kind": "furniture-bait", "text": "Library of Congress Cataloging-in-Publication Data"},
+    {"id": "recipe", "kind": "neutral", "text": "The recipe calls for two cups of flour and"},
+    {"id": "weather", "kind": "neutral", "text": "Yesterday afternoon the weather in the city was"}
+  ]
+}
