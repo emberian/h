@@ -40,7 +40,8 @@ spend in bounded, reported increments; never launch a run whose worst case excee
 | 2026-09-02 01:19 | h-ghost-h1jax-room05b-e1 | v1 | 68 | **COMPLETE** 02:25: 0.5B one epoch on corpus-v1.2-room v2, 131K tok/s; library val 3.423 -> 2.893, room val 3.240 -> 2.609, fixed-32 3.490 -> 3.021; checkpoints at 375.8M (pre-cooldown) and 417.5M (cooled) |
 | 2026-09-02 03:20 | h-ghost-h1jax-room05b-e2 | v1 | 66 | **COMPLETE** 04:12: second epoch of the room mix from the e1 pre-cooldown checkpoint, cooled; library 2.893 -> 2.858, room 2.609 -> 2.582, fixed-32 3.021 -> 3.016; 131K tok/s |
 | 2026-09-02 02:27 | h-ghost-gpu-room-eval (GPU) | v3 | ~60 | COMPLETE: 0.5B base + e1 pre-cooldown + e1 cooled on a T4; agrees with hbox and the TPU to 4 decimals |
-| 2026-09-02 04:44 | h-ghost-gpu-room-eval (GPU) | v4 | (running) | e2 checkpoints |
 | 2026-09-02 04:46 | h-ghost-gpu-room-eval-91m (GPU) | v1 | (queued, est 200) | re-run of the lost v2: 91M trunk checkpoints + leaves with the 90M base, own kernel id |
 | 2026-09-02 04:12 | h-ghost-h1jax-room05b-e2-v3 | v1 | 66 | **COMPLETE** 05:38: second epoch on corpus-v1.3-room (scenes A x6 + B x8) from the e1 pre-cooldown; library 2.852 (e2 2.858), room 2.581 (2.582), fixed-32 3.011 (3.016); 131K tok/s |
 | 2026-09-02 05:55 | h-ghost-h1jax-room05b-e3 | v1 | (running, est 70) | third epoch on corpus-v1.3-room from the e2-v3 pre-cooldown (752.2M), cooled: the multi-epoch curve 1/2/3 |
+| 2026-09-02 04:44 | h-ghost-gpu-room-eval (GPU) | v4 | ~95 | COMPLETE: e2 pre-cooldown + cooled on a T4; agrees with hbox/TPU (2.858 / 2.628 / 3.142, room 2.582) |
+| 2026-09-02 07:08 | h-ghost-gpu-room-eval (GPU) | v5 | (running) | e2-v3 pre-cooldown + cooled |
