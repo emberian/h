@@ -34,7 +34,7 @@ os.environ.setdefault("H1JAX_SSD", os.environ.get("HGHOST_CPT_SSD", "v2"))
 if os.environ.get("HGHOST_CPT_REMAT_POLICY", ""):
     os.environ.setdefault("H1JAX_REMAT_POLICY", os.environ["HGHOST_CPT_REMAT_POLICY"])
 
-RUN_NAME = os.environ.get("HGHOST_CPT_RUN_NAME", "pilot-05b-lr5e-5")
+RUN_NAME = os.environ.get("HGHOST_CPT_RUN_NAME", "trunk-wsd-lr1e-4-wd0.3-seed0")
 OUTPUT = Path(os.environ.get("HGHOST_CPT_OUTPUT", f"/kaggle/working/{RUN_NAME}"))
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
@@ -77,31 +77,31 @@ from jax.sharding import PartitionSpec as P
 
 # ----------------------------------------------------------------------------- settings
 
-PER_CHIP = int(os.environ.get("HGHOST_CPT_PER_CHIP", "8"))
+PER_CHIP = int(os.environ.get("HGHOST_CPT_PER_CHIP", "64"))
 SEQ_LEN = int(os.environ.get("HGHOST_CPT_SEQ", "512"))
 REMAT = os.environ.get("HGHOST_CPT_REMAT", "1") == "1"
-TOTAL_TOKENS = int(os.environ.get("HGHOST_CPT_TOTAL_TOKENS", "30000000"))
-LEARNING_RATE = float(os.environ.get("HGHOST_CPT_LR", "5e-5"))
-WARMUP_TOKENS = int(os.environ.get("HGHOST_CPT_WARMUP_TOKENS", "3000000"))
+TOTAL_TOKENS = int(os.environ.get("HGHOST_CPT_TOTAL_TOKENS", "374405212"))
+LEARNING_RATE = float(os.environ.get("HGHOST_CPT_LR", "1e-4"))
+WARMUP_TOKENS = int(os.environ.get("HGHOST_CPT_WARMUP_TOKENS", "10000000"))
 MIN_LR_RATIO = float(os.environ.get("HGHOST_CPT_MIN_LR_RATIO", "0.1"))
-WEIGHT_DECAY = float(os.environ.get("HGHOST_CPT_WEIGHT_DECAY", "0.1"))
+WEIGHT_DECAY = float(os.environ.get("HGHOST_CPT_WEIGHT_DECAY", "0.3"))
 MAX_GRAD_NORM = float(os.environ.get("HGHOST_CPT_MAX_GRAD_NORM", "1.0"))
 SAVE_TOKENS = [
     int(v)
     for v in os.environ.get(
         "HGHOST_CPT_SAVE_TOKENS",
-        "",
+        "100000000,200000000",
     ).split(",")
     if v
 ]
-EVAL_EVERY_TOKENS = int(os.environ.get("HGHOST_CPT_EVAL_EVERY_TOKENS", "5000000"))
+EVAL_EVERY_TOKENS = int(os.environ.get("HGHOST_CPT_EVAL_EVERY_TOKENS", "25000000"))
 EVAL_SEQUENCES = int(os.environ.get("HGHOST_CPT_EVAL_SEQUENCES", "512"))
 FIXED_EVAL_SEQUENCES = int(os.environ.get("HGHOST_CPT_FIXED_EVAL_SEQUENCES", "32"))
 LOG_STEPS = int(os.environ.get("HGHOST_CPT_LOG_STEPS", "10"))
-MAX_MINUTES = float(os.environ.get("HGHOST_CPT_MAX_MINUTES", "45"))
+MAX_MINUTES = float(os.environ.get("HGHOST_CPT_MAX_MINUTES", "60"))
 BUDGET_MARGIN_MINUTES = float(os.environ.get("HGHOST_CPT_BUDGET_MARGIN_MINUTES", "6"))
 SEED = int(os.environ.get("HGHOST_CPT_SEED", "0"))
-SCHEDULE = os.environ.get("HGHOST_CPT_SCHEDULE", "cosine")  # cosine | wsd
+SCHEDULE = os.environ.get("HGHOST_CPT_SCHEDULE", "wsd")  # cosine | wsd
 DECAY_TOKENS = int(
     os.environ.get("HGHOST_CPT_DECAY_TOKENS", "0")
 )  # wsd: decay over the last N tokens
@@ -120,6 +120,61 @@ MIR_MASK_ID = int(
     os.environ.get("HGHOST_CPT_MIR_MASK_ID", "0")
 )  # <|pad|>, never in the corpus
 HBOX_BASE_EVAL = {"loss": 3.745613, "accuracy": 0.349426}
+ROLLOUT_STEPS = int(
+    os.environ.get("HGHOST_CPT_ROLLOUT_STEPS", "64")
+)  # 0 disables in-run rollouts
+ROLLOUT_LENGTH = int(
+    os.environ.get("HGHOST_CPT_ROLLOUT_LENGTH", "96")
+)  # static prompt+generation length
+ROLLOUT_TEMPERATURE = float(os.environ.get("HGHOST_CPT_ROLLOUT_TEMPERATURE", "0.8"))
+# The twelve fixed evaluation prompts (research/eval/prompts.json), tokenized on the Mac so the kernel
+# needs no tokenizer; generated ids are logged and decoded offline.
+ROLLOUT_PROMPT_IDS = [
+    [1243, 10685, 1945, 3954, 823, 3222],
+    [1003, 784, 7730, 1179, 12862, 2600, 6473, 4598, 535, 1365],
+    [1137, 10477, 2359, 860, 1051, 954, 1878, 2392],
+    [1243, 14218, 813],
+    [4740, 9203, 805, 2353, 3023, 14596, 1281, 813],
+    [4662, 860, 2679, 8095, 554, 1007, 3958, 5374],
+    [1243, 7954, 11653, 1179, 1051, 784, 11653, 1047, 2320, 550, 784, 17132],
+    [
+        15910,
+        12423,
+        1706,
+        877,
+        1992,
+        784,
+        12060,
+        17161,
+        537,
+        1116,
+        784,
+        7948,
+        771,
+        1617,
+        3329,
+    ],
+    [
+        21875,
+        1223,
+        6703,
+        805,
+        2353,
+        6391,
+        6050,
+        817,
+        1138,
+        4763,
+        535,
+        823,
+        878,
+        935,
+        1047,
+    ],
+    [9575, 813, 10578, 31302, 796, 536, 769, 536, 8017, 849, 3245],
+    [1243, 20232, 7970, 878, 1703, 17004, 813, 15463, 823],
+    [580, 24887, 22149, 784, 9186, 809, 784, 5219, 1179],
+]
 
 started_wall = time.monotonic()
 
@@ -465,6 +520,73 @@ eval_step = jax.jit(
     _eval_step, in_shardings=(REPLICATED, SHARDED), out_shardings=REPLICATED
 )
 
+
+# ----------------------------------------------------------------------------- rollouts
+
+
+def _rollout_logits(p, tokens):
+    return falcon_h1_forward(
+        p,
+        tokens,
+        cfg,
+        compute_dtype=jnp.bfloat16,
+        gradient_checkpointing=False,
+        layer_scan=LAYER_SCAN,
+    )
+
+
+rollout_logits = jax.jit(
+    _rollout_logits, in_shardings=(REPLICATED, SHARDED), out_shardings=SHARDED
+)
+
+
+def rollouts(p, step: int) -> list[dict[str, Any]]:
+    """Greedy and sampled continuations of the fixed prompts at a static shape, one prompt per chip.
+
+    Twelve prompts are padded to ROLLOUT_LENGTH and generated token by token with a full recompute per
+    step (no cache; the model is causal, so padding after the current position is inert). Cheap at this
+    size and needs no tokenizer on the kernel side.
+    """
+
+    if ROLLOUT_STEPS <= 0:
+        return []
+    prompts = ROLLOUT_PROMPT_IDS
+    rows = ((len(prompts) + DEVICE_COUNT - 1) // DEVICE_COUNT) * DEVICE_COUNT
+    results = []
+    for mode in ("greedy", "sample"):
+        tokens = np.zeros((rows, ROLLOUT_LENGTH), dtype=np.int32)
+        lengths = np.zeros(rows, dtype=np.int32)
+        for i, ids in enumerate(prompts):
+            tokens[i, : len(ids)] = ids
+            lengths[i] = len(ids)
+        key = jax.random.PRNGKey(step * 7919 + (1 if mode == "sample" else 0))
+        for t in range(ROLLOUT_STEPS):
+            logits = jax.device_get(rollout_logits(p, jax.device_put(tokens, SHARDED)))
+            positions = lengths + t - 1
+            row_logits = logits[np.arange(rows), positions].astype(np.float32)
+            if mode == "greedy":
+                nxt = row_logits.argmax(-1)
+            else:
+                key, sub = jax.random.split(key)
+                nxt = np.asarray(
+                    jax.random.categorical(
+                        sub, jnp.asarray(row_logits) / ROLLOUT_TEMPERATURE
+                    )
+                )
+            write = np.minimum(positions + 1, ROLLOUT_LENGTH - 1)
+            tokens[np.arange(rows), write] = nxt
+        for i, ids in enumerate(prompts):
+            end = min(len(ids) + ROLLOUT_STEPS, ROLLOUT_LENGTH)
+            results.append(
+                {
+                    "prompt": i,
+                    "mode": mode,
+                    "generated": tokens[i, len(ids) : end].tolist(),
+                }
+            )
+    return results
+
+
 # ----------------------------------------------------------------------------- data
 
 train_stream = TokenStream(train_path, SEQ_LEN, seed=SEED)
@@ -569,6 +691,23 @@ def save(step: int, exposed: int, label: str, extra: dict | None = None) -> Path
         tokenizer_dir=base_root,
     )
     emit("checkpoint", path=str(checkpoint), step=step, tokens=exposed, label=label)
+    if ROLLOUT_STEPS > 0:
+        started = time.monotonic()
+        try:
+            samples = rollouts(params, step)
+            emit(
+                "rollouts",
+                step=step,
+                tokens=exposed,
+                seconds=time.monotonic() - started,
+                samples=samples,
+            )
+        except Exception as exc:  # noqa: BLE001
+            emit(
+                "rollouts_failed",
+                step=step,
+                error=f"{type(exc).__name__}: {str(exc)[:300]}",
+            )
     return checkpoint
 
 

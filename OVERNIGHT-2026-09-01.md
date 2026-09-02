@@ -338,3 +338,12 @@ Evaluate everything with `hghost-evalpack` (subagent building it) plus the haunt
   (`~/dev/chapterx/src/discord/context-fetch.ts`, uncommitted in that repo); bot restarted.
 - hbox rollout/loss evaluator subagent started (Transformers on the ROCm GPU; syncs checkpoints, writes
   per-token losses and fixed-seed generations, results back to `research/results/hbox-rollouts/`).
+- 23:36: `!reset` collided with ChapterX's `!`-prefixed "m command" handling, which deletes the command
+  message; without Manage Messages the bot spent minutes in a delete-retry loop and looked dead. Alias
+  renamed to `.reset` (dot namespace, like `.history`); bot restarted.
+- 23:38: Discord tuning stopped (ember: "not useful, back to training"). The resident needs the room as
+  a genre in its training data. Started the room-mix builder (subagent): corpus-native interview/transcript
+  blocks, Gutenberg Dialogue Dataset, When2Speak/MultiLIGHT rooms with `h` relabeled as a participant and a
+  companion file of speak/silent decisions, woven into v1 as corpus-v1.2-room (Kaggle-ready, not uploaded).
+- CPT kernel now logs in-run rollouts (greedy + sampled, twelve fixed prompts) at every checkpoint;
+  rehearsing on CPU. Applies to kernels generated after tonight's queue.

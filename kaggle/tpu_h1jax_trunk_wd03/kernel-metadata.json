@@ -1,0 +1,19 @@
+{
+  "id": "emberian64/h-ghost-h1jax-trunk-wd03",
+  "title": "H Ghost h1jax trunk-wd03",
+  "code_file": "run.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": false,
+  "enable_gpu": false,
+  "enable_tpu": true,
+  "enable_internet": false,
+  "dataset_sources": [
+    "emberian64/hghost-jax-code-public",
+    "emberian64/hghost-falcon-h1-90m-base-public",
+    "emberian64/hghost-curated-tokens-v1"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}
