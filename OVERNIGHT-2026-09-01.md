@@ -488,3 +488,5 @@ New main line, h first:
   push a new version of a kernel while an earlier version runs. The 91M room-loss column is lost for now.
 - 04:47: re-pushed the 91M GPU evaluation under its own kernel id (h-ghost-gpu-room-eval-91m, 90M base, T4); it queues
   behind v4 (e2). e2-v3 running on the TPU; its post-run chain is armed.
+- 05:39: e2-v3 COMPLETE (66 min): cooled library 2.852 (e2 2.858), room 2.581 (2.582), fixed-32 3.011 (3.016). Scene set B
+  costs nothing on the guardrails; the read (deflection) decides. Download + harvest + hbox + judge + room read armed.

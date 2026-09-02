@@ -38,8 +38,8 @@ spend in bounded, reported increments; never launch a run whose worst case excee
 | 2026-09-01 23:59 | h-ghost-h1jax-trunk-mir | v1 | 39 | COMPLETE: MIR 0.4 at 32x512, one epoch, val 3.279 (plain 64x512 trunk at the same 374M tokens: 3.280); 194K tok/s. No gain at 2x compute. |
 | 2026-09-02 00:39 | h-ghost-h1jax-profile-gate-0-5b | v1 | 37 | **PASS** 0.5B: 16x512 remat 100,191 tok/s, 22.0% MFU, one 417M-token pass ~70 min; 8x512 93.5K, 32x512 93.4K (94% HBM); compile ~7 min/shape; base eval on the fixed slice 3.490 (91M base 3.746); sanity 30 steps finite |
 | 2026-09-02 01:19 | h-ghost-h1jax-room05b-e1 | v1 | 68 | **COMPLETE** 02:25: 0.5B one epoch on corpus-v1.2-room v2, 131K tok/s; library val 3.423 -> 2.893, room val 3.240 -> 2.609, fixed-32 3.490 -> 3.021; checkpoints at 375.8M (pre-cooldown) and 417.5M (cooled) |
-| 2026-09-02 03:33 | h-ghost-h1jax-room05b-e2-v3 | v1 | (running from 04:12, est 70) | same as e2 but on corpus-v1.3-room (scenes A x6 + B x8): the scene effect at matched compute |
 | 2026-09-02 03:20 | h-ghost-h1jax-room05b-e2 | v1 | 66 | **COMPLETE** 04:12: second epoch of the room mix from the e1 pre-cooldown checkpoint, cooled; library 2.893 -> 2.858, room 2.609 -> 2.582, fixed-32 3.021 -> 3.016; 131K tok/s |
 | 2026-09-02 02:27 | h-ghost-gpu-room-eval (GPU) | v3 | ~60 | COMPLETE: 0.5B base + e1 pre-cooldown + e1 cooled on a T4; agrees with hbox and the TPU to 4 decimals |
 | 2026-09-02 04:44 | h-ghost-gpu-room-eval (GPU) | v4 | (running) | e2 checkpoints |
 | 2026-09-02 04:46 | h-ghost-gpu-room-eval-91m (GPU) | v1 | (queued, est 200) | re-run of the lost v2: 91M trunk checkpoints + leaves with the 90M base, own kernel id |
+| 2026-09-02 04:12 | h-ghost-h1jax-room05b-e2-v3 | v1 | 66 | **COMPLETE** 05:38: second epoch on corpus-v1.3-room (scenes A x6 + B x8) from the e1 pre-cooldown; library 2.852 (e2 2.858), room 2.581 (2.582), fixed-32 3.011 (3.016); 131K tok/s |
