@@ -514,3 +514,8 @@ New main line, h first:
 - 08:04: 91M GPU table recovered (own kernel id, T4): room loss base 3.578 -> trunk ~3.68 -> leaf-e4 3.664. The library
   epochs made the 91M worse at room text; the 0.5B room line sits at 2.58. That is the Discord failure as a number.
 - 09:23: GPU eval v5 (e2-v3) complete; results saved. All background work of the night has landed.
+- 12:32: ember tested e2-v3: it echoed the visitor line twice and then imitated its own echo. Cause: echoing is a
+  sampling mode (~1 in 3 on some renderings) and one echo in context seeds the next. Fix in the harness:
+  `chapterx/room_proxy.py` on :8126 between ChapterX and mlx (samples up to 4, rejects echoes of the visitor line,
+  copies of earlier h lines, empties and frame sentences; drops earlier echo turns from the context). ChapterX now
+  points at :8126. Bot restarted.
