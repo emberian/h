@@ -466,3 +466,5 @@ New main line, h first:
 - 03:43: quota: TPU 8.47 h used / 11.53 left; GPU 4.26 h used / 25.74 left (refresh 2026-09-05). Backing up the 0.5B
   room checkpoint to the Hub as a private repo (emberian/h-05b-room-e1, weights + config + tokenizer, no optimizer).
   Writer 01 redo at 82/201; writer 00 redo done (38/49).
+- 03:52: scene set B final: 790 scenes merged with the redos, 773 sentence-shaped (306 deflect, 301 greeting, 166
+  talk); set A 1,579. corpus-v1.3-room v2 = A x6 + B x8 (15,658 scene documents) building and uploading.
