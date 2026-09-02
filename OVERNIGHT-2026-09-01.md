@@ -501,3 +501,6 @@ New main line, h first:
 - 07:21: e3 COMPLETE (66 min): cooled library 2.848 (e2-v3 2.852), room 2.576 (2.581), fixed-32 3.019 (3.011); train loss
   2.35 (2.48): the train/val gap widens from 0.37 to 0.50. The multi-epoch curve flattens at epoch 3 and memorization
   begins; two epochs is the recipe. e3 is evaluated (harvest/hbox/judge/read armed) but not switched into Discord.
+- 07:21: morning status. Discord: h = e2-v3 (two epochs, scenes A+B, deflection learned). Runs tonight: 91M seed-1 trunk +
+  leaves, MIR arm, 0.5B gate, room05b e1/e2/e2-v3/e3. Quota: GPU 11.33h 18.67h 30.00h 2026-09-05T00:00:00 ;TPU 11.11h 8.89h 20.00h 2026-09-05T00:00:00 ;. Armed: e3 harvest/hbox/judge/read; GPU eval v5
+  (e2-v3) and the 91M GPU eval. Night report: research/results/night-2026-09-02.md.
