@@ -53,6 +53,7 @@ import tempfile
 import time
 import unicodedata
 from pathlib import Path
+from typing import Sequence
 
 import numpy as np
 
@@ -466,6 +467,14 @@ def plan_insertions(
     return rng.integers(0, document_count + 1, size=synthetic_count)
 
 
+def gather_documents(documents, members: Sequence[int]) -> np.ndarray:
+    """Concatenate the documents at ``members`` (rows of a 2-D array or 1-D arrays)."""
+
+    if isinstance(documents, np.ndarray) and documents.ndim == 2:
+        return np.ascontiguousarray(documents[list(members)]).reshape(-1)
+    return np.concatenate([np.asarray(documents[index]).reshape(-1) for index in members])
+
+
 def weave_stream(
     stream: np.ndarray,
     documents: np.ndarray,
@@ -475,10 +484,12 @@ def weave_stream(
 ) -> dict:
     """Write ``stream`` with ``documents`` inserted at their slots; return the plan.
 
-    The v1 documents keep their order and bytes; synthetic documents sharing a slot are
-    written in index order before v1 document ``slot`` (or at the end). The returned
-    dictionary lists every insertion group with its offsets in both streams and the
-    SHA-256 of the written file.
+    ``documents`` is either a ``[N, L]`` array of equal-length documents or a sequence of
+    ``N`` one-dimensional arrays of any lengths (each ending with EOS). The v1 documents
+    keep their order and bytes; inserted documents sharing a slot are written in index
+    order before v1 document ``slot`` (or at the end). The returned dictionary lists
+    every insertion group with its offsets in both streams and the SHA-256 of the
+    written file.
     """
 
     starts, ends = document_bounds(stream, eos_id)
@@ -495,7 +506,8 @@ def weave_stream(
         for slot in range(starts.shape[0] + 1):
             members = groups.get(slot)
             if members:
-                block = np.ascontiguousarray(documents[members]).astype("<u2").tobytes()
+                tokens = gather_documents(documents, members)
+                block = tokens.astype("<u2").tobytes()
                 handle.write(block)
                 digest.update(block)
                 v1_offset = (
@@ -509,10 +521,10 @@ def weave_stream(
                         "v1_offset": v1_offset,
                         "v11_offset": offset,
                         "documents": members,
-                        "tokens": int(documents.shape[1]) * len(members),
+                        "tokens": int(tokens.shape[0]),
                     }
                 )
-                offset += int(documents.shape[1]) * len(members)
+                offset += int(tokens.shape[0])
             if slot < starts.shape[0]:
                 block = (
                     np.ascontiguousarray(stream[starts[slot] : ends[slot]])
@@ -544,7 +556,7 @@ def verify_weave(
     inserted = 0
     for group in plan["insertions"]:
         start = group["v11_offset"]
-        block = documents[group["documents"]].reshape(-1)
+        block = gather_documents(documents, group["documents"])
         if not np.array_equal(woven[start : start + block.shape[0]], block):
             raise ValueError(f"insertion at {start} does not match its documents")
         inserted += block.shape[0]
@@ -580,9 +592,11 @@ def derive_validation_report(v1_report: dict, train: dict, synthetic: dict) -> d
     report = json.loads(json.dumps(v1_report))
     split = report["splits"]["train"]
     added_documents = synthetic["documents"]
-    added_source_tokens = synthetic["documents"] * (
-        synthetic["tokens_per_document"] - 1
-    )
+    if "tokens" in synthetic:
+        added_tokens = synthetic["tokens"]
+    else:
+        added_tokens = synthetic["documents"] * synthetic["tokens_per_document"]
+    added_source_tokens = added_tokens - added_documents
     split["documents"] += added_documents
     for key in ("source_tokens", "dataset_source_tokens", "tokenized_source_tokens"):
         split[key] += added_source_tokens

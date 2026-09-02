@@ -12,6 +12,7 @@ dependencies = [
   "matplotlib>=3.11.1",
   "numpy>=2,<3",
   "pydivsufsort>=0.0.20",
+  "requests>=2.34.2",
   "tokenizers>=0.21,<1",
 ]
 
@@ -36,6 +37,7 @@ hghost-families = "hghost.families:main"
 hghost-beliefgeo = "hghost.beliefgeo:main"
 hghost-evalpack = "hghost.evalpack:main"
 hghost-ocr-view = "hghost.ocr_viewer:main"
+hghost-roommix = "hghost.roommix:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/hghost"]

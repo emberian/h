@@ -545,8 +545,9 @@ def falcon_h1_forward(
     gradient_checkpointing: bool = False,
     ssd_precision: jax.lax.Precision = jax.lax.Precision.DEFAULT,
     layer_scan: bool = False,
-) -> Array:
-    """Full forward pass to logits.
+    return_hidden: bool = False,
+) -> Array | tuple[Array, Array]:
+    """Full forward pass to logits (and, with `return_hidden`, the final normalized hidden state).
 
     `layer_scan=True` runs the decoder stack as one `lax.scan` over stacked layer parameters
     instead of unrolling 24 copies of the layer graph. The arithmetic is identical; the traced
@@ -579,7 +580,12 @@ def falcon_h1_forward(
         if cfg.tie_word_embeddings
         else params["lm_head.weight"]
     )
-    return _linear(hidden, lm_head) * jnp.asarray(cfg.lm_head_multiplier, hidden.dtype)
+    logits = _linear(hidden, lm_head) * jnp.asarray(
+        cfg.lm_head_multiplier, hidden.dtype
+    )
+    if return_hidden:
+        return logits, hidden
+    return logits
 
 
 def causal_lm_loss(

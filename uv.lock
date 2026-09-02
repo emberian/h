@@ -596,6 +596,7 @@ dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "numpy", version = "2.5.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "pydivsufsort" },
+    { name = "requests" },
     { name = "tokenizers" },
 ]
 
@@ -614,6 +615,7 @@ requires-dist = [
     { name = "ocrmypdf", marker = "extra == 'ocr'", specifier = ">=17,<18" },
     { name = "pydivsufsort", specifier = ">=0.0.20" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8,<10" },
+    { name = "requests", specifier = ">=2.34.2" },
     { name = "tokenizers", specifier = ">=0.21,<1" },
 ]
 provides-extras = ["dev", "ocr"]
@@ -1752,6 +1754,21 @@ wheels = [
 ]
 
 [[package]]
+name = "requests"
+version = "2.34.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "certifi" },
+    { name = "charset-normalizer" },
+    { name = "idna" },
+    { name = "urllib3" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ac/c3/e2a2b89f2d3e2179abd6d00ebd70bff6273f37fb3e0cc209f48b39d00cbf/requests-2.34.2.tar.gz", hash = "sha256:f288924cae4e29463698d6d60bc6a4da69c89185ad1e0bcc4104f584e960b9ed", size = 142856, upload-time = "2026-05-14T19:25:27.735Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a0/f4/c67b0b3f1b9245e8d266f0f112c500d50e5b4e83cb6f3b71b6528104182a/requests-2.34.2-py3-none-any.whl", hash = "sha256:2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0", size = 73075, upload-time = "2026-05-14T19:25:26.443Z" },
+]
+
+[[package]]
 name = "rich"
 version = "15.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1853,6 +1870,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/24/a4/91ec8b808ae70bad20bf16b959d908f6bad9a9231a0879abb6ab3efe1db6/uharfbuzz-0.56.1-pp311-pypy311_pp73-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:31f7083df919e5b7f9e6fd79d821cf8ff3a8553d77c1b803eb922840a4e2a1ba", size = 1747192, upload-time = "2026-08-31T20:42:40.547Z" },
     { url = "https://files.pythonhosted.org/packages/81/71/bcf16cb7abc427db266e1acc703c5073bae0a2443ebf963daf6df45e3a04/uharfbuzz-0.56.1-pp311-pypy311_pp73-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:de9df332293a2586dc29750da4362ae46eca45702881b4c9026d9fbfc1e68e28", size = 1827884, upload-time = "2026-08-31T20:42:42.125Z" },
     { url = "https://files.pythonhosted.org/packages/06/1e/e9827bd7698734cdd943eaa6511b01eeea517c6dfe19bf6e03d6a102cee0/uharfbuzz-0.56.1-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:bf69321f01b6591e5428e2347b9d45c2b1176d773d9c1615e1ef5c14e7f3a715", size = 1466729, upload-time = "2026-08-31T20:42:43.537Z" },
+]
+
+[[package]]
+name = "urllib3"
+version = "2.7.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/53/0c/06f8b233b8fd13b9e5ee11424ef85419ba0d8ba0b3138bf360be2ff56953/urllib3-2.7.0.tar.gz", hash = "sha256:231e0ec3b63ceb14667c67be60f2f2c40a518cb38b03af60abc813da26505f4c", size = 433602, upload-time = "2026-05-07T16:13:18.596Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7f/3e/5db95bcf282c52709639744ca2a8b149baccf648e39c8cc87553df9eae0c/urllib3-2.7.0-py3-none-any.whl", hash = "sha256:9fb4c81ebbb1ce9531cce37674bbc6f1360472bc18ca9a553ede278ef7276897", size = 131087, upload-time = "2026-05-07T16:13:17.151Z" },
 ]
 
 [[package]]
