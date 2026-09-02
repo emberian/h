@@ -10,15 +10,54 @@
 <header>
   <h1>h explorer</h1>
   <nav class="tabs">
-    <button data-tab="loom" class="on">Loom</button>
-    <button data-tab="provenance">Provenance</button>
-    <button data-tab="observatory">Observatory</button>
-    <button data-tab="compare">Compare</button>
+    <button data-tab="loom" class="on" title="1">Loom</button>
+    <button data-tab="provenance" title="2">Provenance</button>
+    <button data-tab="observatory" title="3">Observatory</button>
+    <button data-tab="compare" title="4">Compare</button>
+    <button data-tab="counterfactual" title="5">Counterfactual</button>
+    <button data-tab="roomstate" title="6">Room state</button>
+    <button data-tab="population" title="7">Population</button>
+    <button data-tab="labels" title="8">Labels</button>
   </nav>
   <span id="status" class="status"></span>
   <span id="servers-status" class="servers"></span>
   <button id="servers-refresh" title="re-probe the model servers">servers</button>
+  <button id="help-btn" title="keyboard shortcuts (?)">?</button>
 </header>
+
+<div id="toasts" class="toasts"></div>
+
+<dialog id="help">
+  <h3>keys</h3>
+  <table class="keys">
+    <tr><td>← →</td><td>previous / next sibling</td></tr>
+    <tr><td>↑ ↓</td><td>parent / first child</td></tr>
+    <tr><td>Enter</td><td>expand the active node (N samples, sampler panel)</td></tr>
+    <tr><td>e</td><td>edit text</td></tr>
+    <tr><td>n</td><td>edit note</td></tr>
+    <tr><td>l</td><td>label (failure taxonomy / KEEP)</td></tr>
+    <tr><td>b</td><td>bookmark</td></tr>
+    <tr><td>x</td><td>deactivate (tip moves to parent)</td></tr>
+    <tr><td>c</td><td>collapse / uncollapse children</td></tr>
+    <tr><td>h</td><td>provenance-scan the active node</td></tr>
+    <tr><td>Delete / Backspace</td><td>delete the active node and its subtree</td></tr>
+    <tr><td>⌘/Ctrl Z · ⇧⌘Z</td><td>undo · redo</td></tr>
+    <tr><td>⌘/Ctrl S</td><td>save the weave</td></tr>
+    <tr><td>⌘/Ctrl ⇧ C</td><td>copy the active path as a transcript</td></tr>
+    <tr><td>1 … 8</td><td>switch tab</td></tr>
+    <tr><td>Esc</td><td>cancel edit / split, close dialogs</td></tr>
+  </table>
+  <form method="dialog"><button>close</button></form>
+</dialog>
+
+<dialog id="label-dialog">
+  <h3>label <span id="label-target" class="hint"></span></h3>
+  <div id="label-buttons" class="label-buttons"></div>
+  <label>correction <textarea id="label-correction" rows="3" placeholder="what h should have said (optional)"></textarea></label>
+  <label>note <input id="label-note" placeholder="optional"></label>
+  <label>who <input id="label-who" value="ember"></label>
+  <div class="row"><button id="label-submit" class="primary">record</button><button id="label-cancel">cancel</button></div>
+</dialog>
 
 <main>
 <!-- ================================================================== loom -->
@@ -37,22 +76,29 @@
     </details>
     <details open>
       <summary>prompt (root node)</summary>
-      <textarea id="loom-prompt" rows="9" spellcheck="false" placeholder="frame, blank line, turns as 'name: text', ending with h:"></textarea>
+      <textarea id="loom-prompt" rows="8" spellcheck="false" placeholder="frame, blank line, turns as 'name: text', ending with h:"></textarea>
       <div class="row">
         <button id="loom-frame" title="insert the bare room frame">frame</button>
-        <button id="loom-expand-root" title="sample N continuations of the active node">expand active</button>
+        <button id="loom-expand-root" title="sample N continuations of the active node (Enter)">expand active</button>
       </div>
     </details>
     <details open>
       <summary>weave</summary>
       <div class="row">
         <input id="weave-name" placeholder="name" spellcheck="false">
-        <button id="weave-save">save</button>
+        <button id="weave-save" title="⌘S">save</button>
         <button id="weave-new" title="start an empty weave">new</button>
       </div>
       <div class="row">
         <select id="weave-list"></select>
         <button id="weave-load">load</button>
+        <button id="weave-delete" title="delete the selected saved weave">✕</button>
+      </div>
+      <div class="row">
+        <button id="undo-btn" title="⌘Z">undo</button>
+        <button id="redo-btn" title="⇧⌘Z">redo</button>
+        <button id="copy-transcript" title="copy the active path as text (⌘⇧C)">copy transcript</button>
+        <button id="copy-json" title="copy the weave JSON">copy json</button>
       </div>
       <div id="weave-info" class="hint"></div>
     </details>
@@ -66,6 +112,7 @@
         <button id="haunt-all" title="provenance-scan every node in one call">scan all nodes</button>
         <button id="collapse-all">collapse all</button>
         <button id="expand-all">uncollapse</button>
+        <button id="collapse-deep" title="collapse everything below depth 2 except the active path">tidy</button>
       </div>
       <div class="legend">
         <span class="tok" data-lp="0">p≈1</span>
@@ -78,13 +125,15 @@
     </details>
   </aside>
 
-  <div class="panel tree-wrap">
+  <div class="panel tree-wrap" id="tree-wrap" tabindex="0">
     <div id="tree"></div>
   </div>
 
   <aside class="panel reading-wrap">
     <h3>active path <span id="reading-stats" class="hint"></span></h3>
     <div id="reading" class="reading"></div>
+    <h3>node <span class="hint">repro · note · labels</span></h3>
+    <div id="node-info" class="node-info"></div>
   </aside>
 </section>
 
@@ -160,6 +209,131 @@
   <div class="panel compare">
     <div class="col"><h3 id="cmp-a-title">A</h3><div id="cmp-a-stats" class="hint"></div><div id="cmp-a-out"></div></div>
     <div class="col"><h3 id="cmp-b-title">B</h3><div id="cmp-b-stats" class="hint"></div><div id="cmp-b-out"></div></div>
+  </div>
+</section>
+
+<!-- ================================================================== counterfactual -->
+<section id="tab-counterfactual" class="tab">
+  <aside class="panel controls">
+    <details open>
+      <summary>source</summary>
+      <div class="row"><button id="cf-from-loom" title="take the active path: the room turns become editable, the active node's text becomes the fixed reply">from loom</button></div>
+      <label>scorer <select id="cf-scorer"></select></label>
+      <label>reply (fixed text) <textarea id="cf-reply" rows="3" spellcheck="false"></textarea></label>
+      <div class="row">
+        <button id="cf-score" class="primary" title="score the fixed reply under the true and the edited context">score both</button>
+        <button id="cf-rerun" title="sample continuations from the edited context with the loom sampler">re-run continuation</button>
+      </div>
+      <p class="hint">edit, delete, reorder, or reassign any earlier turn on the right, then score. positive Δ = the reply became more likely under the edit.</p>
+    </details>
+    <details open>
+      <summary>summary</summary>
+      <div id="cf-summary" class="summary"></div>
+    </details>
+  </aside>
+  <div class="panel cf">
+    <div class="cf-cols">
+      <div class="col"><h3>true context</h3><div id="cf-true" class="turns"></div></div>
+      <div class="col"><h3>edited context <button id="cf-reset" class="mini">reset</button> <button id="cf-add" class="mini">+ turn</button></h3><div id="cf-edited" class="turns"></div></div>
+    </div>
+    <h3>per-token deltas <span class="hint">(logprob and rank of each reply token: true → edited)</span></h3>
+    <div id="cf-tokens"></div>
+    <h3>continuations from the edited context</h3>
+    <div id="cf-rerun-out"></div>
+  </div>
+</section>
+
+<!-- ================================================================== room state -->
+<section id="tab-roomstate" class="tab">
+  <aside class="panel controls">
+    <details open>
+      <summary>server</summary>
+      <div id="rs-status" class="summary">…</div>
+      <div class="row"><button id="rs-refresh">refresh</button></div>
+    </details>
+    <details open>
+      <summary>rooms</summary>
+      <div class="row"><input id="rs-room-name" placeholder="room id" spellcheck="false"><button id="rs-room-create" title="create with the bare frame">create</button></div>
+      <select id="rs-rooms" size="5"></select>
+      <div class="row"><button id="rs-room-open">open</button><button id="rs-room-delete">delete</button></div>
+    </details>
+    <details open>
+      <summary>event</summary>
+      <textarea id="rs-event" rows="2" spellcheck="false" placeholder="ember: hi h"></textarea>
+      <div class="row"><button id="rs-event-send" class="primary">read into state</button></div>
+      <div class="grid2">
+        <label>n <input id="rs-n" type="number" value="4" min="1" max="16"></label>
+        <label>max <input id="rs-max" type="number" value="64" min="1" max="256"></label>
+        <label>temperature <input id="rs-temp" type="number" value="0.7" min="0" step="0.05"></label>
+        <label>top_p <input id="rs-topp" type="number" value="0.9" min="0" max="1" step="0.05"></label>
+      </div>
+      <label><input type="checkbox" id="rs-control"> control arm (fresh re-render, same seeds)</label>
+      <div class="row"><button id="rs-candidates" class="primary">candidates</button><button id="rs-silence">silence</button><button id="rs-snapshot">snapshot</button></div>
+    </details>
+  </aside>
+  <div class="panel rs">
+    <div id="rs-transcript" class="turns"></div>
+    <h3>candidates (branches of the committed state)</h3>
+    <div id="rs-candidates-out"></div>
+    <h3>state per turn <span class="hint">mean per-layer SSM head norm (line = layer), token count, bytes</span></h3>
+    <div id="rs-plot"></div>
+    <div id="rs-state" class="summary"></div>
+  </div>
+</section>
+
+<!-- ================================================================== population -->
+<section id="tab-population" class="tab">
+  <aside class="panel controls">
+    <details open>
+      <summary>prompt</summary>
+      <textarea id="pop-prompt" rows="8" spellcheck="false"></textarea>
+      <div class="row"><button id="pop-frame">frame</button><button id="pop-from-loom">from loom</button></div>
+    </details>
+    <details open>
+      <summary>checkpoints</summary>
+      <div id="pop-checkpoints" class="checklist"></div>
+      <div class="row"><button id="pop-all" class="mini">all</button><button id="pop-none" class="mini">none</button></div>
+    </details>
+    <details open>
+      <summary>run</summary>
+      <div class="grid2">
+        <label>K <input id="pop-k" type="number" value="3" min="1" max="16"></label>
+        <label>max_tokens <input id="pop-max" type="number" value="40" min="1" max="512"></label>
+        <label>temperature <input id="pop-temp" type="number" value="0.7" min="0" step="0.05"></label>
+        <label>top_p <input id="pop-topp" type="number" value="0.9" min="0" max="1" step="0.05"></label>
+      </div>
+      <label><input type="checkbox" id="pop-judge" checked> judge (library-likeness: NLL under the 91M leaf − under base)</label>
+      <label><input type="checkbox" id="pop-haunt" checked> provenance scan</label>
+      <div class="row"><button id="pop-run" class="primary">run</button><button id="pop-stop">stop</button></div>
+      <p class="hint">each checkpoint is served in turn on :8125 (the :8124 resident is never touched); switching takes ~10 s per checkpoint.</p>
+    </details>
+  </aside>
+  <div class="panel">
+    <div id="pop-status" class="hint"></div>
+    <div id="pop-grid" class="pop-grid"></div>
+  </div>
+</section>
+
+<!-- ================================================================== labels / pairs -->
+<section id="tab-labels" class="tab">
+  <aside class="panel controls">
+    <details open>
+      <summary>ledger</summary>
+      <div id="labels-summary" class="summary"></div>
+      <div class="row"><button id="labels-reload">reload</button></div>
+      <p class="hint">records go to research/results/room-labels/YYYY-MM-DD.jsonl. label from any loom node (l) or observatory candidate.</p>
+    </details>
+    <details open>
+      <summary>pairwise sheets</summary>
+      <select id="pairs-list"></select>
+      <div class="row"><button id="pairs-open">open</button></div>
+      <p class="hint">blind A/B sheets written by hghost-roombank pairs; the key is never loaded here.</p>
+    </details>
+  </aside>
+  <div class="panel">
+    <div id="pairs-view"></div>
+    <h3>recent labels</h3>
+    <div id="labels-recent"></div>
   </div>
 </section>
 </main>
