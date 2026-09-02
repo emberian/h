@@ -451,3 +451,9 @@ New main line, h first:
 - 03:03: activation policy unchanged: h replies only when named (reply_on_name, no random replies). Random
   participation is a later lever. Scene set B (856 passages, 40% greeting / 40% deflect) being written by
   three agents, single-writer each; room05b-e2 queued on the TPU.
+- 03:28: scene set B written (272/270/266); a sentence-shape filter added to the renderer drops fragments: set A keeps
+  1,579/1,710, set B 561/808 (writers 00 and 01 redoing their fragments as whole sentences). Plan: corpus-v1.3-room
+  = v1 + rooms + scenes A x6 + scenes B x8, then room05b-e2-v3 branched from the same pre-cooldown checkpoint as
+  e2, so the scene effect is measured at matched compute.
+- 03:29: building corpus-v1.3-room (scenes A 1,579 x6 + B 561 x8, sentence-shaped only) and uploading as a new
+  private dataset; version 2 follows if the writers' redos land before e2 finishes.
