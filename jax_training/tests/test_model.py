@@ -273,3 +273,59 @@ def test_layer_scan_matches_unrolled(remat: bool) -> None:
             atol=1e-5,
             err_msg=key,
         )
+
+
+def test_ssd_forward_v2_matches_reference() -> None:
+    from h1jax.model import ssd_forward, ssd_forward_v2
+
+    rng = np.random.default_rng(0)
+    batch, seq_len, heads, head_dim, state, groups, chunk = 2, 300, 6, 8, 16, 2, 128
+    x = jnp.asarray(
+        rng.standard_normal((batch, seq_len, heads, head_dim), dtype=np.float32)
+    )
+    dt = jnp.asarray(rng.standard_normal((batch, seq_len, heads), dtype=np.float32))
+    a = -jnp.exp(jnp.asarray(rng.standard_normal(heads, dtype=np.float32)))
+    b_groups = jnp.asarray(
+        rng.standard_normal((batch, seq_len, groups, state), dtype=np.float32)
+    )
+    c_groups = jnp.asarray(
+        rng.standard_normal((batch, seq_len, groups, state), dtype=np.float32)
+    )
+    d = jnp.asarray(rng.standard_normal(heads, dtype=np.float32))
+    dt_bias = jnp.asarray(rng.standard_normal(heads, dtype=np.float32))
+    limit = (0.0, float("inf"))
+    repeats = heads // groups
+    b_heads = jnp.repeat(b_groups, repeats, axis=2)
+    c_heads = jnp.repeat(c_groups, repeats, axis=2)
+
+    def reference(x_, dt_, b_, c_):
+        return jnp.sum(
+            jnp.sin(ssd_forward(x_, dt_, a, b_, c_, chunk, d, dt_bias, limit))
+        )
+
+    def rewrite(x_, dt_, b_, c_):
+        return jnp.sum(
+            jnp.sin(ssd_forward_v2(x_, dt_, a, b_, c_, chunk, d, dt_bias, limit))
+        )
+
+    y1 = ssd_forward(x, dt, a, b_heads, c_heads, chunk, d, dt_bias, limit)
+    y2 = ssd_forward_v2(x, dt, a, b_groups, c_groups, chunk, d, dt_bias, limit)
+    scale = float(jnp.max(jnp.abs(y1)))
+    assert float(jnp.max(jnp.abs(y1 - y2))) / scale < 1e-4
+
+    g1 = jax.grad(reference, argnums=(0, 1, 2, 3))(x, dt, b_heads, c_heads)
+    g2 = jax.grad(rewrite, argnums=(0, 1, 2, 3))(x, dt, b_groups, c_groups)
+    g1_b = g1[2].reshape(batch, seq_len, groups, repeats, state).sum(3)
+    g1_c = g1[3].reshape(batch, seq_len, groups, repeats, state).sum(3)
+    for expected, actual in (
+        (g1[0], g2[0]),
+        (g1[1], g2[1]),
+        (g1_b, g2[2]),
+        (g1_c, g2[3]),
+    ):
+        assert bool(jnp.all(jnp.isfinite(actual)))
+        assert (
+            float(jnp.max(jnp.abs(expected - actual)))
+            / float(jnp.max(jnp.abs(expected)))
+            < 1e-3
+        )

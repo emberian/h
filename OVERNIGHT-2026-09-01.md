@@ -151,3 +151,38 @@ Evaluate everything with `hghost-evalpack` (subagent building it) plus the haunt
   unaffected. Trunk status at 20:30: RUNNING (50 min).
 - OCR viewer added (`hghost-ocr-view`, output `artifacts/ocr-viewer/index.html`): page render with layout
   boxes overlaid, recognized text beside it, hover to pair.
+
+## 20:40–20:58 — published, and the SSD rewrite
+
+- Pushed four commits (h1jax + TPU kernels; haunting index + families; review/log/ChapterX/OCR viewer;
+  site + Pages workflow). GitHub Pages enabled with workflow builds, custom domain `h.fg-goose.online`
+  (ember set the DNS CNAME), HTTPS enforced. **The site is live at https://h.fg-goose.online/** loading
+  the public Tiny-H1 ONNX from the Hub; our own checkpoints follow once the export lands.
+- `ssd_forward_v2` in `h1jax` 0.1.5: group-shaped B/C (no 24× head repeat), single cumsum with masked
+  difference for the intra-chunk decay (masking before `exp`, which is where a NaN in the dt gradient
+  came from and was fixed), explicit two-matmul intra-chunk product, chunk-state scan. Parity with the
+  reference: forward 2e-6 relative, all gradients ≤ 1.3e-4, test added. Selected by `H1JAX_SSD=v2`;
+  default stays `v1`, so the trunk's leaves keep the trunk's math.
+- `kaggle/tpu_h1jax_ssd_bench`: times the full training step for v1 / v2 / v2-bf16 and the bare SSD
+  forward+backward; runs after the trunk and leaves (one TPU session per account).
+
+## 21:00 — belief-geometry instrument done (`hghost-beliefgeo`, `research/results/beliefgeo-baseline.md`)
+
+- Mess3 generator with exact Bayesian beliefs; emission glyphs `∇ ∂ ←` (corpus counts 119/302/105) with
+  prefix `│`; corpus-v1.1 stream with 14,866 synthetic documents = 2.0001% of 382.0M tokens, v1 bytes
+  verified identical outside insertions, Kaggle layout ready (not uploaded); residual-stream and per-token
+  Mamba-state probes (state recurrence parity-checked against `ssd_forward` at 1.2e-6).
+- **Negative result that saves a TPU arm:** with the paper's x=0.15, α=0.6, a linear probe from the last
+  16 one-hot symbols explains R² 0.987 of the belief; the base model's residual reaches 0.999 at layer 3
+  and the SSM state 0.9996 at layer 0, shuffled controls ≈ 0. Mess3 belief is near-linear in recency, so it
+  cannot distinguish an authored representation from ordinary recency features. Use a process whose belief
+  is not recency-linear (RRXOR-like or longer memory) for the "made to represent" experiment; report MSE and
+  depth profiles rather than R² when the arm runs.
+
+## 21:08 — TPU queue armed
+
+- `kaggle/tpu_queue.sh` runs in tmux `hghost-tpu-queue`: waits for the trunk, then pushes and waits for
+  `leaf-e1-decay10`, `leaf-e4-decay10`, and the SSD bench in order, downloading each finished output to the
+  session scratchpad; stops at the first failure. Log: scratchpad `tpu-queue/queue.log`.
+- `h1jax` 0.1.6 adds `H1JAX_REMAT_POLICY` (selective rematerialization: keep batch-free matmul outputs);
+  the bench compares v1, v2, v2-bf16, and v2 + selective remat on the full training step.

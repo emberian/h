@@ -12,6 +12,33 @@ from .config import FalconH1Config
 Array = jax.Array
 Params = Mapping[str, Array]
 
+# SSD implementation switch (read once at import): "v1" is the reference chunked form that
+# passed parity against Transformers; "v2" is the TPU-friendlier rewrite (ssd_forward_v2),
+# which must agree with v1 to float32 tolerance (see tests). H1JAX_SSD_MATMUL_DTYPE may lower
+# v2's two large matmul inputs (e.g. "bfloat16"); unset keeps float32.
+import os as _os
+
+SSD_IMPLEMENTATION = _os.environ.get("H1JAX_SSD", "v1")
+SSD_MATMUL_DTYPE = (
+    jnp.dtype(_os.environ["H1JAX_SSD_MATMUL_DTYPE"])
+    if _os.environ.get("H1JAX_SSD_MATMUL_DTYPE")
+    else None
+)
+# Rematerialization policy for the per-layer checkpoint in the layer scan: "" (recompute
+# everything, minimum memory), "dots_no_batch" (keep the outputs of batch-free matmuls, i.e. the
+# projections), or "dots" (keep every dot output; large).
+REMAT_POLICY = _os.environ.get("H1JAX_REMAT_POLICY", "")
+
+
+def _remat_policy():
+    if REMAT_POLICY == "dots_no_batch":
+        return jax.checkpoint_policies.dots_with_no_batch_dims_saveable
+    if REMAT_POLICY == "dots":
+        return jax.checkpoint_policies.dots_saveable
+    if REMAT_POLICY:
+        raise ValueError(f"unknown H1JAX_REMAT_POLICY {REMAT_POLICY!r}")
+    return None
+
 
 def _linear(x: Array, weight: Array, bias: Array | None = None) -> Array:
     """PyTorch-layout linear: weight is (out_features, in_features)."""
@@ -212,6 +239,121 @@ def ssd_forward(
     return output[:, :seq_len]
 
 
+def ssd_forward_v2(
+    x: Array,
+    dt: Array,
+    a: Array,
+    b_matrix: Array,
+    c_matrix: Array,
+    chunk_size: int,
+    d: Array,
+    dt_bias: Array,
+    dt_limit: tuple[float, float],
+    *,
+    precision: jax.lax.Precision = jax.lax.Precision.DEFAULT,
+    matmul_dtype: jnp.dtype | None = None,
+) -> Array:
+    """Chunked Mamba-2 SSD, same math as ``ssd_forward`` in a TPU-friendlier form.
+
+    Differences from the reference form: ``b_matrix``/``c_matrix`` may be group-shaped
+    ``[batch, seq, groups, state]`` (no materialized repeat across heads); the intra-chunk
+    decay is ``exp(cumsum_i - cumsum_j)`` from a single cumulative sum instead of a 4-D
+    segment sum; the intra-chunk product is two explicit batched matmuls (C B^T once per
+    group, then the decayed [q, q] matrix against X per head); the carried state runs as a
+    scan over chunks. ``matmul_dtype`` optionally lowers the two big matmul inputs.
+    """
+
+    batch, seq_len, num_heads, head_dim = x.shape
+    dt_dtype = dt.dtype
+    dt = jax.nn.softplus(dt + dt_bias.astype(dt_dtype)).astype(dt_dtype)
+    dt = jnp.clip(dt, dt_limit[0], dt_limit[1]).astype(jnp.float32)
+    x = x.astype(jnp.float32)
+    b_matrix = b_matrix.astype(jnp.float32)
+    c_matrix = c_matrix.astype(jnp.float32)
+    d = d.astype(jnp.float32)
+    groups = b_matrix.shape[2]
+    if num_heads % groups != 0:
+        raise ValueError(f"{num_heads} heads are not divisible into {groups} groups")
+    repeats = num_heads // groups
+    state = b_matrix.shape[-1]
+
+    pad_size = (chunk_size - seq_len % chunk_size) % chunk_size
+    x_padded = _pad_sequence(x, pad_size)
+    dt_padded = _pad_sequence(dt, pad_size)
+    b_padded = _pad_sequence(b_matrix, pad_size)
+    c_padded = _pad_sequence(c_matrix, pad_size)
+    padded_len = seq_len + pad_size
+    chunks = padded_len // chunk_size
+
+    d_residual = d[None, None, :, None] * x_padded
+    x_discrete = (x_padded * dt_padded[..., None]).reshape(
+        batch, chunks, chunk_size, groups, repeats, head_dim
+    )
+    a_discrete = (a.astype(jnp.float32) * dt_padded).reshape(
+        batch, chunks, chunk_size, groups, repeats
+    )
+    b_blocks = b_padded.reshape(batch, chunks, chunk_size, groups, state)
+    c_blocks = c_padded.reshape(batch, chunks, chunk_size, groups, state)
+
+    # Cumulative log-decay within each chunk, laid out [batch, chunk, group, head, q].
+    cumsum = jnp.cumsum(a_discrete.transpose(0, 1, 3, 4, 2), axis=-1)
+    causal = jnp.tril(jnp.ones((chunk_size, chunk_size), dtype=jnp.bool_))
+    # Mask before the exponential: the upper triangle would overflow to inf and poison the
+    # backward pass with 0 * inf; exp(-inf) is 0 with a zero gradient.
+    within_decay = jnp.exp(
+        jnp.where(causal, cumsum[..., :, None] - cumsum[..., None, :], -jnp.inf)
+    )  # [b, c, g, r, i, j]
+
+    cb = jnp.einsum(
+        "bcign,bcjgn->bcgij", c_blocks, b_blocks, precision=precision
+    )  # [b, c, g, i, j]
+    mixed = within_decay * cb[:, :, :, None]  # [b, c, g, r, i, j]
+    x_heads = x_discrete.transpose(0, 1, 3, 4, 2, 5)  # [b, c, g, r, j, p]
+    if matmul_dtype is not None:
+        mixed = mixed.astype(matmul_dtype)
+        x_heads = x_heads.astype(matmul_dtype)
+    y_diagonal = jnp.einsum(
+        "bcgrij,bcgrjp->bcgrip", mixed, x_heads, precision=precision
+    ).astype(jnp.float32)  # [b, c, g, r, i, p]
+
+    # Chunk states: sum_j B_j exp(cs_end - cs_j) X_j  -> [b, c, g, r, n, p].
+    decay_to_end = jnp.exp(cumsum[..., -1:] - cumsum)  # [b, c, g, r, j]
+    weighted_x = x_heads * decay_to_end[..., None]  # [b, c, g, r, j, p]
+    states = jnp.einsum(
+        "bcjgn,bcgrjp->bcgrnp",
+        b_blocks,
+        weighted_x.astype(jnp.float32),
+        precision=precision,
+    )
+    chunk_end_decay = jnp.exp(cumsum[..., -1])  # [b, c, g, r]
+
+    def carry_step(carry, inputs):
+        end_decay, chunk_state = inputs
+        boundary = carry
+        carry = boundary * end_decay[..., None, None] + chunk_state
+        return carry, boundary
+
+    _, boundary_states = jax.lax.scan(
+        carry_step,
+        jnp.zeros((batch, groups, repeats, state, head_dim), jnp.float32),
+        (chunk_end_decay.transpose(1, 0, 2, 3), states.transpose(1, 0, 2, 3, 4, 5)),
+    )
+    boundary_states = boundary_states.transpose(1, 0, 2, 3, 4, 5)  # [b, c, g, r, n, p]
+
+    y_off_diagonal = jnp.einsum(
+        "bcign,bcgrnp,bcgri->bcgrip",
+        c_blocks,
+        boundary_states,
+        jnp.exp(cumsum),
+        precision=precision,
+    )
+    output = (y_diagonal + y_off_diagonal).transpose(
+        0, 1, 4, 2, 3, 5
+    )  # [b, c, i, g, r, p]
+    output = output.reshape(batch, padded_len, num_heads, head_dim) + d_residual
+    return output[:, :seq_len]
+
+
 def _depthwise_causal_conv(
     x: Array, weight: Array, bias: Array | None, kernel_size: int
 ) -> Array:
@@ -281,22 +423,37 @@ def mamba(
     hidden = hidden.reshape(batch, seq_len, cfg.mamba_n_heads, cfg.mamba_d_head)
     b_matrix = b_matrix.reshape(batch, seq_len, cfg.mamba_n_groups, cfg.mamba_d_state)
     c_matrix = c_matrix.reshape(batch, seq_len, cfg.mamba_n_groups, cfg.mamba_d_state)
-    head_repeats = cfg.mamba_n_heads // cfg.mamba_n_groups
-    b_matrix = jnp.repeat(b_matrix, head_repeats, axis=2)
-    c_matrix = jnp.repeat(c_matrix, head_repeats, axis=2)
     a = -jnp.exp(layer["mamba.A_log"].astype(jnp.float32))
-    scanned = ssd_forward(
-        hidden,
-        dt,
-        a,
-        b_matrix,
-        c_matrix,
-        cfg.mamba_chunk_size,
-        layer["mamba.D"],
-        layer["mamba.dt_bias"],
-        cfg.time_step_limit,
-        precision=ssd_precision,
-    ).reshape(batch, seq_len, cfg.mamba_d_ssm)
+    if SSD_IMPLEMENTATION == "v2":
+        scanned = ssd_forward_v2(
+            hidden,
+            dt,
+            a,
+            b_matrix,
+            c_matrix,
+            cfg.mamba_chunk_size,
+            layer["mamba.D"],
+            layer["mamba.dt_bias"],
+            cfg.time_step_limit,
+            precision=ssd_precision,
+            matmul_dtype=SSD_MATMUL_DTYPE,
+        ).reshape(batch, seq_len, cfg.mamba_d_ssm)
+    else:
+        head_repeats = cfg.mamba_n_heads // cfg.mamba_n_groups
+        b_matrix = jnp.repeat(b_matrix, head_repeats, axis=2)
+        c_matrix = jnp.repeat(c_matrix, head_repeats, axis=2)
+        scanned = ssd_forward(
+            hidden,
+            dt,
+            a,
+            b_matrix,
+            c_matrix,
+            cfg.mamba_chunk_size,
+            layer["mamba.D"],
+            layer["mamba.dt_bias"],
+            cfg.time_step_limit,
+            precision=ssd_precision,
+        ).reshape(batch, seq_len, cfg.mamba_d_ssm)
     if cfg.mamba_rms_norm:
         if not cfg.mamba_norm_before_gate:
             scanned = scanned * jax.nn.silu(gate.astype(jnp.float32))
@@ -406,7 +563,10 @@ def falcon_h1_forward(
             return apply_layer(layer, carry), None
 
         if gradient_checkpointing:
-            body = jax.checkpoint(body)
+            policy = _remat_policy()
+            body = (
+                jax.checkpoint(body, policy=policy) if policy else jax.checkpoint(body)
+            )
         hidden, _ = jax.lax.scan(body, hidden, stacked_layer_params(params, cfg))
     else:
         if gradient_checkpointing:
