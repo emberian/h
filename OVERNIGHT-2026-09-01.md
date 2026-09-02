@@ -380,3 +380,15 @@ New main line, h first:
   the room mix goes to Falcon-H1-0.5B-Base (same tokenizer, EOS 11, pad 0; vocab padded to 32,784). Plan:
   0.5B profiling gate (shapes with remat) after trunk-mir frees the TPU, then a one-epoch room-mixed run.
 - 00:19: 0.5B parity on CPU with the current h1jax (SSD v2): max abs error 6.9e-5 vs the PyTorch reference, allclose.
+- 00:22: room mix built (`research/results/roommix-v1.2.md`): 41.9M room tokens in 123,116 documents (Gutenberg
+  dialogue 26.4M, When2Speak 7.8M with the GPT-4 agent as `moderator`, MultiLIGHT 5.7M, corpus-native 1.2M plus an
+  h-relabeled copy 0.3M, Plato 0.4M); stream 416,327,270 tokens, rooms 10.07%, v1 bytes intact, 1.0M-token room
+  holdout, frames on 39.9% of room docs (bot frame verbatim on 6,139). Upload to Kaggle (private) started 00:21
+  without scenes; scenes so far 929 rendered (part00 737 done, part01 ~200, part02 merging) for a v2 upload.
+  0.5B layer-scan equivalence 2.7e-5; 0.5B gate rehearsing on CPU.
+- 00:33: goal reset by ember: "conduct the research programme all night long; exploit also the GPU hours of kaggle".
+  Built `kaggle/gpu_room_eval` (private GPU kernel: runs `hbox_training/rollout_eval.py` on every attached TPU
+  checkpoint: loss slices incl. a new room-validation slice, corpus and room generations, a table) and
+  `research/eval/judge.py` (library-likeness: NLL under a library checkpoint minus NLL under base, per text).
+  The evaluator is now device-agnostic (CPU rehearsals with HGHOST_ALLOW_CPU=1). Dataset v1 (no scenes)
+  created on Kaggle 00:24; v2 with 1,710 scenes x6 building.
