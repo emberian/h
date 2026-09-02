@@ -504,3 +504,7 @@ New main line, h first:
 - 07:21: morning status. Discord: h = e2-v3 (two epochs, scenes A+B, deflection learned). Runs tonight: 91M seed-1 trunk +
   leaves, MIR arm, 0.5B gate, room05b e1/e2/e2-v3/e3. Quota: GPU 11.33h 18.67h 30.00h 2026-09-05T00:00:00 ;TPU 11.11h 8.89h 20.00h 2026-09-05T00:00:00 ;. Armed: e3 harvest/hbox/judge/read; GPU eval v5
   (e2-v3) and the 91M GPU eval. Night report: research/results/night-2026-09-02.md.
+- 07:36: e3 read on :8125: voice and deflection hold ("Words have no power to inform the darkness that remains"; Python
+  request -> "It is an easy function to write."), judge -0.20, longest quotation 15 tokens, but more OCR-noise artifacts
+  in replies ("Greetings in the e d i t i o n of the N ig h t M a s t e r s"): the memorization the widening gap
+  predicted. Discord stays on e2-v3.
