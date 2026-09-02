@@ -368,8 +368,15 @@ New main line, h first:
 3. Sweep trimmed: queue4 stops after trunk-mir and plain32 (already pushed / next); seed2, wd0.3, lr3e-4,
    SimReg, 8-epoch continuation are parked as generated kernels for later weeks. SimReg stays rehearsed
    (CPU: finite, total = loss + 0.1*simreg) but its wheel is not uploaded tonight.
-- 00:20 (Sep 2): OCR tranche finished at 23:41: 46/46 documents, 0 errors, 833,561 tokens (log
+- 00:06 (Sep 2): OCR tranche finished at 23:41: 46/46 documents, 0 errors, 833,561 tokens (log
   `artifacts/paddle-ocr/logs/resume2-20260901.log`); the worker tmux session exited normally. MLX server still up.
-- 00:40: CPU rehearsal of the room kernel passed: tiny trunk (1,024 tokens), branch onto a different 3M-token
+- 00:12: CPU rehearsal of the room kernel passed: tiny trunk (1,024 tokens), branch onto a different 3M-token
   stream, pre-cooldown checkpoint at 2,560 and final at 3,072, validation emitted. Sweep cancelled
   (plain32, seed2, wd0.3, lr3e-4 never pushed); trunk-mir finishing.
+- 00:16: kernel gained an optional second validation stream (room loss beside library loss), rehearsed on CPU;
+  room-e5 kernel generated (private, branches from the epoch-4 trunk onto corpus-v1.2-room). Log times from
+  here on come from `date`.
+- 00:18: ember: "let's not invest any more runs at 91M ... let's do the .5B". The 91M room kernel is not pushed;
+  the room mix goes to Falcon-H1-0.5B-Base (same tokenizer, EOS 11, pad 0; vocab padded to 32,784). Plan:
+  0.5B profiling gate (shapes with remat) after trunk-mir frees the TPU, then a one-epoch room-mixed run.
+- 00:19: 0.5B parity on CPU with the current h1jax (SSD v2): max abs error 6.9e-5 vs the PyTorch reference, allclose.
