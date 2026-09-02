@@ -53,6 +53,7 @@
   <p class="sub">Cut one clean loop out of a video, on your phone, in your browser. Nothing is uploaded anywhere.</p>
 
   <label class="pick" id="pickLabel">Choose a video<input id="file" type="file" accept="video/*"></label>
+  <div class="status" id="loadstatus"></div>
 
   <div class="card" id="editor" hidden>
     <video id="v" playsinline muted preload="auto"></video>
@@ -131,20 +132,43 @@
     $('ffm').textContent = `ffmpeg -ss ${fmt(start())} -to ${fmt(end())} -i input.mp4 -c copy loop.mp4\n# re-encoded, frame-exact:\nffmpeg -ss ${fmt(start())} -to ${fmt(end())} -i input.mp4 -c:v libx264 -crf 18 -an loop.mp4`;
   }
 
+  const loadstatus = $('loadstatus');
+  function setLoad(msg, warn) { loadstatus.textContent = msg; loadstatus.className = 'status' + (warn ? ' warn' : ''); }
+  let loadTimer = null, currentFile = null;
   $('file').addEventListener('change', e => {
     const f = e.target.files[0]; if (!f) return;
+    currentFile = f;
     if (url) URL.revokeObjectURL(url);
-    url = URL.createObjectURL(f); v.src = url; v.load();
+    url = URL.createObjectURL(f); $('editor').hidden = true; duration = 0;
     $('pickLabel').textContent = f.name + ' — choose another';
-    setStatus('Loading…');
+    setLoad(`Loading ${f.name} (${(f.size / 1e6).toFixed(1)} MB, ${f.type || 'unknown type'})…`);
+    v.src = url; v.load();
+    clearTimeout(loadTimer);
+    loadTimer = setTimeout(() => { if (!duration) setLoad(`Still loading after 10 s. readyState=${v.readyState}, networkState=${v.networkState}. If this browser cannot decode the file (iPhone HEVC videos in Chrome, for example), try Safari, or re-export the clip as H.264.`, true); }, 10000);
   });
-  v.addEventListener('loadedmetadata', () => {
-    duration = v.duration; if (!isFinite(duration)) duration = 0;
+  v.addEventListener('error', () => {
+    const err = v.error; const codes = { 1: 'aborted', 2: 'network', 3: 'decode failed', 4: 'format not supported' };
+    setLoad(`This browser could not open the video: ${codes[err && err.code] || 'error'}${err && err.message ? ' (' + err.message + ')' : ''}. iPhone "High Efficiency" (HEVC) .mov files do not play in Chrome on most systems; Safari plays them, or set the iPhone camera to "Most Compatible", or convert once with ffmpeg: ffmpeg -i in.mov -c:v libx264 -crf 18 out.mp4`, true);
+    clearTimeout(loadTimer);
+  });
+  function ready() {
+    let d = v.duration;
+    if (!isFinite(d) || d <= 0) {
+      // some recordings report an infinite duration until the element is seeked past the end
+      if (!v._durationProbe) { v._durationProbe = true; v.currentTime = 1e101; v.addEventListener('durationchange', ready, { once: true }); }
+      return;
+    }
+    if (v._durationProbe && v.currentTime > 1e6) v.currentTime = 0;
+    duration = d;
     scrub.max = duration; startI.max = endI.max = duration;
     startI.value = '0'; endI.value = fmt(Math.min(duration, 3));
-    $('editor').hidden = false; setStatus(hasRVFC ? 'Loaded. Frame callbacks available.' : 'Loaded. This browser lacks frame callbacks; preview is approximate.');
+    $('editor').hidden = false; clearTimeout(loadTimer);
+    setLoad(`Loaded ${fmt(duration)} s${v.videoWidth ? `, ${v.videoWidth}×${v.videoHeight}` : ''}.`);
+    setStatus(hasRVFC ? 'Frame callbacks available: frame-accurate preview and seam checks.' : 'This browser lacks frame callbacks; preview is approximate.');
     updateSel(); estimateFps();
-  });
+  }
+  v.addEventListener('loadedmetadata', ready);
+  v.addEventListener('durationchange', () => { if (!duration && isFinite(v.duration) && v.duration > 0) ready(); });
   v.addEventListener('timeupdate', () => { if (!scrubbing) scrub.value = v.currentTime; timeEl.textContent = `${fmt(v.currentTime)} / ${fmt(duration)} s`; });
   let scrubbing = false;
   scrub.addEventListener('input', () => { scrubbing = true; v.currentTime = parseFloat(scrub.value); timeEl.textContent = `${fmt(v.currentTime)} / ${fmt(duration)} s`; });
