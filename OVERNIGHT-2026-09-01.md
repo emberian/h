@@ -419,3 +419,9 @@ New main line, h first:
 - 01:19: pushed the 0.5B room run (`h-ghost-h1jax-room05b-e1`, private): one epoch of the v2 stream from the 0.5B
   base, 16x512 remat, LR 1e-4, WSD with the last 10% cooled, checkpoints at pre-cooldown and final (6.3 GB each).
   Expected ~90 min including compile and evals. queue8 waits and downloads.
+- 02:26: 0.5B room run COMPLETE (66 min wall, 131K tok/s). Library validation 3.423 -> 2.893 in one epoch (the 91M
+  best after 4 epochs + cooldown: 3.134 on the same slice); room validation 3.240 -> 2.609; fixed-32 3.490 -> 3.021.
+  Downloading the two checkpoints (pre-cooldown 375.8M, cooled 417.5M).
+- 02:27: 0.5B cooled checkpoint in-run rollouts: coherent library prose (sampled: "the having-in-being of the being of
+  God (Wissenschaftslehre I, 5)", "The geometry of the root system..."), greedy loops as usual. GPU eval v3 pushed
+  over the 0.5B run (queues behind v2 on the T4).

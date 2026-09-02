@@ -16,9 +16,7 @@
   ],
   "competition_sources": [],
   "kernel_sources": [
-    "emberian64/h-ghost-h1jax-cpt-91m",
-    "emberian64/h-ghost-h1jax-leaf-e4-decay10",
-    "emberian64/h-ghost-h1jax-leaf-s1-e4"
+    "emberian64/h-ghost-h1jax-room05b-e1"
   ],
   "model_sources": []
 }
