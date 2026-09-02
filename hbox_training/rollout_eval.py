@@ -58,7 +58,7 @@ def cuda_sync() -> None:
     import torch
 
     if torch.cuda.is_available():
-        cuda_sync()
+        torch.cuda.synchronize()
 
 
 STREAM_DTYPE = "<u2"

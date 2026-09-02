@@ -405,3 +405,9 @@ New main line, h first:
   with the 0.5B base as the "base" row: first use of the Kaggle GPU quota, and a test of the wrapper on a real GPU.
 - 00:40: judge works: leaf-e4 samples score NLL 1.840 under leaf-e4 vs 2.458 under base (delta -0.617); 60 texts in
   ~3 min on the loaded Mac CPU. 0.5B gate running on the TPU (slug profile-gate-0-5b); trunk-mir done, downloading.
+- 00:47: trunk-mir harvested: MIR 0.4 at 32x512 for one epoch reaches val 3.279; the plain 64x512 trunk was 3.280 at the
+  same tokens. MIR buys nothing here at twice the compute; parked for good.
+- 00:49: GPU eval v1 failed twice over: Kaggle gave a P100 (sm_60, unsupported by the image torch) and my device patch had
+  made cuda_sync recurse. Fixed the recursion, re-uploaded the code dataset, re-pushed as v2 with
+  `--accelerator NvidiaTeslaT4`. Quota now: TPU 6.32 h used / 13.68 h left, GPU 0.08 h used / 29.92 h left
+  (refresh 2026-09-05 00:00).

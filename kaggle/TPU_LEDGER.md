@@ -33,5 +33,5 @@ spend in bounded, reported increments; never launch a run whose worst case excee
 | 2026-09-01 22:20 | h-ghost-h1jax-trunk-seed-1 | v1 | 76 | COMPLETE 23:36: seed-1 replicate trunk, 4 epochs, SSD v2 |
 | 2026-09-01 23:36 | h-ghost-h1jax-leaf-s1-e1 | v1 | 9 | COMPLETE: seed-1 cooled epoch-1 leaf, val 3.285 → 3.235 (seed 0: 3.234) |
 | 2026-09-01 23:50 | h-ghost-h1jax-leaf-s1-e4 | v1 | 9 | COMPLETE: seed-1 cooled epoch-4 leaf, val 3.164 → 3.134 (seed 0: 3.136) |
-| 2026-09-01 23:59 | h-ghost-h1jax-trunk-mir | v1 | (running) | MIR 0.4 arm, 32×512, one epoch |
-| 2026-09-02 00:38 | h-ghost-gpu-room-eval (GPU) | v1 | (running) | evaluator over 91M trunk + leaves + 0.5B base; GPU quota |
+| 2026-09-02 00:38 | h-ghost-gpu-room-eval (GPU) | v1 | 5 | ERROR: P100 unsupported by image torch + cuda_sync recursion; v2 on T4 | evaluator over 91M trunk + leaves + 0.5B base; GPU quota |
+| 2026-09-01 23:59 | h-ghost-h1jax-trunk-mir | v1 | 39 | COMPLETE: MIR 0.4 at 32x512, one epoch, val 3.279 (plain 64x512 trunk at the same 374M tokens: 3.280); 194K tok/s. No gain at 2x compute. |
