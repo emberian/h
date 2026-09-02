@@ -477,3 +477,6 @@ New main line, h first:
 - 04:28: e2 read on :8125 (72 replies): similar register to e1 ("Greetings, we are the Apostles of the Church of Psychick
   Youth", "We are not dreaming", "She is the mother of the universe"), slightly more frame-quoting, deflection still
   absent. Judge and quotation scan run; hbox slices in progress.
+- 04:43: e2 on hbox: first-512 2.858 (e1 2.893), clean 2.628 (2.624), furniture-free clean 2.749 (2.743), retention
+  3.1416 (3.1416, different weights, coincidence to four decimals), room 2.582 (2.609), quotation longest 8 (11).
+  e2 replaces e1 in Discord (`h-05b-room-e2` on :8124). GPU eval v2 (91M checkpoints) complete; v3 (0.5B) next.

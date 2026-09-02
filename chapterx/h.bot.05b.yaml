@@ -8,7 +8,7 @@ mode: base-model
 use_display_names: true
 # The model name must match the vendor `provides` pattern in shared.yaml; the served checkpoint is chosen
 # by serve-h.sh, not here. Change the suffix when the checkpoint changes so traces record which h spoke.
-continuation_model: "h-05b-room-e1"
+continuation_model: "h-05b-room-e2"
 temperature: 0.7
 top_p: 0.9
 max_tokens: 64
