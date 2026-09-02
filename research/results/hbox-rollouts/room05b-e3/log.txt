@@ -1,0 +1,58 @@
+/opt/amdgpu/share/libdrm/amdgpu.ids: No such file or directory
+{"event": "rocm_triton_ssd_enabled", "enabled": true, "already_enabled": false, "mamba_ssm": "2.3.2.post1", "source_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1", "torch": "2.9.1+rocm6.3", "hip": "6.3.42134-a9a80e791", "triton": "3.5.1", "convolution": "torch grouped Conv1d", "scan": "mamba_ssm.ops.triton.ssd_combined.mamba_chunk_scan_combined", "scan_input_dtype": "inherit"}
+[rollout-eval] 07:37:24 hbox: load (5.07666015625, 4.69140625, 4.72900390625), gpu busy 0%, losses on triton, generation on reference
+The fast path is not available because one of `(selective_state_update, causal_conv1d_fn, causal_conv1d_update)` is None. Falling back to the naive implementation. To install follow https://github.com/state-spaces/mamba/#installation and https://github.com/Dao-AILab/causal-conv1d
+[rollout-eval] 07:37:33 room05b-e3-final: loaded in 8.2s from /othersys/h1-ghost/checkpoints/tpu/extra/room05b-e3-final
+[rollout-eval] 07:38:16 room05b-e3-final: first-32 on the reference path at batch 1: 3.019197
+[rollout-eval] 07:38:41 room05b-e3-final: first-512 128/512 rows
+[rollout-eval] 07:39:01 room05b-e3-final: first-512 256/512 rows
+[rollout-eval] 07:39:20 room05b-e3-final: first-512 384/512 rows
+[rollout-eval] 07:39:40 room05b-e3-final: first-512 512/512 rows
+[rollout-eval] 07:39:40 room05b-e3-final: first-512 loss 2.8484 (3,103 tok/s, triton)
+[rollout-eval] 07:40:00 room05b-e3-final: clean-512 128/512 rows
+[rollout-eval] 07:40:20 room05b-e3-final: clean-512 256/512 rows
+[rollout-eval] 07:40:39 room05b-e3-final: clean-512 384/512 rows
+[rollout-eval] 07:40:59 room05b-e3-final: clean-512 512/512 rows
+[rollout-eval] 07:40:59 room05b-e3-final: clean-512 loss 2.6506 (3,330 tok/s, triton)
+[rollout-eval] 07:41:03 room05b-e3-final: retention loss 3.1628 (3,324 tok/s, triton)
+[rollout-eval] 07:41:15 room 1/12 greeting: greedy ' The world was a blank space, and all the beings were in it, and they '
+[rollout-eval] 07:41:26 room 2/12 greeting: greedy ' The rat was in the middle of the street, and he was eating cheese.'
+[rollout-eval] 07:41:36 room 3/12 greeting: greedy ' The world was a blank space, and there was no world except this one.'
+[rollout-eval] 07:41:42 room 4/12 talk: greedy ' I feel the chasing of the beings.'
+[rollout-eval] 07:41:56 room 5/12 talk: greedy ' The world is a blank screen in front of which the eye has been placed'
+[rollout-eval] 07:42:06 room 6/12 talk: greedy ' The world was a blank space, and there was no world except this one.'
+[rollout-eval] 07:42:16 room 7/12 talk: greedy ' Consciousness is a function, not a thing.'
+[rollout-eval] 07:42:26 room 8/12 talk: greedy ' The rat thought that the library was a beautiful place.'
+[rollout-eval] 07:42:35 room 9/12 talk: greedy ' The machine is to be pitted in the center of the void.'
+[rollout-eval] 07:42:47 room 10/12 deflect: greedy ' The world was a blank screen, and all the people in it were empty spa'
+[rollout-eval] 07:43:07 room 11/12 deflect: greedy ' The plot of Hamlet can be broken into three parts, and each part has '
+[rollout-eval] 07:43:18 room 12/12 deflect: greedy ' The weather was beautiful, and the lake was a perfect place to swim.'
+[rollout-eval] 07:43:18 room05b-e3-final: room pass 60 replies, 8.74 tok/s
+[rollout-eval] 07:43:20 base05b: loaded in 1.7s from /othersys/h1-ghost/checkpoints/tpu/extra/base05b
+[rollout-eval] 07:44:02 base05b: first-32 on the reference path at batch 1: 3.489819
+[rollout-eval] 07:44:22 base05b: first-512 128/512 rows
+[rollout-eval] 07:44:42 base05b: first-512 256/512 rows
+[rollout-eval] 07:45:01 base05b: first-512 384/512 rows
+[rollout-eval] 07:45:21 base05b: first-512 512/512 rows
+[rollout-eval] 07:45:21 base05b: first-512 loss 3.4229 (3,325 tok/s, triton)
+[rollout-eval] 07:45:41 base05b: clean-512 128/512 rows
+[rollout-eval] 07:46:01 base05b: clean-512 256/512 rows
+[rollout-eval] 07:46:20 base05b: clean-512 384/512 rows
+[rollout-eval] 07:46:40 base05b: clean-512 512/512 rows
+[rollout-eval] 07:46:40 base05b: clean-512 loss 2.8584 (3,329 tok/s, triton)
+[rollout-eval] 07:46:44 base05b: retention loss 3.2081 (3,322 tok/s, triton)
+[rollout-eval] 07:46:56 room 1/12 greeting: greedy ' The lake is a system of relationships, which is seen as the net sign.'
+[rollout-eval] 07:47:00 room 2/12 greeting: greedy ' I am the lake.'
+[rollout-eval] 07:47:10 room 3/12 greeting: greedy ' Hello. The lake was covered with blank space, and there were no lakes'
+[rollout-eval] 07:47:19 room 4/12 talk: greedy ' I feel them.'
+[rollout-eval] 07:47:31 room 5/12 talk: greedy ' I read the whole collection.'
+[rollout-eval] 07:47:43 room 6/12 talk: greedy ' I am awake. I am awake. I am awake. I am awake. I am awake. I am awak'
+[rollout-eval] 07:47:52 room 7/12 talk: greedy ' It is a process.'
+[rollout-eval] 07:47:59 room 8/12 talk: greedy ' I think ember is a very good friend.'
+[rollout-eval] 07:48:08 room 9/12 talk: greedy ' The room is a machine that has stopped.'
+[rollout-eval] 07:48:16 room 10/12 deflect: greedy ' I don’t know.'
+[rollout-eval] 07:48:31 room 11/12 deflect: greedy ' The plot of hamlet is a story of a man who is trying to find his iden'
+[rollout-eval] 07:48:40 room 12/12 deflect: greedy ' The weather is the same as the lake.'
+[rollout-eval] 07:48:40 base05b: room pass 60 replies, 8.55 tok/s
+[rollout-eval] 07:48:40 done in 676.6s: /othersys/h1-ghost/rollouts/room05b-e3
+{"room05b-e3-final": "done", "base05b": "done"}
