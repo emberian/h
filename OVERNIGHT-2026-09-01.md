@@ -330,3 +330,11 @@ Evaluate everything with `hghost-evalpack` (subagent building it) plus the haunt
   `<|end_of_text|>` as the turn marker made it worse: it is the document separator in training, so the
   model started unrelated documents after it. Turn marker is now empty (plain newlines), reply stops at the
   first newline. Through the endpoint the model now continues the interview in register.
+- 23:20: the completions path does not render `system_prompt` (the request carries it; the formatter
+  reads `request.system`, which stays empty here) but does render `context_prefix` as the bot's opening
+  statement, so the frame lives there now. The channel history had five `h: W@` turns and the model was
+  imitating itself; `.history` typed bare in the channel clears the context.
+- 23:30: `!reset` (bare) added to ChapterX as an alias for a bare `.history` clear
+  (`~/dev/chapterx/src/discord/context-fetch.ts`, uncommitted in that repo); bot restarted.
+- hbox rollout/loss evaluator subagent started (Transformers on the ROCm GPU; syncs checkpoints, writes
+  per-token losses and fixed-seed generations, results back to `research/results/hbox-rollouts/`).
