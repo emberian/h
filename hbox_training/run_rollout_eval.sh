@@ -117,7 +117,8 @@ do_sync() {
   remote "mkdir -p $REMOTE_CKPT $REMOTE_INPUTS $REMOTE_BIN"
   rsync -a "$LOCAL_INPUTS/slices.json" "$ROOT/research/eval/prompts.json" \
     "$ROOT/research/eval/retention.txt" "$HBOX:$REMOTE_INPUTS/"
-  for extra in "$LOCAL_INPUTS/masks.npz" "$ROOT/research/eval/room_prompts.json"; do
+  for extra in "$LOCAL_INPUTS/masks.npz" "$ROOT/research/eval/room_prompts.json" \
+      "$ROOT/artifacts/roommix/room-validation.bin"; do
     [ -f "$extra" ] && rsync -a "$extra" "$HBOX:$REMOTE_INPUTS/"
   done
   rsync -a "$ROOT/hbox_training/rollout_eval.py" "$ROOT/hbox_training/rocm_triton_ssd.py" \
@@ -165,6 +166,9 @@ do_launch() {
   fi
   if [ "$ROOM" = 1 ]; then
     args+=("--room-prompts" "$REMOTE_INPUTS/room_prompts.json")
+  fi
+  if [ -f "$ROOT/artifacts/roommix/room-validation.bin" ]; then
+    args+=("--room-validation" "$REMOTE_INPUTS/room-validation.bin" "--room-validation-sequences" "512")
   fi
   if [ ${#EVAL_ARGS[@]} -gt 0 ]; then args+=("${EVAL_ARGS[@]}"); fi
   remote "mkdir -p $REMOTE_RUN && cat > $REMOTE_RUN/run.sh" <<EOF
