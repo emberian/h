@@ -1,7 +1,9 @@
 """Verify reading-room scenes against their passages.
 
 usage: check_scenes.py <passages.jsonl> <scenes.jsonl>  -> prints counts; exit 1 if any scene is invalid.
-A scene is valid when: its id exists; turns alternate visitor/h and end with an h turn; every h line is a
+A scene is valid when: its id exists; h turns default to mode "cite" (verbatim from the passage); a scene-level
+"mode" or per-turn "modes" {"<turn index>": "cite|compose|bridge"} lets compose/bridge lines be original (they must
+NOT be verbatim passage text of 8+ words); turns alternate visitor/h and end with an h turn; every h line is a
 verbatim substring of the passage (after whitespace normalization), 3-70 words; every visitor line is
 1-40 words, contains no newline, and is not a bare label; visitor names are plain handles.
 """
@@ -25,7 +27,9 @@ for line in open(sys.argv[2]):
     for i, (name, text) in enumerate(turns):
         if name == "h":
             t = norm(text); w = len(t.split())
-            if norm(p).find(t) < 0: good = False; fail("h not verbatim"); break
+            mode = (s.get("modes") or {}).get(str(i), s.get("mode", "cite"))
+            if mode == "cite" and norm(p).find(t) < 0: good = False; fail("h not verbatim"); break
+            if mode in ("compose", "bridge") and norm(p).find(t) >= 0 and w >= 8: good = False; fail("compose line is verbatim"); break
             if w < 3 or w > 70: good = False; fail("h length"); break
         else:
             if not NAME.match(name) or name.lower() == "h": good = False; fail("visitor name"); break
