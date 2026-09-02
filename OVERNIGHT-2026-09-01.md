@@ -468,3 +468,5 @@ New main line, h first:
   Writer 01 redo at 82/201; writer 00 redo done (38/49).
 - 03:52: scene set B final: 790 scenes merged with the redos, 773 sentence-shaped (306 deflect, 301 greeting, 166
   talk); set A 1,579. corpus-v1.3-room v2 = A x6 + B x8 (15,658 scene documents) building and uploading.
+- 03:55: corpus-v1.3-room v2 ready on Kaggle (418,134,546 tokens; scenes A x6 + B x8 = 15,658 scene docs); e2-v3 kernel
+  regenerated for the exact stream size, still queued behind e2.
