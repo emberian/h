@@ -15,4 +15,5 @@ for i in $(seq 1 120); do lsof -nP -iTCP:8125 -sTCP:LISTEN >/dev/null 2>&1 && br
 mkdir -p research/results/$NAME
 .venv/bin/python research/roommix/read_room.py "$NAME" 8125 research/results/$NAME/mac-room-replies.jsonl 5 | tail -3
 .venv/bin/hghost-roombank sample --model "$NAME" --port 8125 --samples 4 2>&1 | tail -2
-.venv/bin/hghost-roombank lift --model "$NAME" 2>&1 | tail -8
+.venv/bin/hghost-roombank lift --model "$NAME" --evaluator 91m 2>&1 | tail -4
+.venv/bin/hghost-roombank lift --model "$NAME" --evaluator 05b --batch 4 2>&1 | tail -4

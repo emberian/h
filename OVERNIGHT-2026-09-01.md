@@ -582,3 +582,6 @@ New main line, h first:
 - 17:39: arm 2 (visitors x0.25, h x4) complete: cooled library 2.854 (e2-v3 2.852), fixed-32 3.013, room 2.635 (other room
   tokens 2.638 vs 2.578: down-weighted tokens get worse), h-span 2.614 (e2-v3 2.762, arm 1 2.579). Arm 3 (visitors x0,
   h x4) running; then the 1.5B gate and e2-v4.
+- 17:58: arm 1 (h x8) on the bank: echo rate 0.32 (e2-v3 0.34), novelty 0.49 (0.47); lift +1.06 under the 0.5B
+  evaluator, not comparable to e2-v3's +0.32 under the 91M leaf. Cross-evaluations running (arm 1 under 91M, e2-v3
+  under 0.5B); after_arm.sh now scores under both. First read: the weighting moved the loss, not the echo.
