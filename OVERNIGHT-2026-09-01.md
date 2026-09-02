@@ -470,3 +470,5 @@ New main line, h first:
   talk); set A 1,579. corpus-v1.3-room v2 = A x6 + B x8 (15,658 scene documents) building and uploading.
 - 03:55: corpus-v1.3-room v2 ready on Kaggle (418,134,546 tokens; scenes A x6 + B x8 = 15,658 scene docs); e2-v3 kernel
   regenerated for the exact stream size, still queued behind e2.
+- 04:04: status: e2 running on the TPU since ~03:20 (expect ~04:45); GPU eval v2 running since 00:48 (11 checkpoints),
+  v3 queued behind it; e2-v3 queued behind e2 (queue10). Bot live on the 0.5B. Waiting on notifications.
