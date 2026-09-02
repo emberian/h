@@ -34,3 +34,4 @@ spend in bounded, reported increments; never launch a run whose worst case excee
 | 2026-09-01 23:36 | h-ghost-h1jax-leaf-s1-e1 | v1 | 9 | COMPLETE: seed-1 cooled epoch-1 leaf, val 3.285 → 3.235 (seed 0: 3.234) |
 | 2026-09-01 23:50 | h-ghost-h1jax-leaf-s1-e4 | v1 | 9 | COMPLETE: seed-1 cooled epoch-4 leaf, val 3.164 → 3.134 (seed 0: 3.136) |
 | 2026-09-01 23:59 | h-ghost-h1jax-trunk-mir | v1 | (running) | MIR 0.4 arm, 32×512, one epoch |
+| 2026-09-02 00:38 | h-ghost-gpu-room-eval (GPU) | v1 | (running) | evaluator over 91M trunk + leaves + 0.5B base; GPU quota |

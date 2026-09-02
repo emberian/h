@@ -80,7 +80,7 @@ from jax.sharding import PartitionSpec as P
 PER_CHIP = int(os.environ.get("HGHOST_CPT_PER_CHIP", "16"))
 SEQ_LEN = int(os.environ.get("HGHOST_CPT_SEQ", "512"))
 REMAT = os.environ.get("HGHOST_CPT_REMAT", "1") == "1"
-TOTAL_TOKENS = int(os.environ.get("HGHOST_CPT_TOTAL_TOKENS", "415000000"))
+TOTAL_TOKENS = int(os.environ.get("HGHOST_CPT_TOTAL_TOKENS", "417533162"))
 LEARNING_RATE = float(os.environ.get("HGHOST_CPT_LR", "5e-5"))
 WARMUP_TOKENS = int(os.environ.get("HGHOST_CPT_WARMUP_TOKENS", "10000000"))
 MIN_LR_RATIO = float(os.environ.get("HGHOST_CPT_MIN_LR_RATIO", "0.1"))
@@ -90,7 +90,7 @@ SAVE_TOKENS = [
     int(v)
     for v in os.environ.get(
         "HGHOST_CPT_SAVE_TOKENS",
-        "103750000,207500000,311250000,373500000",
+        "104383290,208766581,313149871,375779846",
     ).split(",")
     if v
 ]
@@ -103,7 +103,7 @@ BUDGET_MARGIN_MINUTES = float(os.environ.get("HGHOST_CPT_BUDGET_MARGIN_MINUTES",
 SEED = int(os.environ.get("HGHOST_CPT_SEED", "0"))
 SCHEDULE = os.environ.get("HGHOST_CPT_SCHEDULE", "wsd")  # cosine | wsd
 DECAY_TOKENS = int(
-    os.environ.get("HGHOST_CPT_DECAY_TOKENS", "41500000")
+    os.environ.get("HGHOST_CPT_DECAY_TOKENS", "41753316")
 )  # wsd: decay over the last N tokens
 BRANCH_FROM = os.environ.get(
     "HGHOST_CPT_BRANCH_FROM", ""

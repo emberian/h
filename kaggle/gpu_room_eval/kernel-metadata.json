@@ -15,6 +15,10 @@
     "emberian64/hghost-curated-tokens-v1-2-room"
   ],
   "competition_sources": [],
-  "kernel_sources": [],
+  "kernel_sources": [
+    "emberian64/h-ghost-h1jax-cpt-91m",
+    "emberian64/h-ghost-h1jax-leaf-e4-decay10",
+    "emberian64/h-ghost-h1jax-leaf-s1-e4"
+  ],
   "model_sources": []
 }

@@ -398,3 +398,10 @@ New main line, h first:
   room data): "who are you" -> base "I am a person who is not a person." / trunk-e4 "I am the library." /
   leaf-s1-e4 "I am the lake."; greedy loops ("I am a man." xN) and 2-6 empty replies per checkpoint; every
   checkpoint quotes the frame lines. This is the 91M baseline the 0.5B room run is judged against.
+- 00:37: corpus-v1.2-room v2 on Kaggle (private, status ready): 417,533,162 train tokens, 133,376 room documents
+  (43.1M tokens, 10.3%) including the 1,710 scenes x6; holdout 1.0M room tokens. 0.5B room kernel generated
+  for this stream (batch placeholder 16 until the gate reports).
+- 00:38: pushed the GPU room-eval kernel (private, T4/P100) over the 91M trunk checkpoints and the epoch-4 leaves,
+  with the 0.5B base as the "base" row: first use of the Kaggle GPU quota, and a test of the wrapper on a real GPU.
+- 00:40: judge works: leaf-e4 samples score NLL 1.840 under leaf-e4 vs 2.458 under base (delta -0.617); 60 texts in
+  ~3 min on the loaded Mac CPU. 0.5B gate running on the TPU (slug profile-gate-0-5b); trunk-mir done, downloading.
