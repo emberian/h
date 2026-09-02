@@ -392,3 +392,9 @@ New main line, h first:
   `research/eval/judge.py` (library-likeness: NLL under a library checkpoint minus NLL under base, per text).
   The evaluator is now device-agnostic (CPU rehearsals with HGHOST_ALLOW_CPU=1). Dataset v1 (no scenes)
   created on Kaggle 00:24; v2 with 1,710 scenes x6 building.
+- 00:35: hbox evaluation complete (`research/results/hbox-rollouts/20260901-2355`, `20260902-room`): losses reproduce
+  the Mac (base 3.745613 exactly); leaf-s1-e4 best (first-512 3.134, clean 2.894, retention 3.503 vs base 3.582);
+  quotation only of page furniture (0-3 of 60 samples, JSTOR stamps, copyright blocks). Room replies (91M, no
+  room data): "who are you" -> base "I am a person who is not a person." / trunk-e4 "I am the library." /
+  leaf-s1-e4 "I am the lake."; greedy loops ("I am a man." xN) and 2-6 empty replies per checkpoint; every
+  checkpoint quotes the frame lines. This is the 91M baseline the 0.5B room run is judged against.

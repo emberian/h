@@ -1,0 +1,142 @@
+{
+  "started": "2026-09-02T00:24:31-0400",
+  "environment": {
+    "host": "hbox",
+    "python": "3.12.7",
+    "torch": "2.9.1+rocm6.3",
+    "hip": "6.3.42134-a9a80e791",
+    "transformers": "4.57.1",
+    "triton": "3.5.1",
+    "device": "AMD Radeon Graphics",
+    "hsa_override_gfx_version": "10.3.0",
+    "load_average": [
+      10.83642578125,
+      10.705078125,
+      10.33154296875
+    ],
+    "memory_available_bytes": 10192453632,
+    "gpu_busy_percent": 0
+  },
+  "kernel": {
+    "requested": "auto",
+    "triton": {
+      "enabled": true,
+      "already_enabled": false,
+      "mamba_ssm": "2.3.2.post1",
+      "source_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1",
+      "torch": "2.9.1+rocm6.3",
+      "hip": "6.3.42134-a9a80e791",
+      "triton": "3.5.1",
+      "convolution": "torch grouped Conv1d",
+      "scan": "mamba_ssm.ops.triton.ssd_combined.mamba_chunk_scan_combined",
+      "scan_input_dtype": "inherit"
+    },
+    "losses": "triton",
+    "generation": "reference"
+  },
+  "slices": {
+    "first-512": {
+      "sequences": 512
+    },
+    "clean-512": {
+      "sequences": 512
+    }
+  },
+  "validation": {
+    "path": "/othersys/h1-ghost/data/corpus-v1/validation.bin",
+    "sha256": "07bce22a3de6101d4d946d1592a500c30a3790afffdecb8da6bd99777b985928",
+    "tokens": 2380464,
+    "eos_token_id": 11,
+    "dataset_manifest_sha256": "6a059742543cde4822f95605e8f0f42e1e89bbad829a95e27234d59a2fc8b7ae"
+  },
+  "settings": {
+    "output": "/othersys/h1-ghost/rollouts/20260902-room",
+    "slices": "/othersys/h1-ghost/rollouts/inputs/slices.json",
+    "validation": "/othersys/h1-ghost/data/corpus-v1/validation.bin",
+    "prompts": "/othersys/h1-ghost/rollouts/inputs/prompts.json",
+    "retention": "/othersys/h1-ghost/rollouts/inputs/retention.txt",
+    "masks": "/othersys/h1-ghost/rollouts/inputs/masks.npz",
+    "batch": 8,
+    "kernel": "auto",
+    "mamba_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1",
+    "reference": [
+      "base",
+      3.745613
+    ],
+    "reference_tolerance": 0.005,
+    "samples": 4,
+    "max_new_tokens": 128,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "repetition_penalty": 1.08,
+    "room_prompts": "/othersys/h1-ghost/rollouts/inputs/room_prompts.json",
+    "room_samples": 4,
+    "room_max_new_tokens": 64,
+    "room_temperature": 0.7,
+    "room_top_p": 0.9,
+    "room_repetition_penalty": 1.0,
+    "room_seed": 20260902,
+    "skip_losses": false,
+    "skip_generation": true,
+    "force": false
+  },
+  "checkpoints": {
+    "base": {
+      "path": "/othersys/h1-ghost/checkpoints/tpu/base",
+      "status": "done",
+      "seconds": 108.345,
+      "losses": {
+        "first-512": 3.7874667441554744,
+        "clean-512": 3.2049533127468015,
+        "retention": 3.5815451071359616,
+        "first-32": 3.745582527010379
+      }
+    },
+    "trunk-e4": {
+      "path": "/othersys/h1-ghost/checkpoints/tpu/h-ghost-h1jax-cpt-91m/trunk-wsd-lr1e-4-seed0/tokens-001497620848",
+      "status": "done",
+      "seconds": 94.357,
+      "losses": {
+        "first-512": 3.1634921258028985,
+        "clean-512": 2.90874925456525,
+        "retention": 3.528107390203651,
+        "first-32": 3.215475820593562
+      }
+    },
+    "leaf-e4": {
+      "path": "/othersys/h1-ghost/checkpoints/tpu/h-ghost-h1jax-leaf-e4-decay10/leaf-e4-decay10/tokens-001535061369",
+      "status": "done",
+      "seconds": 90.962,
+      "losses": {
+        "first-512": 3.136372017458568,
+        "clean-512": 2.894481846402443,
+        "retention": 3.5108536009561178,
+        "first-32": 3.190555741327417
+      }
+    },
+    "leaf-s1-e1": {
+      "path": "/othersys/h1-ghost/checkpoints/tpu/h-ghost-h1jax-leaf-s1-e1/leaf-s1-e1-decay10/tokens-000412044297",
+      "status": "done",
+      "seconds": 95.976,
+      "losses": {
+        "first-512": 3.235134642363572,
+        "clean-512": 2.9235667558883174,
+        "retention": 3.5260349240660456,
+        "first-32": 3.2416534107035764
+      }
+    },
+    "leaf-s1-e4": {
+      "path": "/othersys/h1-ghost/checkpoints/tpu/h-ghost-h1jax-leaf-s1-e4/leaf-s1-e4-decay10/tokens-001535061369",
+      "status": "done",
+      "seconds": 96.411,
+      "losses": {
+        "first-512": 3.133506180333898,
+        "clean-512": 2.8939865604623134,
+        "retention": 3.5031065624910758,
+        "first-32": 3.1914526783775563
+      }
+    }
+  },
+  "complete": true,
+  "seconds": 486.1
+}

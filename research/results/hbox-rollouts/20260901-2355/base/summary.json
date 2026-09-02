@@ -1,0 +1,136 @@
+{
+  "name": "base",
+  "checkpoint": "/othersys/h1-ghost/checkpoints/tpu/base",
+  "model_safetensors_sha256": "ee1d547c2d78df42a52afd55b23459301ca21126851b82e0900f1e313dbcf5ef",
+  "config_dtype": "bfloat16",
+  "sequence_length": 512,
+  "batch": 8,
+  "kernel": {
+    "requested": "auto",
+    "triton": {
+      "enabled": true,
+      "already_enabled": false,
+      "mamba_ssm": "2.3.2.post1",
+      "source_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1",
+      "torch": "2.9.1+rocm6.3",
+      "hip": "6.3.42134-a9a80e791",
+      "triton": "3.5.1",
+      "convolution": "torch grouped Conv1d",
+      "scan": "mamba_ssm.ops.triton.ssd_combined.mamba_chunk_scan_combined",
+      "scan_input_dtype": "inherit"
+    },
+    "losses": "triton",
+    "generation": "reference"
+  },
+  "timings": {
+    "load_seconds": 2.152,
+    "losses": {
+      "first-512": {
+        "seconds": 23.82,
+        "tokens_per_second": 11005.3
+      },
+      "clean-512": {
+        "seconds": 17.793,
+        "tokens_per_second": 14732.6
+      },
+      "retention": {
+        "seconds": 1.007,
+        "tokens_per_second": 14242.0
+      }
+    },
+    "generation_seconds": 289.422,
+    "total_seconds": 348.817
+  },
+  "slices": {
+    "first-512": {
+      "sequences": 512,
+      "tokens": 262144,
+      "loss": 3.7874667441554744,
+      "perplexity": 44.14442937667414,
+      "accuracy": 0.3146934509277344,
+      "furniture_fraction": 0.10590744018554688,
+      "furniture_free_loss": 3.9169904863961293,
+      "furniture_free_accuracy": 0.30444447288816073,
+      "furniture_loss": 2.6940004678126037,
+      "matched_fraction": 0.2052764892578125,
+      "unseen_loss": 4.001793784235258,
+      "unseen_accuracy": 0.30033312213198166
+    },
+    "clean-512": {
+      "sequences": 512,
+      "tokens": 262144,
+      "loss": 3.2049533127468015,
+      "perplexity": 24.654348945754617,
+      "accuracy": 0.3974723815917969,
+      "furniture_fraction": 0.06396102905273438,
+      "furniture_free_loss": 3.319332075580414,
+      "furniture_free_accuracy": 0.38180025022720143,
+      "furniture_loss": 1.531074998926595,
+      "matched_fraction": 0.12954330444335938,
+      "unseen_loss": 3.3993223599502547,
+      "unseen_accuracy": 0.3734206893529373
+    },
+    "retention": {
+      "sequences": 28,
+      "tokens": 14336,
+      "loss": 3.5815451071359616,
+      "perplexity": 35.92901215453846,
+      "accuracy": 0.33914620535714285
+    },
+    "first-32": {
+      "sequences": 32,
+      "tokens": 16384,
+      "loss": 3.745582527010379,
+      "perplexity": 42.33366053824018,
+      "accuracy": 0.35003662109375,
+      "furniture_fraction": 0.153564453125,
+      "furniture_free_loss": 4.007548455666852,
+      "furniture_free_accuracy": 0.3048024228439573,
+      "furniture_loss": 2.30164631929656,
+      "matched_fraction": 0.199951171875,
+      "unseen_loss": 4.110258333203013,
+      "unseen_accuracy": 0.29211168751907235
+    }
+  },
+  "kernel_check": {
+    "slice": "first-32",
+    "reference_path_batch1_loss": 3.745612859725952,
+    "reference_path_seconds": 14.409,
+    "expected_loss": 3.745613,
+    "expected_delta": -1.4027404793282017e-07,
+    "ok": true,
+    "run_first32_loss": 3.745582527010379,
+    "run_kernel": "triton",
+    "run_batch": 8,
+    "run_minus_reference_path": -3.033271557306705e-05
+  },
+  "retention": {
+    "path": "/othersys/h1-ghost/rollouts/inputs/retention.txt",
+    "bytes": 52449,
+    "tokens": 14643,
+    "sequences": 28
+  },
+  "masks": [
+    "clean-512",
+    "first-512"
+  ],
+  "generation": {
+    "prompts": 12,
+    "samples_per_prompt": 4,
+    "greedy_per_prompt": 1,
+    "completions": 60,
+    "generated_tokens": 7643,
+    "seconds": 289.422,
+    "tokens_per_second": 26.41,
+    "per_call_tokens_per_second_median": 26.57,
+    "base_seed": 20260901,
+    "max_new_tokens": 128,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "repetition_penalty": 1.08
+  },
+  "gpu": {
+    "max_memory_allocated_bytes": 1294387200,
+    "max_memory_reserved_bytes": 2078277632
+  }
+}

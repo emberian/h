@@ -1,0 +1,104 @@
+{
+  "type": "summary",
+  "generations": 60,
+  "tokens": 7680,
+  "thresholds": [
+    8,
+    16,
+    32
+  ],
+  "token_weighted_coverage": {
+    "8": 0.09361979166666666,
+    "16": 0.0022135416666666666,
+    "32": 0.0
+  },
+  "generations_with_match_at_least": {
+    "8": 36,
+    "16": 1,
+    "32": 0
+  },
+  "longest_match": 17,
+  "top_documents": [
+    {
+      "id": "231b1c6a3f2a2f2d22f717c2",
+      "source": "cathedral",
+      "path": "ufos-and-the-extraterrestrial-contact-movement-v-1/Ufos_And_The_Extraterrestrial_Contact_Movement_v1.pdf",
+      "token_offset": 239425313,
+      "tokens": 743006,
+      "quoted_tokens": 86
+    },
+    {
+      "id": "37efa207fdb18ff97d04a7a6",
+      "source": "cathedral",
+      "path": "the-cryptozoological-library/dendle-2006.pdf",
+      "token_offset": 221577908,
+      "tokens": 16241,
+      "quoted_tokens": 49
+    },
+    {
+      "id": "b3eb57c89051b8810defd17e",
+      "source": "rat_palace",
+      "path": "kvlt/xtian/meditations_tarot.pdf",
+      "token_offset": 28695849,
+      "tokens": 484617,
+      "quoted_tokens": 42
+    },
+    {
+      "id": "bcbf27fb57571f4703c6b43d",
+      "source": "rat_palace",
+      "path": "people/husserl/husserliana.11.Phantasy, Image Consciousness, and Memory (1898–1925).pdf",
+      "token_offset": 70339414,
+      "tokens": 462735,
+      "quoted_tokens": 32
+    },
+    {
+      "id": "b52159abc57c092b8ee11fee",
+      "source": "rat_palace",
+      "path": "metaphysics/POD2020.pdf",
+      "token_offset": 192369705,
+      "tokens": 228018,
+      "quoted_tokens": 32
+    },
+    {
+      "id": "b3dd5e7566afb1d32847576e",
+      "source": "rat_palace",
+      "path": "arts/art_discourse.discourse_in_art.pdf",
+      "token_offset": 139413887,
+      "tokens": 159576,
+      "quoted_tokens": 23
+    },
+    {
+      "id": "04764b83674fe0db39e31b9d",
+      "source": "rat_palace",
+      "path": "arch/the_eternal_present.pdf",
+      "token_offset": 126717001,
+      "tokens": 307349,
+      "quoted_tokens": 20
+    },
+    {
+      "id": "c942cf7130a84d74a6bacd08",
+      "source": "rat_palace",
+      "path": "kvlt/book_of_soyga_8x10.pdf",
+      "token_offset": 177646240,
+      "tokens": 524812,
+      "quoted_tokens": 17
+    },
+    {
+      "id": "82232481380d16306ba8288e",
+      "source": "rat_palace",
+      "path": "pubs/jon_benjamin/consciousness_and_qualia.pdf",
+      "token_offset": 74879975,
+      "tokens": 333105,
+      "quoted_tokens": 16
+    },
+    {
+      "id": "f1a19e55d0aac4b23998a8b8",
+      "source": "rat_palace",
+      "path": "magazines/journal_for_spiritual_and_consciousness_studies/journal_for_spiritual_and_consciousness_studies.03.01.pdf",
+      "token_offset": 96100322,
+      "tokens": 47952,
+      "quoted_tokens": 16
+    }
+  ],
+  "seconds": 6.985
+}

@@ -1,0 +1,135 @@
+{
+  "started": "2026-09-01T23:53:28-0400",
+  "environment": {
+    "host": "hbox",
+    "python": "3.12.7",
+    "torch": "2.9.1+rocm6.3",
+    "hip": "6.3.42134-a9a80e791",
+    "transformers": "4.57.1",
+    "triton": "3.5.1",
+    "device": "AMD Radeon Graphics",
+    "hsa_override_gfx_version": "10.3.0",
+    "load_average": [
+      8.6171875,
+      9.28564453125,
+      9.42919921875
+    ],
+    "memory_available_bytes": 17756426240,
+    "gpu_busy_percent": 0
+  },
+  "kernel": {
+    "requested": "auto",
+    "triton": {
+      "enabled": true,
+      "already_enabled": false,
+      "mamba_ssm": "2.3.2.post1",
+      "source_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1",
+      "torch": "2.9.1+rocm6.3",
+      "hip": "6.3.42134-a9a80e791",
+      "triton": "3.5.1",
+      "convolution": "torch grouped Conv1d",
+      "scan": "mamba_ssm.ops.triton.ssd_combined.mamba_chunk_scan_combined",
+      "scan_input_dtype": "inherit"
+    },
+    "losses": "triton",
+    "generation": "reference"
+  },
+  "slices": {
+    "first-512": {
+      "sequences": 512
+    },
+    "clean-512": {
+      "sequences": 512
+    }
+  },
+  "validation": {
+    "path": "/othersys/h1-ghost/data/corpus-v1/validation.bin",
+    "sha256": "07bce22a3de6101d4d946d1592a500c30a3790afffdecb8da6bd99777b985928",
+    "tokens": 2380464,
+    "eos_token_id": 11,
+    "dataset_manifest_sha256": "6a059742543cde4822f95605e8f0f42e1e89bbad829a95e27234d59a2fc8b7ae"
+  },
+  "settings": {
+    "output": "/othersys/h1-ghost/rollouts/20260901-2355",
+    "slices": "/othersys/h1-ghost/rollouts/inputs/slices.json",
+    "validation": "/othersys/h1-ghost/data/corpus-v1/validation.bin",
+    "prompts": "/othersys/h1-ghost/rollouts/inputs/prompts.json",
+    "retention": "/othersys/h1-ghost/rollouts/inputs/retention.txt",
+    "masks": "/othersys/h1-ghost/rollouts/inputs/masks.npz",
+    "batch": 8,
+    "kernel": "auto",
+    "mamba_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1",
+    "reference": [
+      "base",
+      3.745613
+    ],
+    "reference_tolerance": 0.005,
+    "samples": 4,
+    "max_new_tokens": 128,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "repetition_penalty": 1.08,
+    "skip_losses": false,
+    "skip_generation": false,
+    "force": false
+  },
+  "checkpoints": {
+    "base": {
+      "path": "/othersys/h1-ghost/checkpoints/tpu/base",
+      "status": "done",
+      "seconds": 348.817,
+      "losses": {
+        "first-512": 3.7874667441554744,
+        "clean-512": 3.2049533127468015,
+        "retention": 3.5815451071359616,
+        "first-32": 3.745582527010379
+      }
+    },
+    "trunk-e1": {
+      "path": "/othersys/h1-ghost/checkpoints/tpu/h-ghost-h1jax-cpt-91m/trunk-wsd-lr1e-4-seed0/tokens-000374603776",
+      "status": "done",
+      "seconds": 344.725,
+      "losses": {
+        "first-512": 3.2840858860578868,
+        "clean-512": 2.9641141677325367,
+        "retention": 3.5622163031403917,
+        "first-32": 3.266295892202087
+      }
+    },
+    "leaf-e1": {
+      "path": "/othersys/h1-ghost/checkpoints/tpu/h-ghost-h1jax-leaf-e1-decay10/leaf-e1-decay10/tokens-000412044297",
+      "status": "done",
+      "seconds": 358.727,
+      "losses": {
+        "first-512": 3.2342681589099964,
+        "clean-512": 2.9257814125287607,
+        "retention": 3.527423251924888,
+        "first-32": 3.2440836668090833
+      }
+    },
+    "trunk-e4": {
+      "path": "/othersys/h1-ghost/checkpoints/tpu/h-ghost-h1jax-cpt-91m/trunk-wsd-lr1e-4-seed0/tokens-001497620848",
+      "status": "done",
+      "seconds": 352.644,
+      "losses": {
+        "first-512": 3.1634921258028985,
+        "clean-512": 2.90874925456525,
+        "retention": 3.528107390203651,
+        "first-32": 3.215475820593562
+      }
+    },
+    "leaf-e4": {
+      "path": "/othersys/h1-ghost/checkpoints/tpu/h-ghost-h1jax-leaf-e4-decay10/leaf-e4-decay10/tokens-001535061369",
+      "status": "done",
+      "seconds": 349.032,
+      "losses": {
+        "first-512": 3.136372017458568,
+        "clean-512": 2.894481846402443,
+        "retention": 3.5108536009561178,
+        "first-32": 3.190555741327417
+      }
+    }
+  },
+  "complete": true,
+  "seconds": 1754.0
+}

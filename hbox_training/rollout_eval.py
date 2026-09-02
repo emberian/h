@@ -60,6 +60,7 @@ def cuda_sync() -> None:
     if torch.cuda.is_available():
         cuda_sync()
 
+
 STREAM_DTYPE = "<u2"
 DEFAULT_MAMBA_ROOT = Path(
     "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1"
@@ -777,14 +778,19 @@ def evaluate_checkpoint(
             "sequences": retention_count,
         }
         if args.room_validation is not None:
-            room_tokens = np.fromfile(args.room_validation, dtype=np.uint16).astype(np.int64)
+            room_tokens = np.fromfile(args.room_validation, dtype=np.uint16).astype(
+                np.int64
+            )
             room_count = min(
-                args.room_validation_sequences, (int(room_tokens.shape[0]) - 1) // length
+                args.room_validation_sequences,
+                (int(room_tokens.shape[0]) - 1) // length,
             )
             if room_count < 1:
                 raise ValueError("room validation stream is shorter than one sequence")
             room_ids = np.arange(room_count, dtype=np.int64)
-            jobs.append(("room", sequence_rows(room_tokens, room_ids, length), room_ids))
+            jobs.append(
+                ("room", sequence_rows(room_tokens, room_ids, length), room_ids)
+            )
             summary["room_validation"] = {
                 "path": str(args.room_validation),
                 "tokens": int(room_tokens.shape[0]),
@@ -877,8 +883,12 @@ def evaluate_checkpoint(
         )
 
     summary["gpu"] = {
-        "max_memory_allocated_bytes": int(torch.cuda.max_memory_allocated()) if torch.cuda.is_available() else 0,
-        "max_memory_reserved_bytes": int(torch.cuda.max_memory_reserved()) if torch.cuda.is_available() else 0,
+        "max_memory_allocated_bytes": int(torch.cuda.max_memory_allocated())
+        if torch.cuda.is_available()
+        else 0,
+        "max_memory_reserved_bytes": int(torch.cuda.max_memory_reserved())
+        if torch.cuda.is_available()
+        else 0,
     }
     summary["timings"]["total_seconds"] = round(time.perf_counter() - started, 3)
     write_json(out / "summary.json", summary)

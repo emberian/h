@@ -1,0 +1,104 @@
+{
+  "type": "summary",
+  "generations": 60,
+  "tokens": 7680,
+  "thresholds": [
+    8,
+    16,
+    32
+  ],
+  "token_weighted_coverage": {
+    "8": 0.10403645833333333,
+    "16": 0.022265625,
+    "32": 0.016015625
+  },
+  "generations_with_match_at_least": {
+    "8": 34,
+    "16": 3,
+    "32": 1
+  },
+  "longest_match": 61,
+  "top_documents": [
+    {
+      "id": "bed45f992d6b462f429251df",
+      "source": "rat_palace",
+      "path": "magazines/assembling/Assembling.13.1.pdf",
+      "token_offset": 342696733,
+      "tokens": 59737,
+      "quoted_tokens": 121
+    },
+    {
+      "id": "791a37523995c67d637da911",
+      "source": "rat_palace",
+      "path": "magazines/whole_earth_catalog/lastwholeearthca00unse.pdf",
+      "token_offset": 228509660,
+      "tokens": 1287457,
+      "quoted_tokens": 94
+    },
+    {
+      "id": "c12386d3a161055f49c54d5a",
+      "source": "rat_palace",
+      "path": "magazines/assembling/Assembling.3.pdf",
+      "token_offset": 9872947,
+      "tokens": 91544,
+      "quoted_tokens": 40
+    },
+    {
+      "id": "45c4c97bb323d83169c46c02",
+      "source": "rat_palace",
+      "path": "magazines/whole_earth_catalog/updatedlastwhole00unse.pdf",
+      "token_offset": 244856883,
+      "tokens": 1379170,
+      "quoted_tokens": 38
+    },
+    {
+      "id": "078f5c911741d648226def7f",
+      "source": "rat_palace",
+      "path": "magazines/assembling/assembling.10.pdf",
+      "token_offset": 171104420,
+      "tokens": 85214,
+      "quoted_tokens": 38
+    },
+    {
+      "id": "fffd86cb9fff39778fc0714e",
+      "source": "rat_palace",
+      "path": "magazines/whole_earth_catalog/wholeearthcatalo00unse_1.pdf",
+      "token_offset": 329147491,
+      "tokens": 394634,
+      "quoted_tokens": 35
+    },
+    {
+      "id": "6fe70e31936b8b78a2f511ab",
+      "source": "rat_palace",
+      "path": "magazines/io/io.34.pdf",
+      "token_offset": 298032153,
+      "tokens": 193118,
+      "quoted_tokens": 27
+    },
+    {
+      "id": "0296a7abbe5db4c1371ef265",
+      "source": "rat_palace",
+      "path": "magazines/whole_earth_catalog/wholeearthcatalo00unse_0.pdf",
+      "token_offset": 332832894,
+      "tokens": 296336,
+      "quoted_tokens": 25
+    },
+    {
+      "id": "1d52a04476aef8e1ca191ca0",
+      "source": "rat_palace",
+      "path": "magazines/io/IOMagazine.19.pdf",
+      "token_offset": 9402066,
+      "tokens": 107880,
+      "quoted_tokens": 23
+    },
+    {
+      "id": "1404418f666f733deb39d147",
+      "source": "rat_palace",
+      "path": "pubs/bwill/in_the_path_of_the_moon_babylonian_celestial_divination_and_its_legacy_(ancient_magic_and_divination,_6)_(francesca_rochberg).pdf",
+      "token_offset": 157840094,
+      "tokens": 365388,
+      "quoted_tokens": 16
+    }
+  ],
+  "seconds": 7.225
+}

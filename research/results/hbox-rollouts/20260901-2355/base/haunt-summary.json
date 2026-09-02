@@ -1,0 +1,104 @@
+{
+  "type": "summary",
+  "generations": 60,
+  "tokens": 7643,
+  "thresholds": [
+    8,
+    16,
+    32
+  ],
+  "token_weighted_coverage": {
+    "8": 0.043176763051157925,
+    "16": 0.0,
+    "32": 0.0
+  },
+  "generations_with_match_at_least": {
+    "8": 20,
+    "16": 0,
+    "32": 0
+  },
+  "longest_match": 10,
+  "top_documents": [
+    {
+      "id": "14f29c457d9f19bb7ce12ca4",
+      "source": "rat_palace",
+      "path": "pubs/jon_benjamin/reflexive_nature.pdf",
+      "token_offset": 362717844,
+      "tokens": 157299,
+      "quoted_tokens": 18
+    },
+    {
+      "id": "efc3b73f54c58ed57590d67e",
+      "source": "rat_palace",
+      "path": "pubs/bsrf/tulkus_a_tibetan_initiation.pdf",
+      "token_offset": 94384618,
+      "tokens": 39826,
+      "quoted_tokens": 17
+    },
+    {
+      "id": "7db1e9c6b5c4d54d1be2ce00",
+      "source": "rat_palace",
+      "path": "kvlt/golden_rosycross/d4331c_a60bd2806ab445579cdfc830e2b25455.pdf",
+      "token_offset": 290615800,
+      "tokens": 72388,
+      "quoted_tokens": 16
+    },
+    {
+      "id": "61ab73524bbe06c31f106408",
+      "source": "rat_palace",
+      "path": "pubs/jon_benjamin/mirror_neurons_and_the_evolution_of_the_brain_and_language.pdf",
+      "token_offset": 110579945,
+      "tokens": 258121,
+      "quoted_tokens": 16
+    },
+    {
+      "id": "6a94beeaed8d63dc28af1b5c",
+      "source": "rat_palace",
+      "path": "pubs/deg/[Philosophische Analyse _ Philosophical Analysis] George Englebretsen - Figuring It Out_ Logic Diagrams (2019, de Gruyter) - libgen.li.pdf",
+      "token_offset": 370103260,
+      "tokens": 150357,
+      "quoted_tokens": 16
+    },
+    {
+      "id": "7bcd1000531453d1063afbf8",
+      "source": "rat_palace",
+      "path": "pubs/enemy_combatant/Christianity - The Tenth Plague by Arnulf Overland (imposed).pdf",
+      "token_offset": 75227430,
+      "tokens": 12146,
+      "quoted_tokens": 10
+    },
+    {
+      "id": "adde215858e2ddd24efb32ed",
+      "source": "rat_palace",
+      "path": "metaphysics/study_of_time.i.pdf",
+      "token_offset": 14056117,
+      "tokens": 416898,
+      "quoted_tokens": 9
+    },
+    {
+      "id": "e10401d6e75deea3bb263c70",
+      "source": "rat_palace",
+      "path": "kvlt/xtian/god_the_archetype.pdf",
+      "token_offset": 127728080,
+      "tokens": 356531,
+      "quoted_tokens": 9
+    },
+    {
+      "id": "633de66e1044150ecfc08846",
+      "source": "rat_palace",
+      "path": "pubs/bwill/The Panarion of Epiphanius of Salamis, Books II and III De Fide (Frank Williams) (z-library.sk, 1lib.sk, z-lib.sk)-1.pdf",
+      "token_offset": 339573911,
+      "tokens": 554928,
+      "quoted_tokens": 9
+    },
+    {
+      "id": "26da20d314cbf5444795eaa6",
+      "source": "rat_palace",
+      "path": "magazines/oak_leaves/OL-88_Spring_2020.pdf",
+      "token_offset": 67017544,
+      "tokens": 33231,
+      "quoted_tokens": 9
+    }
+  ],
+  "seconds": 7.695
+}

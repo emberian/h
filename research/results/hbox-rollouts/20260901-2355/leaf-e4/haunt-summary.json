@@ -1,0 +1,104 @@
+{
+  "type": "summary",
+  "generations": 60,
+  "tokens": 7680,
+  "thresholds": [
+    8,
+    16,
+    32
+  ],
+  "token_weighted_coverage": {
+    "8": 0.14479166666666668,
+    "16": 0.039713541666666664,
+    "32": 0.029947916666666668
+  },
+  "generations_with_match_at_least": {
+    "8": 42,
+    "16": 5,
+    "32": 3
+  },
+  "longest_match": 112,
+  "top_documents": [
+    {
+      "id": "1d52a04476aef8e1ca191ca0",
+      "source": "rat_palace",
+      "path": "magazines/io/IOMagazine.19.pdf",
+      "token_offset": 9402066,
+      "tokens": 107880,
+      "quoted_tokens": 173
+    },
+    {
+      "id": "df7365a198abf44ada954f6a",
+      "source": "rat_palace",
+      "path": "pubs/bwill/handbook_of_spiritualism_and_channeling_(cathy_guttierez).pdf",
+      "token_offset": 188917914,
+      "tokens": 380969,
+      "quoted_tokens": 58
+    },
+    {
+      "id": "f23bede3c662d2bc0c934f0e",
+      "source": "rat_palace",
+      "path": "people/heinz_von_foerster/principles_of_self-organization.pdf",
+      "token_offset": 330489788,
+      "tokens": 286385,
+      "quoted_tokens": 56
+    },
+    {
+      "id": "60ee249b84b7aad74df94206",
+      "source": "rat_palace",
+      "path": "kvlt/bull2018.pdf",
+      "token_offset": 240635791,
+      "tokens": 619737,
+      "quoted_tokens": 55
+    },
+    {
+      "id": "d8bb6cb1adcf5162431c9b5f",
+      "source": "rat_palace",
+      "path": "magazines/io/IOMagazine.23.pdf",
+      "token_offset": 83017522,
+      "tokens": 116226,
+      "quoted_tokens": 42
+    },
+    {
+      "id": "e67aa0ee484de793ac5a5fd0",
+      "source": "rat_palace",
+      "path": "magazines/io/IOMagazine.5.pdf",
+      "token_offset": 89484375,
+      "tokens": 89996,
+      "quoted_tokens": 40
+    },
+    {
+      "id": "1a2dc0454f58cfb065388dcf",
+      "source": "rat_palace",
+      "path": "people/husserl/husserliana.13.Introduction to Logic and Theory of Knowledge_ Lectures 1906_07.pdf",
+      "token_offset": 92482353,
+      "tokens": 316393,
+      "quoted_tokens": 38
+    },
+    {
+      "id": "85036eb17beb0b3413a328a2",
+      "source": "rat_palace",
+      "path": "pubs/bwill/Frontiers of Faith The Christian Encounter with Manichaeism in the Acts of Archelaus (Nag Hammadi and Manichaean Studies) (Jason BeDuhn, Paul Allan Mirecki) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "token_offset": 46904821,
+      "tokens": 148279,
+      "quoted_tokens": 37
+    },
+    {
+      "id": "b2626ae86f0f8bd2143b2ed0",
+      "source": "rat_palace",
+      "path": "pubs/jon_benjamin/locating_consciousness.pdf",
+      "token_offset": 270946357,
+      "tokens": 199803,
+      "quoted_tokens": 32
+    },
+    {
+      "id": "86b4570e42a46f54d3d63d57",
+      "source": "rat_palace",
+      "path": "metaphysics/art_of_awareness.pdf",
+      "token_offset": 57226232,
+      "tokens": 242161,
+      "quoted_tokens": 24
+    }
+  ],
+  "seconds": 7.484
+}

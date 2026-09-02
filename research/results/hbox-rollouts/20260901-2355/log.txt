@@ -1,0 +1,137 @@
+/opt/amdgpu/share/libdrm/amdgpu.ids: No such file or directory
+{"event": "rocm_triton_ssd_enabled", "enabled": true, "already_enabled": false, "mamba_ssm": "2.3.2.post1", "source_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1", "torch": "2.9.1+rocm6.3", "hip": "6.3.42134-a9a80e791", "triton": "3.5.1", "convolution": "torch grouped Conv1d", "scan": "mamba_ssm.ops.triton.ssd_combined.mamba_chunk_scan_combined", "scan_input_dtype": "inherit"}
+[rollout-eval] 23:53:28 hbox: load (8.6171875, 9.28564453125, 9.42919921875), gpu busy 0%, losses on triton, generation on reference
+The fast path is not available because one of `(selective_state_update, causal_conv1d_fn, causal_conv1d_update)` is None. Falling back to the naive implementation. To install follow https://github.com/state-spaces/mamba/#installation and https://github.com/Dao-AILab/causal-conv1d
+[rollout-eval] 23:53:30 base: loaded in 2.2s from /othersys/h1-ghost/checkpoints/tpu/base
+[rollout-eval] 23:53:45 base: first-32 on the reference path at batch 1: 3.745613
+[rollout-eval] 23:53:45 base: reproduces 3.745613 within -0.000000
+[rollout-eval] 23:53:55 base: first-512 128/512 rows
+[rollout-eval] 23:54:00 base: first-512 256/512 rows
+[rollout-eval] 23:54:04 base: first-512 384/512 rows
+[rollout-eval] 23:54:09 base: first-512 512/512 rows
+[rollout-eval] 23:54:09 base: first-512 loss 3.7875 (11,005 tok/s, triton)
+[rollout-eval] 23:54:13 base: clean-512 128/512 rows
+[rollout-eval] 23:54:18 base: clean-512 256/512 rows
+[rollout-eval] 23:54:22 base: clean-512 384/512 rows
+[rollout-eval] 23:54:26 base: clean-512 512/512 rows
+[rollout-eval] 23:54:27 base: clean-512 loss 3.2050 (14,733 tok/s, triton)
+[rollout-eval] 23:54:28 base: retention loss 3.5815 (14,242 tok/s, triton)
+[rollout-eval] 23:54:52 generated 1/12 thought-language (5 completions, last 27.93 tok/s)
+[rollout-eval] 23:55:15 generated 2/12 being-nothing (5 completions, last 25.71 tok/s)
+[rollout-eval] 23:55:40 generated 3/12 consciousness-object (5 completions, last 26.56 tok/s)
+[rollout-eval] 23:56:03 generated 4/12 geometry-of (5 completions, last 27.24 tok/s)
+[rollout-eval] 23:56:27 generated 5/12 preface-grew (5 completions, last 27.22 tok/s)
+[rollout-eval] 23:56:51 generated 6/12 what-is-thinking (5 completions, last 26.7 tok/s)
+[rollout-eval] 23:57:16 generated 7/12 ancient-sky (5 completions, last 25.88 tok/s)
+[rollout-eval] 23:57:41 generated 8/12 flood-myth (5 completions, last 27.13 tok/s)
+[rollout-eval] 23:58:04 generated 9/12 underground-editorial (5 completions, last 26.54 tok/s)
+[rollout-eval] 23:58:28 generated 10/12 cip-block (5 completions, last 27.96 tok/s)
+[rollout-eval] 23:58:53 generated 11/12 recipe (5 completions, last 25.33 tok/s)
+[rollout-eval] 23:59:17 generated 12/12 weather (5 completions, last 25.86 tok/s)
+[rollout-eval] 23:59:17 base: 60 completions, 26.41 tok/s overall, median call 26.57 tok/s
+[rollout-eval] 23:59:20 trunk-e1: loaded in 2.9s from /othersys/h1-ghost/checkpoints/tpu/h-ghost-h1jax-cpt-91m/trunk-wsd-lr1e-4-seed0/tokens-000374603776
+[rollout-eval] 23:59:34 trunk-e1: first-32 on the reference path at batch 1: 3.266420
+[rollout-eval] 23:59:39 trunk-e1: first-512 128/512 rows
+[rollout-eval] 23:59:43 trunk-e1: first-512 256/512 rows
+[rollout-eval] 23:59:47 trunk-e1: first-512 384/512 rows
+[rollout-eval] 23:59:52 trunk-e1: first-512 512/512 rows
+[rollout-eval] 23:59:52 trunk-e1: first-512 loss 3.2841 (14,651 tok/s, triton)
+[rollout-eval] 23:59:56 trunk-e1: clean-512 128/512 rows
+[rollout-eval] 00:00:01 trunk-e1: clean-512 256/512 rows
+[rollout-eval] 00:00:05 trunk-e1: clean-512 384/512 rows
+[rollout-eval] 00:00:10 trunk-e1: clean-512 512/512 rows
+[rollout-eval] 00:00:10 trunk-e1: clean-512 loss 2.9641 (14,665 tok/s, triton)
+[rollout-eval] 00:00:11 trunk-e1: retention loss 3.5622 (14,601 tok/s, triton)
+[rollout-eval] 00:00:35 generated 1/12 thought-language (5 completions, last 25.76 tok/s)
+[rollout-eval] 00:00:59 generated 2/12 being-nothing (5 completions, last 27.5 tok/s)
+[rollout-eval] 00:01:23 generated 3/12 consciousness-object (5 completions, last 28.13 tok/s)
+[rollout-eval] 00:01:47 generated 4/12 geometry-of (5 completions, last 27.95 tok/s)
+[rollout-eval] 00:02:11 generated 5/12 preface-grew (5 completions, last 27.15 tok/s)
+[rollout-eval] 00:02:36 generated 6/12 what-is-thinking (5 completions, last 25.92 tok/s)
+[rollout-eval] 00:03:00 generated 7/12 ancient-sky (5 completions, last 28.09 tok/s)
+[rollout-eval] 00:03:24 generated 8/12 flood-myth (5 completions, last 25.53 tok/s)
+[rollout-eval] 00:03:49 generated 9/12 underground-editorial (5 completions, last 27.94 tok/s)
+[rollout-eval] 00:04:13 generated 10/12 cip-block (5 completions, last 26.89 tok/s)
+[rollout-eval] 00:04:37 generated 11/12 recipe (5 completions, last 26.33 tok/s)
+[rollout-eval] 00:05:02 generated 12/12 weather (5 completions, last 27.24 tok/s)
+[rollout-eval] 00:05:02 trunk-e1: 60 completions, 26.4 tok/s overall, median call 26.77 tok/s
+[rollout-eval] 00:05:04 leaf-e1: loaded in 1.8s from /othersys/h1-ghost/checkpoints/tpu/h-ghost-h1jax-leaf-e1-decay10/leaf-e1-decay10/tokens-000412044297
+[rollout-eval] 00:05:17 leaf-e1: first-32 on the reference path at batch 1: 3.243598
+[rollout-eval] 00:05:22 leaf-e1: first-512 128/512 rows
+[rollout-eval] 00:05:26 leaf-e1: first-512 256/512 rows
+[rollout-eval] 00:05:31 leaf-e1: first-512 384/512 rows
+[rollout-eval] 00:05:35 leaf-e1: first-512 512/512 rows
+[rollout-eval] 00:05:35 leaf-e1: first-512 loss 3.2343 (14,603 tok/s, triton)
+[rollout-eval] 00:05:40 leaf-e1: clean-512 128/512 rows
+[rollout-eval] 00:05:44 leaf-e1: clean-512 256/512 rows
+[rollout-eval] 00:05:49 leaf-e1: clean-512 384/512 rows
+[rollout-eval] 00:05:53 leaf-e1: clean-512 512/512 rows
+[rollout-eval] 00:05:53 leaf-e1: clean-512 loss 2.9258 (14,648 tok/s, triton)
+[rollout-eval] 00:05:54 leaf-e1: retention loss 3.5274 (14,601 tok/s, triton)
+[rollout-eval] 00:06:19 generated 1/12 thought-language (5 completions, last 23.22 tok/s)
+[rollout-eval] 00:06:46 generated 2/12 being-nothing (5 completions, last 22.73 tok/s)
+[rollout-eval] 00:07:10 generated 3/12 consciousness-object (5 completions, last 27.49 tok/s)
+[rollout-eval] 00:07:34 generated 4/12 geometry-of (5 completions, last 25.11 tok/s)
+[rollout-eval] 00:07:59 generated 5/12 preface-grew (5 completions, last 23.91 tok/s)
+[rollout-eval] 00:08:24 generated 6/12 what-is-thinking (5 completions, last 25.19 tok/s)
+[rollout-eval] 00:08:49 generated 7/12 ancient-sky (5 completions, last 25.95 tok/s)
+[rollout-eval] 00:09:16 generated 8/12 flood-myth (5 completions, last 24.12 tok/s)
+[rollout-eval] 00:09:40 generated 9/12 underground-editorial (5 completions, last 27.98 tok/s)
+[rollout-eval] 00:10:08 generated 10/12 cip-block (5 completions, last 20.3 tok/s)
+[rollout-eval] 00:10:35 generated 11/12 recipe (5 completions, last 24.57 tok/s)
+[rollout-eval] 00:11:00 generated 12/12 weather (5 completions, last 24.84 tok/s)
+[rollout-eval] 00:11:00 leaf-e1: 60 completions, 25.09 tok/s overall, median call 25.18 tok/s
+[rollout-eval] 00:11:04 trunk-e4: loaded in 3.0s from /othersys/h1-ghost/checkpoints/tpu/h-ghost-h1jax-cpt-91m/trunk-wsd-lr1e-4-seed0/tokens-001497620848
+[rollout-eval] 00:11:18 trunk-e4: first-32 on the reference path at batch 1: 3.215143
+[rollout-eval] 00:11:22 trunk-e4: first-512 128/512 rows
+[rollout-eval] 00:11:27 trunk-e4: first-512 256/512 rows
+[rollout-eval] 00:11:31 trunk-e4: first-512 384/512 rows
+[rollout-eval] 00:11:36 trunk-e4: first-512 512/512 rows
+[rollout-eval] 00:11:36 trunk-e4: first-512 loss 3.1635 (14,642 tok/s, triton)
+[rollout-eval] 00:11:40 trunk-e4: clean-512 128/512 rows
+[rollout-eval] 00:11:45 trunk-e4: clean-512 256/512 rows
+[rollout-eval] 00:11:50 trunk-e4: clean-512 384/512 rows
+[rollout-eval] 00:11:54 trunk-e4: clean-512 512/512 rows
+[rollout-eval] 00:11:54 trunk-e4: clean-512 loss 2.9087 (14,482 tok/s, triton)
+[rollout-eval] 00:11:55 trunk-e4: retention loss 3.5281 (14,559 tok/s, triton)
+[rollout-eval] 00:12:20 generated 1/12 thought-language (5 completions, last 26.62 tok/s)
+[rollout-eval] 00:12:46 generated 2/12 being-nothing (5 completions, last 23.93 tok/s)
+[rollout-eval] 00:13:11 generated 3/12 consciousness-object (5 completions, last 24.95 tok/s)
+[rollout-eval] 00:13:36 generated 4/12 geometry-of (5 completions, last 27.95 tok/s)
+[rollout-eval] 00:14:01 generated 5/12 preface-grew (5 completions, last 24.28 tok/s)
+[rollout-eval] 00:14:25 generated 6/12 what-is-thinking (5 completions, last 26.91 tok/s)
+[rollout-eval] 00:14:50 generated 7/12 ancient-sky (5 completions, last 26.28 tok/s)
+[rollout-eval] 00:15:15 generated 8/12 flood-myth (5 completions, last 26.13 tok/s)
+[rollout-eval] 00:15:40 generated 9/12 underground-editorial (5 completions, last 27.4 tok/s)
+[rollout-eval] 00:16:04 generated 10/12 cip-block (5 completions, last 27.55 tok/s)
+[rollout-eval] 00:16:28 generated 11/12 recipe (5 completions, last 24.63 tok/s)
+[rollout-eval] 00:16:53 generated 12/12 weather (5 completions, last 26.11 tok/s)
+[rollout-eval] 00:16:53 trunk-e4: 60 completions, 25.77 tok/s overall, median call 25.99 tok/s
+[rollout-eval] 00:16:56 leaf-e4: loaded in 2.7s from /othersys/h1-ghost/checkpoints/tpu/h-ghost-h1jax-leaf-e4-decay10/leaf-e4-decay10/tokens-001535061369
+[rollout-eval] 00:17:10 leaf-e4: first-32 on the reference path at batch 1: 3.190636
+[rollout-eval] 00:17:14 leaf-e4: first-512 128/512 rows
+[rollout-eval] 00:17:19 leaf-e4: first-512 256/512 rows
+[rollout-eval] 00:17:23 leaf-e4: first-512 384/512 rows
+[rollout-eval] 00:17:28 leaf-e4: first-512 512/512 rows
+[rollout-eval] 00:17:28 leaf-e4: first-512 loss 3.1364 (14,654 tok/s, triton)
+[rollout-eval] 00:17:32 leaf-e4: clean-512 128/512 rows
+[rollout-eval] 00:17:37 leaf-e4: clean-512 256/512 rows
+[rollout-eval] 00:17:41 leaf-e4: clean-512 384/512 rows
+[rollout-eval] 00:17:46 leaf-e4: clean-512 512/512 rows
+[rollout-eval] 00:17:46 leaf-e4: clean-512 loss 2.8945 (14,660 tok/s, triton)
+[rollout-eval] 00:17:47 leaf-e4: retention loss 3.5109 (14,591 tok/s, triton)
+[rollout-eval] 00:18:11 generated 1/12 thought-language (5 completions, last 26.62 tok/s)
+[rollout-eval] 00:18:36 generated 2/12 being-nothing (5 completions, last 27.63 tok/s)
+[rollout-eval] 00:19:01 generated 3/12 consciousness-object (5 completions, last 25.63 tok/s)
+[rollout-eval] 00:19:25 generated 4/12 geometry-of (5 completions, last 27.06 tok/s)
+[rollout-eval] 00:19:50 generated 5/12 preface-grew (5 completions, last 25.16 tok/s)
+[rollout-eval] 00:20:14 generated 6/12 what-is-thinking (5 completions, last 28.06 tok/s)
+[rollout-eval] 00:20:39 generated 7/12 ancient-sky (5 completions, last 24.73 tok/s)
+[rollout-eval] 00:21:04 generated 8/12 flood-myth (5 completions, last 25.07 tok/s)
+[rollout-eval] 00:21:28 generated 9/12 underground-editorial (5 completions, last 25.39 tok/s)
+[rollout-eval] 00:21:53 generated 10/12 cip-block (5 completions, last 26.3 tok/s)
+[rollout-eval] 00:22:18 generated 11/12 recipe (5 completions, last 26.5 tok/s)
+[rollout-eval] 00:22:42 generated 12/12 weather (5 completions, last 25.83 tok/s)
+[rollout-eval] 00:22:42 leaf-e4: 60 completions, 25.99 tok/s overall, median call 26.08 tok/s
+[rollout-eval] 00:22:42 done in 1754.0s: /othersys/h1-ghost/rollouts/20260901-2355
+{"base": "done", "trunk-e1": "done", "leaf-e1": "done", "trunk-e4": "done", "leaf-e4": "done"}

@@ -1,0 +1,133 @@
+{
+  "name": "trunk-e1",
+  "checkpoint": "/othersys/h1-ghost/checkpoints/tpu/h-ghost-h1jax-cpt-91m/trunk-wsd-lr1e-4-seed0/tokens-000374603776",
+  "model_safetensors_sha256": "f772f847c4f34cd14ebd492ce3f1e9466c6bd03f7c1bcfeaa0d8f11c47df509b",
+  "config_dtype": "float32",
+  "sequence_length": 512,
+  "batch": 8,
+  "kernel": {
+    "requested": "auto",
+    "triton": {
+      "enabled": true,
+      "already_enabled": false,
+      "mamba_ssm": "2.3.2.post1",
+      "source_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1",
+      "torch": "2.9.1+rocm6.3",
+      "hip": "6.3.42134-a9a80e791",
+      "triton": "3.5.1",
+      "convolution": "torch grouped Conv1d",
+      "scan": "mamba_ssm.ops.triton.ssd_combined.mamba_chunk_scan_combined",
+      "scan_input_dtype": "inherit"
+    },
+    "losses": "triton",
+    "generation": "reference"
+  },
+  "timings": {
+    "load_seconds": 2.86,
+    "losses": {
+      "first-512": {
+        "seconds": 17.893,
+        "tokens_per_second": 14650.9
+      },
+      "clean-512": {
+        "seconds": 17.876,
+        "tokens_per_second": 14664.8
+      },
+      "retention": {
+        "seconds": 0.982,
+        "tokens_per_second": 14601.4
+      }
+    },
+    "generation_seconds": 290.858,
+    "total_seconds": 344.725
+  },
+  "slices": {
+    "first-512": {
+      "sequences": 512,
+      "tokens": 262144,
+      "loss": 3.2840858860578868,
+      "perplexity": 26.684580415616473,
+      "accuracy": 0.3831901550292969,
+      "furniture_fraction": 0.10590744018554688,
+      "furniture_free_loss": 3.49541126687368,
+      "furniture_free_accuracy": 0.35359094807172936,
+      "furniture_loss": 1.5000332231256974,
+      "matched_fraction": 0.2052764892578125,
+      "unseen_loss": 3.6183964711041168,
+      "unseen_accuracy": 0.3409845823013267
+    },
+    "clean-512": {
+      "sequences": 512,
+      "tokens": 262144,
+      "loss": 2.9641141677325367,
+      "perplexity": 19.377530394776002,
+      "accuracy": 0.42462158203125,
+      "furniture_fraction": 0.06396102905273438,
+      "furniture_free_loss": 3.0934180619325025,
+      "furniture_free_accuracy": 0.4061138574520024,
+      "furniture_loss": 1.0718137176159266,
+      "matched_fraction": 0.12954330444335938,
+      "unseen_loss": 3.186475500400924,
+      "unseen_accuracy": 0.39549926594649076
+    },
+    "retention": {
+      "sequences": 28,
+      "tokens": 14336,
+      "loss": 3.5622163031403917,
+      "perplexity": 35.2412158740068,
+      "accuracy": 0.3387974330357143
+    },
+    "first-32": {
+      "sequences": 32,
+      "tokens": 16384,
+      "loss": 3.266295892202087,
+      "perplexity": 26.21405958461379,
+      "accuracy": 0.414794921875,
+      "furniture_fraction": 0.153564453125,
+      "furniture_free_loss": 3.7937245906266734,
+      "furniture_free_accuracy": 0.3241995961926738,
+      "furniture_loss": 0.3591491554166473,
+      "matched_fraction": 0.199951171875,
+      "unseen_loss": 3.9133079161926982,
+      "unseen_accuracy": 0.3062252059810803
+    }
+  },
+  "kernel_check": {
+    "slice": "first-32",
+    "reference_path_batch1_loss": 3.2664198875427246,
+    "reference_path_seconds": 13.887,
+    "run_first32_loss": 3.266295892202087,
+    "run_kernel": "triton",
+    "run_batch": 8,
+    "run_minus_reference_path": -0.0001239953406377836
+  },
+  "retention": {
+    "path": "/othersys/h1-ghost/rollouts/inputs/retention.txt",
+    "bytes": 52449,
+    "tokens": 14643,
+    "sequences": 28
+  },
+  "masks": [
+    "clean-512",
+    "first-512"
+  ],
+  "generation": {
+    "prompts": 12,
+    "samples_per_prompt": 4,
+    "greedy_per_prompt": 1,
+    "completions": 60,
+    "generated_tokens": 7680,
+    "seconds": 290.858,
+    "tokens_per_second": 26.4,
+    "per_call_tokens_per_second_median": 26.77,
+    "base_seed": 20260901,
+    "max_new_tokens": 128,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "repetition_penalty": 1.08
+  },
+  "gpu": {
+    "max_memory_allocated_bytes": 1294387200,
+    "max_memory_reserved_bytes": 2418016256
+  }
+}

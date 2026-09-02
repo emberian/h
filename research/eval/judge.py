@@ -26,16 +26,25 @@ from tokenizers import Tokenizer
 BOS_PREFIX = "\n"  # score each text as a fresh document after a newline
 
 
-def nll_per_text(params, cfg, ids: list[list[int]]) -> list[float]:
+def nll_per_text(params, cfg, ids: list[list[int]], length: int) -> list[float]:
+    """Mean next-token NLL per text; inputs padded to one fixed length so the model compiles once."""
+    forward = jax.jit(
+        lambda p, t: falcon_h1_forward(p, t, cfg, compute_dtype=jnp.float32, layer_scan=True)
+    )
     out = []
-    forward = jax.jit(lambda p, t: falcon_h1_forward(p, t, cfg, compute_dtype=jnp.float32, layer_scan=True))
     for seq in ids:
-        tokens = jnp.asarray([seq], dtype=jnp.int32)
+        seq = seq[: length + 1]
+        padded = np.zeros((1, length + 1), dtype=np.int32)
+        padded[0, : len(seq)] = seq
+        valid = np.zeros((1, length), dtype=np.float32)
+        valid[0, : len(seq) - 1] = 1.0
+        tokens = jnp.asarray(padded)
         logits = forward(params, tokens[:, :-1]).astype(jnp.float32)
         labels = tokens[:, 1:]
         logz = jax.nn.logsumexp(logits, axis=-1)
         sel = jnp.take_along_axis(logits, labels[..., None], axis=-1)[..., 0]
-        out.append(float(jnp.mean(logz - sel)))
+        nll = (logz - sel) * jnp.asarray(valid)
+        out.append(float(jnp.sum(nll) / jnp.sum(jnp.asarray(valid))))
     return out
 
 
@@ -58,7 +67,7 @@ def main() -> None:
     for name, path in [("base", args.base)] + [(p.name, p) for p in args.model]:
         cfg = FalconH1Config.from_json(path / "config.json")
         params = load_hf_params(path, dtype=jnp.float32)
-        results[name] = nll_per_text(params, cfg, [ids[i] for i in keep])
+        results[name] = nll_per_text(params, cfg, [ids[i] for i in keep], args.max_tokens)
         del params
     names = [n for n in results if n != "base"]
     print("| # | " + " | ".join(["base"] + [f"{n} (Δ)" for n in names]) + " | text |")

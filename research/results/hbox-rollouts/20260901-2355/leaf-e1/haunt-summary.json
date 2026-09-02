@@ -1,0 +1,104 @@
+{
+  "type": "summary",
+  "generations": 60,
+  "tokens": 7680,
+  "thresholds": [
+    8,
+    16,
+    32
+  ],
+  "token_weighted_coverage": {
+    "8": 0.13502604166666668,
+    "16": 0.023567708333333333,
+    "32": 0.008723958333333334
+  },
+  "generations_with_match_at_least": {
+    "8": 37,
+    "16": 6,
+    "32": 1
+  },
+  "longest_match": 66,
+  "top_documents": [
+    {
+      "id": "231b1c6a3f2a2f2d22f717c2",
+      "source": "cathedral",
+      "path": "ufos-and-the-extraterrestrial-contact-movement-v-1/Ufos_And_The_Extraterrestrial_Contact_Movement_v1.pdf",
+      "token_offset": 239425313,
+      "tokens": 743006,
+      "quoted_tokens": 118
+    },
+    {
+      "id": "8bcc38035daf2312263247d8",
+      "source": "rat_palace",
+      "path": "celephaïs/inman/Ancient_Faiths_embodied_in_Ancient_Names.1.pdf",
+      "token_offset": 30800827,
+      "tokens": 499668,
+      "quoted_tokens": 111
+    },
+    {
+      "id": "8fed9d82b01f751992b8eb36",
+      "source": "rat_palace",
+      "path": "metaphysics/kevin_townley.the_cube_of_space.pdf",
+      "token_offset": 292766735,
+      "tokens": 122237,
+      "quoted_tokens": 48
+    },
+    {
+      "id": "27041a31001756b6269f0c60",
+      "source": "rat_palace",
+      "path": "math/geonometry.pdf",
+      "token_offset": 370509181,
+      "tokens": 514213,
+      "quoted_tokens": 39
+    },
+    {
+      "id": "83d17d1340846558805c1047",
+      "source": "rat_palace",
+      "path": "pubs/bwill/handbook_of_contemporary_japanese_religions_(inken_prohl,_john_nelson).pdf",
+      "token_offset": 364758800,
+      "tokens": 492325,
+      "quoted_tokens": 33
+    },
+    {
+      "id": "acf901d3f22f26aa81730e4b",
+      "source": "rat_palace",
+      "path": "magazines/awareness/Awareness_2002-03_Vol_25_No_2.pdf",
+      "token_offset": 66103234,
+      "tokens": 28014,
+      "quoted_tokens": 30
+    },
+    {
+      "id": "08728c6b2b13b73c2d76191a",
+      "source": "rat_palace",
+      "path": "people/charles_s_peirce/Writings of Charles S. Peirce A Chronological Edition, Vol. 3 1872–1878 (Charles S. Peirce) (Z-Library).pdf",
+      "token_offset": 367210469,
+      "tokens": 453852,
+      "quoted_tokens": 29
+    },
+    {
+      "id": "873547954f2d32b0284abc8c",
+      "source": "rat_palace",
+      "path": "people/ashayana_dean/12-tribes.2.pdf",
+      "token_offset": 54412672,
+      "tokens": 599915,
+      "quoted_tokens": 24
+    },
+    {
+      "id": "d0af48418c4bafa04a0d9fcb",
+      "source": "rat_palace",
+      "path": "pubs/bwill/religion_and_the_authority_of_science.pdf",
+      "token_offset": 206805003,
+      "tokens": 665779,
+      "quoted_tokens": 22
+    },
+    {
+      "id": "05527680d735f4c57230b254",
+      "source": "rat_palace",
+      "path": "pubs/jon_benjamin/Consciousness and Object.pdf",
+      "token_offset": 16103173,
+      "tokens": 185176,
+      "quoted_tokens": 20
+    }
+  ],
+  "seconds": 6.73
+}
