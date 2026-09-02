@@ -3,9 +3,11 @@
 usage: check_scenes.py <passages.jsonl> <scenes.jsonl>  -> prints counts; exit 1 if any scene is invalid.
 A scene is valid when: its id exists; h turns default to mode "cite" (verbatim from the passage); a scene-level
 "mode" or per-turn "modes" {"<turn index>": "cite|compose|bridge"} lets compose/bridge lines be original (they must
-NOT be verbatim passage text of 8+ words); turns alternate visitor/h and end with an h turn; every h line is a
-verbatim substring of the passage (after whitespace normalization), 3-70 words; every visitor line is
-1-40 words, contains no newline, and is not a bare label; visitor names are plain handles.
+NOT be verbatim passage text of 8+ words); h never speaks twice in a row (visitors may chain, for ambient
+scenes) and the scene ends with an h turn; every h line is a verbatim substring of the passage (after
+whitespace normalization), 3-70 words; every visitor line is 1-40 words, contains no newline, and is not
+a bare label; visitor names are plain handles. A scene id may carry a "#..." suffix (e.g. "<id>#b" for a
+referent/speaker counterfactual pair); the suffix is stripped for the passage lookup.
 """
 import json, re, sys
 passages = {json.loads(l)["id"]: json.loads(l)["passage"] for l in open(sys.argv[1])}
@@ -19,7 +21,8 @@ for line in open(sys.argv[2]):
     if not line: continue
     try: s = json.loads(line)
     except Exception: fail("json"); continue
-    p = passages.get(s.get("id"))
+    sid = s.get("id")
+    p = passages.get(sid.split("#")[0] if isinstance(sid, str) else sid)
     if p is None: fail("unknown id"); continue
     turns = s.get("turns") or []
     if len(turns) < 2 or turns[-1][0] != "h" or turns[0][0] == "h": fail("shape"); continue
@@ -35,7 +38,7 @@ for line in open(sys.argv[2]):
             if not NAME.match(name) or name.lower() == "h": good = False; fail("visitor name"); break
             w = len(text.split())
             if "\n" in text or w < 1 or w > 40: good = False; fail("visitor length"); break
-        if i > 0 and (turns[i-1][0] == "h") == (name == "h"): good = False; fail("alternation"); break
+        if i > 0 and turns[i-1][0] == "h" and name == "h": good = False; fail("alternation"); break
     if good: ok += 1
 print(json.dumps({"ok": ok, "bad": bad, "reasons": reasons}))
 sys.exit(1 if bad else 0)
