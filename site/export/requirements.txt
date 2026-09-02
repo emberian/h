@@ -1,0 +1,17 @@
+# Exact versions used for site/models/h1-tiny-90m-base (2026-09-01, macOS arm64, CPython 3.12.13).
+# Install into an isolated venv:
+#   uv venv --python 3.12 .venv-onnx
+#   uv pip install --python .venv-onnx/bin/python -r site/export/requirements.txt
+torch==2.13.0
+transformers==4.57.6
+tokenizers==0.22.2
+safetensors==0.8.0
+huggingface-hub==0.36.2
+sentencepiece==0.2.2
+onnx==1.22.0
+onnx-ir==1.0.0
+onnxruntime==1.29.0
+onnxslim==0.1.96
+numpy==2.5.2
+protobuf==7.36.1
+tqdm==4.70.0

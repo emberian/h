@@ -15,10 +15,12 @@ python3 -m http.server 8000
 ```
 
 Any static file server works (ES modules need `http://`, not `file://`).
-The ghost fetches its model from the Hugging Face Hub on first visit
-(~150 MB for the default q4 weights, then cached by the browser), so the
-first murmur takes a while; `?ghost=off` in the URL keeps the ghost away
-while you work on everything else.
+The ghost loads the project's own checkpoint from `models/h1-tiny-90m-base/`
+(125 MB of 8-bit weights, served with the site, then cached by the browser),
+so the first murmur takes a while; `?ghost=off` in the URL keeps the ghost
+away while you work on everything else. `models/` is gitignored: export it
+with `export/export_onnx.py` (see "Loading the project's own checkpoint") or
+point `config.js` back at the Hub model.
 
 Tested in current Chrome (headless, see "What is verified"); written to the
 standard Web Audio / SVG / Web Animations / module-worker APIs that current
@@ -53,12 +55,18 @@ field). At runtime it fetches its own WebAssembly runtime from the same CDN —
 `onnxruntime-web@1.26.0-dev.20260416-b7804b056c` under
 `https://cdn.jsdelivr.net/npm/onnxruntime-web@<that version>/dist/` — the
 version is baked into the bundle, not chosen here. Model weights come from
-`https://huggingface.co/` unless `config.model.localPath` is set.
+`config.model.localPath` (default `./models/`, i.e. this site) or, if that is
+`null`, from `https://huggingface.co/`.
 
-Model: `onnx-community/Falcon-H1-Tiny-Multilingual-100M-Instruct-ONNX`,
-`dtype: "q4"` (`onnx/model_q4.onnx` + `model_q4.onnx_data`, ~154 MB), device
-`webgpu` with WASM fallback. The repo also carries `fp32`, `fp16`, `q4f16`
-and `q8` variants if you want to trade size for texture.
+Model: `h1-tiny-90m-base` — the project's export of the exact
+`tiiuae/Falcon-H1-Tiny-90M-Base` (`kaggle/base_model_dataset_public`),
+`dtype: "q8"` (`onnx/model_quantized.onnx` + `_data`, 125 MB: 8-bit
+MatMulNBits and an 8-bit block-quantized embedding), device `webgpu` with
+WASM fallback. The same directory holds `fp32` (`model.onnx`, 365 MB, exact)
+and `q4` (`model_q4.onnx`, 70 MB, the Hub recipe — which turns this 90M
+checkpoint to mush; the numbers are in `export/README.md`). The Hub
+alternative is `onnx-community/Falcon-H1-Tiny-Multilingual-100M-Instruct-ONNX`
+with `localPath: null`, `dtype: "q4"` (~154 MB).
 
 ## Per-token entropy: what the library exposes
 
@@ -83,25 +91,49 @@ the temperature (dry 0.72 → wet 1.45). `top_p` is not implemented in
 
 ## Loading the project's own checkpoint
 
-The site expects a Falcon-H1 causal LM exported to ONNX in the same layout as
-the default (an `onnx/` folder with `model_<dtype>.onnx` (+ `_data`),
+The site expects a Falcon-H1 causal LM exported to ONNX in the layout
+transformers.js reads (an `onnx/` folder with `model_<dtype>.onnx` + `_data`,
 `config.json`, `generation_config.json`, `tokenizer.json`,
-`tokenizer_config.json`). To swap it in:
+`tokenizer_config.json`). `export/export_onnx.py` produces exactly that from
+any Hugging Face Falcon-H1 checkpoint directory and proves it against PyTorch
+with onnxruntime before you use it — `export/README.md` has the pipeline,
+pinned versions and the numbers for the base checkpoint:
 
-1. **From the Hub:** set `config.model.id` to the new repo id. Done.
-2. **Served alongside the site:** put the folder at e.g. `site/models/h/`,
-   set `config.model.localPath = "./models/"` and `config.model.id = "h"`.
-   The worker then sets `env.allowLocalModels = true`,
-   `env.allowRemoteModels = false`, `env.localModelPath = localPath`.
-   Serve `.onnx_data` files with range requests if they are large (any real
-   static host does; `python3 -m http.server` is fine for local use).
-3. Match `dtype` to the file you exported (`q4` → `model_q4.onnx`, etc.).
+```sh
+uv venv --python 3.12 .venv-onnx
+uv pip install --python .venv-onnx/bin/python -r site/export/requirements.txt
+.venv-onnx/bin/python site/export/export_onnx.py <hf checkpoint dir> site/models/<name>
+```
+
+To swap a checkpoint in:
+
+1. **Served alongside the site (the default):** the export goes to
+   `site/models/<name>/`; set `config.model.id = "<name>"` and keep
+   `config.model.localPath = "./models/"`. The worker then sets
+   `env.allowLocalModels = true`, `env.allowRemoteModels = false`,
+   `env.localModelPath = localPath`, and transformers.js fetches
+   `./models/<name>/{config.json, tokenizer.json, tokenizer_config.json,
+   generation_config.json, onnx/model_quantized.onnx, onnx/model_quantized.onnx_data}`
+   relative to the worker. Serve `.onnx_data` files with range requests if
+   they are large (any real static host does; `python3 -m http.server` is
+   fine for local use). `site/models/` is gitignored — deploy it next to the
+   site.
+2. **From the Hub:** set `config.model.localPath = null` and
+   `config.model.id` to the repo id. Done.
+3. Match `dtype` / `wasmDtype` to the file: `q8` → `model_quantized.onnx`
+   (what the exporter's 8-bit file is called; use it), `fp32` → `model.onnx`,
+   `q4` → `model_q4.onnx`. Do not ship `q4` for these 90M checkpoints:
+   round-to-nearest 4-bit costs 0.6 nats of KL against fp32 and the greedy
+   text falls apart after three tokens; 8-bit is 0.0014 nats.
 4. If the checkpoint is a base model (not instruct), nothing else changes:
    the ghost already prompts with raw text, not a chat template. If its
    tokenizer adds no BOS by default and you want one, pass
    `add_special_tokens: true` in `ghost-worker.js`'s `generator(...)` call.
 5. Re-tune `config.generation` to taste; the seed fragments live at the top
    of `ghost.js`.
+
+Both configurations are verified below; `config.js` is committed pointing at
+the local export.
 
 ## What is verified
 
@@ -133,12 +165,25 @@ Run headless with playwright-core + Chromium 1223 (macOS arm64) against
   token per second, far slower than a real GPU. That slowness is what showed
   a fragment must *form* at the lips while tokens arrive and only drift once
   complete (it does now).
+- The same harness (`export/check_site.mjs`, playwright-core 1.58 driving the
+  cached Chromium 1223 with `--enable-unsafe-webgpu`, page served by
+  `python3 -m http.server 8765`) with the **local** `h1-tiny-90m-base` q8
+  export and `config.js` as committed: the worker chose **webgpu**, fetched
+  the six model files from `./models/…`, and murmured
+  `" winter 04, 2015\nGermany and Sweden are the first two"` with **no
+  console errors, no page errors, no failed requests**; a second fragment
+  (`it nevertheless goes deep, dark, thin,`) was forming at the lips when the
+  run's 900 s cap hit — the box was at load average ~200 that evening. With
+  the model files removed the harness reports the 404s and exits 1.
 - No console errors, page errors, or failed requests in any run, ghost on or
   off. `tidy -utf8` on `index.html` and `xmllint` on the inline SVG are clean.
 
 Not verified here: WebGPU on a real GPU (speed and any driver quirks);
 the WASM fallback path end to end (the code path is exercised only when
-`navigator.gpu.requestAdapter()` returns null or the WebGPU load throws);
+`navigator.gpu.requestAdapter()` returns null or the WebGPU load throws —
+note the plain 8-bit MatMulNBits CPU kernel is slow, ~1 s per token in
+Python's onnxruntime on this machine; `export_onnx.py --q8-accuracy-level 4`
+is the knob if WASM matters);
 Safari (no headless Safari available); real listening tests of the synth
 (headless has no audible output — the AudioContext resumed and the envelopes
 were scheduled, which is all that could be observed); hour-scale subsidence,

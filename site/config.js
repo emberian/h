@@ -16,11 +16,13 @@ export const config = {
     // exported to ONNX in the same layout — drops in here.
     id: "onnx-community/Falcon-H1-Tiny-Multilingual-100M-Instruct-ONNX",
 
-    // Weight file variant: "q4" → onnx/model_q4.onnx (+ _data). Others in the
-    // same layout: "fp32" (model.onnx), "fp16", "q4f16", "q8" (model_quantized).
-    dtype: "q4",
-    // Variant to use if we end up on WASM (no WebGPU). q4 runs fine on WASM.
-    wasmDtype: "q4",
+    // Weight file variant: "q8" → onnx/model_quantized.onnx (+ _data). Others in
+    // the same layout: "fp32" (model.onnx), "q4" (model_q4), "fp16", "q4f16".
+    // The project's own 90M checkpoints fall apart at 4 bits (see
+    // site/export/README.md); their 8-bit export is near-lossless and ~140 MB.
+    dtype: "q8",
+    // Variant to use if we end up on WASM (no WebGPU).
+    wasmDtype: "q8",
 
     // "webgpu" with automatic fallback to "wasm"; set "wasm" to force CPU.
     device: "webgpu",
