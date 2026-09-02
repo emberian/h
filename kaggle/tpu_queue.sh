@@ -34,8 +34,12 @@ download() {
   slug="$1"; name=$(basename "$slug"); dest="$OUT/$name"
   mkdir -p "$dest"
   log "DOWNLOAD $slug -> $dest"
-  timeout 3600 $KAGGLE kernels output "$slug" -p "$dest" --force >"$dest/download.log" 2>&1 \
-    && log "DOWNLOADED $slug" || log "DOWNLOAD-FAILED $slug (see $dest/download.log)"
+  ok=0
+  for attempt in 1 2 3; do
+    if timeout 3600 $KAGGLE kernels output "$slug" -p "$dest" --force >"$dest/download.log" 2>&1; then ok=1; break; fi
+    log "download attempt $attempt failed for $slug; retrying"; sleep 60
+  done
+  [ "$ok" = 1 ] && log "DOWNLOADED $slug" || log "DOWNLOAD-FAILED $slug (see $dest/download.log)"
 }
 
 if [ "$WAIT" != "-" ]; then
