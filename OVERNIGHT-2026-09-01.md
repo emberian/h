@@ -480,3 +480,6 @@ New main line, h first:
 - 04:43: e2 on hbox: first-512 2.858 (e1 2.893), clean 2.628 (2.624), furniture-free clean 2.749 (2.743), retention
   3.1416 (3.1416, different weights, coincidence to four decimals), room 2.582 (2.609), quotation longest 8 (11).
   e2 replaces e1 in Discord (`h-05b-room-e2` on :8124). GPU eval v2 (91M checkpoints) complete; v3 (0.5B) next.
+- 04:44: GPU eval v3 complete on a T4: 0.5B base / e1 pre-cooldown / e1 cooled = first-512 3.423 / 2.931 / 2.893, room
+  3.240 / 2.636 / 2.609, retention 3.209 / 3.166 / 3.142; agrees with hbox and the TPU to four decimals. v4 pushed over
+  e2. v2 (91M checkpoints) output not retrievable as the latest version; will retry by version if the CLI allows.
