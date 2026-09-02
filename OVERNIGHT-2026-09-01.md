@@ -494,3 +494,4 @@ New main line, h first:
   cut-and-try process of frustration and anxiety."; Hamlet -> prose about the play, no bullets); judge delta -0.18
   (e1 -0.06, e2 -0.04): the most library-like replies yet; quotation: one 18-token match among 72, none at 32.
   Pushed e3 (third epoch on v1.3 from the e2-v3 pre-cooldown); queue11 waits. hbox chain for e2-v3 running.
+- 06:14: e2-v3 passed the gate on hbox ({"retention": 3.1464, "first-512": 2.8523, "clean-512": 2.6259, "gate": true}); served in Discord as h-05b-room-e2v3.
