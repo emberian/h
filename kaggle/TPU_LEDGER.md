@@ -46,3 +46,4 @@ spend in bounded, reported increments; never launch a run whose worst case excee
 | 2026-09-02 04:46 | h-ghost-gpu-room-eval-91m (GPU) | v1 | ~195 | COMPLETE 08:0x: 91M base + trunk (8) + leaves (2) on a T4; the room-loss column: base 3.578, trunk 3.68, leaf-e4 3.664 (library epochs made the 91M worse at room text) |
 | 2026-09-02 07:08 | h-ghost-gpu-room-eval (GPU) | v5 | ~55 | COMPLETE: e2-v3 pre-cooldown + cooled on a T4 |
 | 2026-09-02 14:43 | h-ghost-h1jax-room05b-w-hup / w-roomdown / w-honly | v1 | (queued, est 3x66) | response-span weighting arms at matched compute to e2-v3: h x8; visitors x0.25 + h x4; visitors x0 + h x4 |
+| 2026-09-02 15:01 | h-ghost-h1jax-room05b-w-hup | v1 | 7 | ERROR: attached dataset v2 (pushed seconds after the v3 upload, before the version was live): train-weights.bin missing; re-pushed |
