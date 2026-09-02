@@ -570,3 +570,8 @@ New main line, h first:
 - 16:28: arm h x8 (w-hup) complete: cooled library 2.864 (e2-v3 2.852), fixed-32 3.019 (3.011), room 2.599 (2.581),
   room h-span 2.579 vs other 2.601 (in-kernel, first 512 holdout seqs). Upweighting h costs a little on every slice;
   the question is echo rate and context lift, evaluated when the download lands. Arm 2 (visitors x0.25, h x4) running.
+- 16:55: built and deployed https://h.fg-goose.online/loop/ for rat: in-browser loop extractor (file picker that opens the
+  phone library, start/end spinners with one-frame nudges, fps estimate from frame callbacks, timeline, seamless loop
+  preview and ping-pong, seam view with a pixel-difference score and a scan for the cleanest end within 0.5 s,
+  export via MediaRecorder to mp4/webm with download and Share sheet, ffmpeg line for a lossless cut). Headless test:
+  load, seam, scan, preview, export (45 KB mp4) with zero console errors.
