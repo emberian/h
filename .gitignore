@@ -57,3 +57,9 @@ kaggle/code_dataset/
 # bibliography and SHA-256 manifest, not another copy of each PDF in Git.
 research/papers/*.pdf
 research/sources/tiny_h1_blog/
+
+# Site: exported browser models and export scratch (third-party clone, Hub reference graphs).
+site/models/
+site/export/transformers.js/
+site/export/scripts-3.8.1/
+site/export/reference/

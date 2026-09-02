@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>h</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%2307070a'/%3E%3Ctext x='32' y='50' font-family='Georgia,serif' font-size='52' text-anchor='middle' fill='%23ece6d8'%3Eh%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- the city, subsiding -->
+<canvas id="city" aria-hidden="true"></canvas>
+
+<!--
+  The vocal tract, midsagittal, facing left. 1 unit ≈ 0.25 mm at life size.
+  Layers, back to front: bone, cartilage, soft tissue, lungs, airflow,
+  moisture, and the laryngoscopic inset of the glottis (lower left).
+  mouth.js animates it; nothing here moves on its own.
+-->
+<svg id="tract" viewBox="0 0 1000 1060" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id="grad-drop" cx="35%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#e8f6ff" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#8ec5e6" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#3b7fa8" stop-opacity="0.15"/>
+    </radialGradient>
+    <linearGradient id="grad-pool" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9fd6f2" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#2b5f84" stop-opacity="0.75"/>
+    </linearGradient>
+    <radialGradient id="grad-inset" cx="50%" cy="40%" r="60%">
+      <stop offset="0" stop-color="#3a2328"/>
+      <stop offset="1" stop-color="#16101a"/>
+    </radialGradient>
+    <clipPath id="clip-chink"><polygon id="chink-clip-poly" points="340,760 300,895 380,895"/></clipPath>
+    <clipPath id="clip-inset"><circle cx="340" cy="830" r="90"/></clipPath>
+  </defs>
+
+  <!-- ===== bone ===== -->
+  <g id="bone" class="bone">
+    <!-- skull base and nasal roof -->
+    <path class="faint" d="M 292 205 C 330 220 420 230 520 250 C 580 262 620 280 640 300"/>
+    <path class="faint" d="M 640 300 C 660 270 700 246 760 236"/>
+    <!-- hard palate: nasal floor above, oral vault below -->
+    <path class="fill" d="M 262 372 L 472 364 L 472 384 C 430 380 360 388 300 406 C 288 410 282 414 280 420 L 268 418 C 262 404 262 388 262 372 Z"/>
+    <!-- cervical spine (C2–T3), vertebral bodies only -->
+    <g class="fill faint">
+      <rect x="668" y="270" width="70" height="108" rx="10"/>
+      <rect x="668" y="392" width="70" height="60" rx="10"/>
+      <rect x="668" y="466" width="70" height="60" rx="10"/>
+      <rect x="668" y="540" width="70" height="60" rx="10"/>
+      <rect x="668" y="614" width="70" height="60" rx="10"/>
+      <rect x="668" y="688" width="70" height="60" rx="10"/>
+      <rect x="668" y="762" width="70" height="60" rx="10"/>
+      <rect x="668" y="836" width="70" height="60" rx="10"/>
+      <rect x="668" y="910" width="70" height="60" rx="10"/>
+    </g>
+    <!-- mandibular symphysis (the chin, in section) and hyoid -->
+    <path class="fill" d="M 272 566 C 256 590 254 622 268 640 C 282 650 296 646 300 630 C 302 604 300 580 292 566 Z"/>
+    <path class="fill" d="M 536 650 C 546 644 558 648 560 660 C 556 668 542 668 536 660 Z"/>
+    <!-- incisors -->
+    <g class="teeth">
+      <path d="M 279 418 L 293 420 L 285 458 L 273 455 Z"/>
+      <path d="M 287 508 L 301 506 L 293 470 L 281 472 Z"/>
+      <path class="faint" d="M 285 418 L 289 398 M 293 508 L 296 530"/>
+    </g>
+  </g>
+
+  <!-- ===== cartilage ===== -->
+  <g id="cartilage" class="cartilage">
+    <!-- epiglottis -->
+    <path class="fill" d="M 566 694 C 574 662 586 630 598 604 C 604 592 610 596 612 606 C 606 640 596 672 588 700 C 580 706 570 704 566 694 Z"/>
+    <!-- thyroid cartilage (anterior lamina) and thyrohyoid membrane -->
+    <path class="thick" d="M 548 688 C 552 700 556 730 558 764"/>
+    <path class="faint" d="M 556 664 L 548 688"/>
+    <!-- arytenoid -->
+    <path class="fill" d="M 618 722 C 628 720 636 728 636 742 C 630 750 620 748 616 740 Z"/>
+    <!-- cricoid: anterior arch, posterior lamina -->
+    <path class="fill" d="M 556 766 C 560 780 562 796 560 806 L 572 806 C 574 792 572 778 570 766 Z"/>
+    <path class="fill" d="M 626 748 C 636 748 642 758 642 792 C 642 804 632 808 626 804 Z"/>
+    <!-- trachea: anterior wall, C-shaped rings, membranous posterior wall -->
+    <path d="M 562 806 C 562 870 560 940 556 1060"/>
+    <path class="dash" d="M 626 806 C 628 870 630 940 632 1060"/>
+    <g class="rings">
+      <path id="ring" d="M 562 826 C 582 820 608 820 626 826"/>
+      <use href="#ring" y="20"/><use href="#ring" y="40"/><use href="#ring" y="60"/><use href="#ring" y="80"/>
+      <use href="#ring" y="100"/><use href="#ring" y="120"/><use href="#ring" y="140"/><use href="#ring" y="160"/>
+      <use href="#ring" y="180"/><use href="#ring" y="200"/><use href="#ring" y="220"/>
+    </g>
+  </g>
+
+  <!-- ===== soft tissue ===== -->
+  <g id="soft" class="soft">
+    <!-- skin profile: forehead → nose → upper lip; lower lip → chin → neck -->
+    <path class="skin" d="M 318 0 C 300 90 282 150 292 205 C 262 238 214 280 210 306 C 206 322 226 336 250 340 C 256 360 251 386 248 406"/>
+    <path class="skin" d="M 246 524 C 252 542 268 552 268 560 C 258 585 252 615 262 640 C 285 675 330 696 395 704 C 440 708 470 712 485 728 C 495 742 492 766 486 800 C 482 860 484 940 486 1060"/>
+    <!-- nostril and nasal cavity: turbinates on the lateral wall -->
+    <path class="skin" d="M 232 316 C 226 326 232 338 246 340"/>
+    <g class="fill faint">
+      <path d="M 300 342 C 380 330 470 332 525 345 C 470 360 380 362 300 350 Z"/>
+      <path d="M 335 300 C 400 288 470 292 505 306 C 465 318 400 320 335 312 Z"/>
+      <path d="M 405 262 C 440 254 480 258 492 270 C 470 280 435 282 405 274 Z"/>
+    </g>
+    <!-- lips, open -->
+    <path class="fill lip" d="M 250 404 C 236 416 238 434 262 442 C 272 444 282 440 286 432 C 288 420 284 408 272 404 Z"/>
+    <path class="fill lip" d="M 262 490 C 244 494 238 510 242 522 C 250 538 270 542 284 532 C 292 522 290 502 282 494 C 276 488 268 488 262 490 Z"/>
+    <!-- tongue, resting low: /h/ asks nothing of it -->
+    <path id="tongue" class="fill tongue" d="M 298 494 C 330 466 386 444 440 440 C 500 438 548 466 566 516 C 578 552 582 584 588 612 C 580 632 560 648 540 656 C 480 650 400 636 330 610 C 306 598 296 560 298 512 Z"/>
+    <!-- floor of mouth (genioglossus / geniohyoid) -->
+    <path class="faint" d="M 300 600 C 380 632 470 646 538 658"/>
+    <!-- soft palate, raised: the nasopharynx is sealed for an oral sound -->
+    <path class="fill" d="M 472 364 C 520 354 575 362 608 386 L 600 404 C 560 396 520 390 472 384 Z"/>
+    <path id="uvula" class="fill" d="M 600 404 C 606 416 602 432 592 442 C 584 436 582 420 588 408 Z"/>
+    <!-- posterior pharyngeal wall and the prevertebral space behind it -->
+    <path class="fill faint" d="M 640 300 C 630 360 628 420 632 500 C 636 580 640 660 640 740 C 640 760 642 780 646 800 L 668 800 L 668 300 Z"/>
+    <path class="wall" d="M 640 300 C 630 360 628 420 632 500 C 636 580 640 660 640 740 C 640 760 642 780 646 800"/>
+    <!-- vestibular (false) fold and true vocal fold, in section -->
+    <path class="fill fold" d="M 560 714 C 574 712 588 716 596 722 C 588 726 574 726 560 722 Z"/>
+    <path id="fold-sag" class="fill fold" d="M 560 734 C 576 732 594 736 604 742 C 594 748 576 748 560 746 Z"/>
+    <!-- oesophagus, collapsed, behind the trachea -->
+    <path class="faint" d="M 646 800 C 652 860 654 930 656 1060 M 660 800 C 664 860 666 930 668 1060"/>
+  </g>
+
+  <!-- ===== lungs, suggested ===== -->
+  <g id="lungs" class="lungs">
+    <path class="faint" d="M 596 915 C 570 930 520 940 470 960 M 596 915 C 630 930 690 940 730 960"/>
+    <path class="fill" d="M 470 936 C 410 944 352 990 344 1060 L 590 1060 C 596 1040 594 990 588 968 C 580 948 560 936 470 936 Z"/>
+    <path class="fill" d="M 720 936 C 780 944 838 990 846 1060 L 602 1060 C 598 1040 600 990 606 968 C 614 948 634 936 720 936 Z"/>
+  </g>
+  <path id="diaphragm" class="diaphragm" d="M 300 1040 C 420 995 700 995 880 1040"/>
+
+  <!-- ===== airflow ===== -->
+  <path id="airway-path" d="M 598 1050 L 598 800 C 598 770 590 752 592 738 C 596 715 606 680 614 640 C 620 580 618 520 606 460 C 596 432 570 428 540 432 C 500 425 470 410 440 409 C 400 408 360 420 330 435 C 310 445 300 458 285 464 C 265 468 230 470 200 472 C 170 474 140 478 110 484" fill="none" stroke="none"/>
+  <g id="particles" class="particles"></g>
+
+  <!-- ===== moisture ===== -->
+  <g id="moisture">
+    <path id="cracks" class="cracks" d="M 380 452 l 8 10 M 420 444 l -4 12 M 460 444 l 10 8 M 500 452 l 3 12 M 340 470 l 8 6 M 530 474 l 6 9"/>
+    <path id="sheen-tongue" class="sheen" d="M 312 480 C 360 456 400 446 440 444 C 496 442 540 470 560 516"/>
+    <path id="sheen-palate" class="sheen" d="M 296 404 C 340 386 400 380 468 384"/>
+    <path id="sheen-pharynx" class="sheen" d="M 631 420 C 634 500 638 580 642 660"/>
+    <ellipse id="pool-vallecula" class="pool" cx="590" cy="612" rx="7" ry="4"/>
+    <ellipse id="pool-ventricle" class="pool" cx="580" cy="729" rx="10" ry="3"/>
+    <g id="droplets"></g>
+  </g>
+
+  <!-- ===== the glottis, seen from above (laryngoscopic) ===== -->
+  <path id="leader" class="leader" d="M 600 742 C 520 760 470 780 432 820"/>
+  <g id="inset">
+    <circle cx="340" cy="830" r="92" fill="url(#grad-inset)" class="inset-ring"/>
+    <g clip-path="url(#clip-inset)">
+      <!-- ventricular folds, lateral -->
+      <path class="fill faint" d="M 318 758 C 292 790 280 850 300 905 L 250 905 L 250 758 Z"/>
+      <path class="fill faint" d="M 362 758 C 388 790 400 850 380 905 L 430 905 L 430 758 Z"/>
+      <!-- the vocal folds; mouth.js rewrites these points every frame -->
+      <polygon id="chink" class="chink" points="340,760 300,895 380,895"/>
+      <polygon id="fold-l" class="fill fold" points="340,760 300,895 254,896 260,810"/>
+      <polygon id="fold-r" class="fill fold" points="340,760 380,895 426,896 420,810"/>
+      <ellipse id="ary-l" class="fill" cx="300" cy="895" rx="10" ry="8"/>
+      <ellipse id="ary-r" class="fill" cx="380" cy="895" rx="10" ry="8"/>
+      <g clip-path="url(#clip-chink)">
+        <path id="pool-inset" class="pool-inset" d=""/>
+        <g id="bubbles"></g>
+      </g>
+      <path id="strand" class="strand" d=""/>
+      <g id="inset-drops"></g>
+    </g>
+  </g>
+</svg>
+
+<!-- what the ghost says -->
+<div id="murmur" aria-hidden="true"></div>
+
+<!-- the h -->
+<button id="h" type="button" aria-label="h">h</button>
+
+<!-- the breath, counting itself -->
+<div id="corner"><span id="count">0</span><i id="ghost-dot" data-state="off" aria-hidden="true"></i></div>
+
+<!-- wetness -->
+<div id="knob-wrap" class="knob-wrap">
+  <div class="knob-tilt">
+    <div class="knob" role="slider" tabindex="0" aria-label="wetness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="30">
+      <div class="knob-body">
+        <div class="knob-bezel"></div>
+        <div class="knob-face"></div>
+        <div class="knob-sheen"></div>
+        <div class="knob-pointer"></div>
+      </div>
+      <div class="knob-fog"></div>
+      <div class="knob-drops"></div>
+    </div>
+  </div>
+  <svg class="knob-label" viewBox="0 0 240 64" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="wet-text" x="-20%" y="-60%" width="140%" height="240%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.018 0.05" numOctaves="2" seed="3" result="t"/>
+        <feDisplacementMap in="SourceGraphic" in2="t" scale="0" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </defs>
+    <text x="120" y="36" text-anchor="middle" filter="url(#wet-text)">wetness</text>
+    <g class="label-drips">
+      <circle cx="96" cy="46" r="2.2"/><circle cx="141" cy="44" r="1.6"/><circle cx="118" cy="48" r="1.3"/>
+    </g>
+  </svg>
+</div>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>

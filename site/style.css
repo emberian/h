@@ -1,0 +1,245 @@
+/* style.css — dark, spare. Everything moves; nothing explains itself. */
+
+:root {
+  --bg: #07070a;
+  --ink: #ece6d8;                 /* the h */
+  --tissue: 224, 168, 158;        /* flesh, as rgb triplet */
+  --bone: 226, 218, 202;
+  --air: 205, 228, 255;
+  --water: 140, 205, 240;
+  --breath: 0;                    /* 0..1 lung volume, set by main.js each frame */
+  --glow: 0.35;                   /* 0..1, the ghost's entropy */
+  --wet: 0.3;                     /* 0..1, mirrored from the knob */
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: radial-gradient(120% 90% at 50% 45%, #0c0c12 0%, var(--bg) 60%, #040405 100%);
+  color: var(--ink);
+  font-family: var(--serif);
+  overflow: hidden;
+  -webkit-user-select: none; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+}
+
+/* ---------- layers ---------- */
+#city { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+#tract {
+  position: fixed; z-index: 1; pointer-events: none;
+  top: 50%; left: 50%;
+  height: 100vh; height: 100dvh; width: auto;
+  transform: translate(-50%, -50%);
+  opacity: 0.92;
+  overflow: visible;
+}
+@media (max-aspect-ratio: 4/5) {
+  #tract { height: auto; width: 150vw; }
+}
+
+#murmur { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
+
+/* ---------- the tract's line work ---------- */
+#tract path, #tract rect, #tract ellipse, #tract polygon, #tract use {
+  fill: none;
+  stroke: rgba(var(--tissue), 0.55);
+  stroke-width: 1.6;
+  stroke-linecap: round; stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+#tract .fill { fill: rgba(var(--tissue), 0.075); }
+#tract .faint { opacity: 0.45; }
+#tract .fill.faint { fill: rgba(var(--tissue), 0.05); }
+#tract .thick { stroke-width: 3; }
+#tract .dash { stroke-dasharray: 3 5; }
+#tract .bone path, #tract .bone rect { stroke: rgba(var(--bone), 0.5); }
+#tract .bone .fill { fill: rgba(var(--bone), 0.06); }
+#tract .teeth path { stroke: rgba(var(--bone), 0.7); fill: rgba(var(--bone), 0.16); }
+#tract .cartilage path, #tract .cartilage use { stroke: rgba(var(--bone), 0.42); }
+#tract .cartilage .fill { fill: rgba(var(--bone), 0.05); }
+#tract .rings use, #tract .rings path { stroke-width: 3; opacity: 0.6; }
+#tract .skin { stroke: rgba(var(--tissue), 0.75); stroke-width: 1.8; }
+#tract .lip { fill: rgba(var(--tissue), 0.16); stroke: rgba(var(--tissue), 0.8); }
+#tract .tongue { fill: rgba(var(--tissue), 0.12); stroke: rgba(var(--tissue), 0.7); }
+#tract .wall { stroke: rgba(var(--tissue), 0.65); }
+#tract .fold { fill: rgba(var(--bone), 0.16); stroke: rgba(var(--tissue), 0.8); }
+#tract .lungs .fill { fill: rgba(var(--tissue), 0.045); stroke: rgba(var(--tissue), 0.28); }
+#tract .diaphragm { stroke: rgba(var(--tissue), 0.35); stroke-width: 2.2; }
+#tract .leader { stroke: rgba(var(--bone), 0.28); stroke-dasharray: 2 6; }
+#tract .inset-ring { stroke: rgba(var(--bone), 0.35); }
+#tract .chink { fill: #050507; stroke: none; }
+#tract #inset .fold { fill: rgba(var(--tissue), 0.22); stroke: rgba(var(--tissue), 0.85); }
+
+/* airflow */
+#tract .particles circle { fill: rgba(var(--air), 0.8); stroke: none; }
+#tract .particles { filter: blur(calc(var(--wet) * 1.6px)); }
+
+/* moisture */
+#tract .sheen { stroke: rgba(var(--water), 0.9); stroke-width: 2.4; stroke-dasharray: 26 180; opacity: 0; }
+#tract .cracks { stroke: rgba(var(--bone), 0.55); stroke-width: 1; opacity: 0; }
+#tract #droplets ellipse, #tract #inset-drops circle { fill: url(#grad-drop); stroke: rgba(var(--water), 0.5); stroke-width: 0.6; }
+#tract .pool { fill: url(#grad-pool); stroke: rgba(var(--water), 0.5); opacity: 0; }
+#tract .pool-inset { fill: url(#grad-pool); stroke: rgba(var(--water), 0.6); stroke-width: 1; }
+#tract #bubbles circle { fill: rgba(var(--air), 0.10); stroke: rgba(var(--air), 0.6); stroke-width: 0.8; }
+#tract .strand { stroke: rgba(var(--water), 0.75); stroke-width: 1.2; opacity: 0; }
+
+/* ---------- the h ---------- */
+#h {
+  position: fixed; z-index: 3;
+  left: 50%; top: 50%;
+  margin: 0; padding: 0 .12em; border: 0; background: none;
+  font: normal 400 clamp(120px, 27vmin, 340px)/1 var(--serif);
+  color: var(--ink);
+  cursor: pointer;
+  transform: translate(-50%, -58%) scale(calc(1 + var(--breath) * 0.085));
+  transform-origin: 50% 60%;
+  text-shadow:
+    0 0 calc(6px + 26px * var(--glow)) rgba(255, 232, 205, calc(0.18 + 0.45 * var(--glow))),
+    0 0 calc(30px + 60px * var(--glow)) rgba(255, 200, 160, calc(0.06 + 0.22 * var(--glow)));
+  -webkit-font-smoothing: antialiased;
+  will-change: transform;
+}
+#h::before {
+  /* a pocket of dark air for the letter to sit in */
+  content: ""; position: absolute; inset: -6% -24%; z-index: -1; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(7,7,10,0.7), rgba(7,7,10,0.35) 55%, rgba(7,7,10,0));
+}
+#h:focus-visible { outline: 1px solid rgba(var(--bone), 0.35); outline-offset: 12px; border-radius: 50%; }
+#h.is-speaking { animation: speak var(--speak-dur, 0.8s) ease-out 1; }
+@keyframes speak {
+  0%   { color: #fff8ee; letter-spacing: 0; }
+  18%  { color: #fffaf2; letter-spacing: .015em; filter: blur(0.3px); }
+  100% { color: var(--ink); letter-spacing: 0; filter: none; }
+}
+
+/* ---------- the count ---------- */
+#corner {
+  position: fixed; z-index: 4; top: max(14px, env(safe-area-inset-top)); left: max(16px, env(safe-area-inset-left));
+  display: flex; align-items: center; gap: 10px;
+  font: 12px/1 var(--mono); letter-spacing: .06em;
+  color: rgba(var(--bone), 0.5);
+  pointer-events: none;
+}
+#ghost-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(var(--bone), 0.5); opacity: 0; transition: opacity .6s; }
+#ghost-dot[data-state="loading"] { opacity: 1; animation: pulse 2.4s ease-in-out infinite; }
+#ghost-dot[data-state="ready"] { opacity: 0.35; }
+#ghost-dot[data-state="thinking"] { opacity: 0.9; background: rgba(var(--water), 0.9); }
+@keyframes pulse { 50% { opacity: 0.15; } }
+
+/* ---------- the murmur ---------- */
+.murmur {
+  position: absolute;
+  max-width: min(30ch, 42vw);
+  text-align: right;
+  font: italic 400 clamp(12px, 1.7vmin, 17px)/1.35 var(--serif);
+  color: rgba(var(--bone), 0.78);
+  white-space: pre-wrap;
+  opacity: 0;
+  will-change: transform, opacity;
+  text-shadow: 0 0 8px rgba(0,0,0,0.8);
+}
+
+/* ---------- wetness ---------- */
+.knob-wrap {
+  --size: clamp(150px, 26vmin, 300px);
+  position: fixed; z-index: 5;
+  right: max(4vw, env(safe-area-inset-right)); bottom: max(3vh, env(safe-area-inset-bottom));
+  width: var(--size);
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+@media (max-aspect-ratio: 4/5) {
+  /* portrait: smaller, tucked bottom-right so the glottis inset stays clear */
+  .knob-wrap { right: max(3vw, env(safe-area-inset-right)); --size: clamp(120px, 38vw, 200px); }
+}
+.knob-tilt {
+  --wob-x: 0deg; --wob-y: 0deg; --wob-s: 1;
+  transform: perspective(700px) rotateX(var(--wob-x)) rotateY(var(--wob-y)) scale(var(--wob-s));
+  will-change: transform;
+}
+.knob {
+  --sheen-a: 0deg; --sheen-s: 0.1;
+  position: relative;
+  width: var(--size); height: var(--size);
+  border-radius: 50%;
+  cursor: grab;
+  outline: none;
+  filter: drop-shadow(0 18px 30px rgba(0,0,0,0.65));
+}
+.knob.is-dragging { cursor: grabbing; }
+.knob:focus-visible .knob-bezel { box-shadow: 0 0 0 1px rgba(var(--bone), 0.35), inset 0 0 0 1px rgba(255,255,255,0.05); }
+.knob-body { position: absolute; inset: 0; border-radius: 50%; will-change: transform; }
+.knob-bezel {
+  position: absolute; inset: 0; border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 74%, rgba(255,255,255,0.03) 75%, transparent 78%),
+    conic-gradient(from 210deg, #1a1c22, #2b2e37 20%, #121317 40%, #262930 60%, #101115 80%, #1a1c22);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.10), inset 0 -2px 6px rgba(0,0,0,0.6);
+}
+.knob-face {
+  position: absolute; inset: 9%; border-radius: 50%;
+  background:
+    radial-gradient(circle at 38% 32%, rgba(255,255,255,0.10), transparent 46%),
+    radial-gradient(circle at 50% 50%, #33363f 0%, #1b1d23 55%, #0d0e11 100%);
+  box-shadow: inset 0 6px 14px rgba(0,0,0,0.55), inset 0 -3px 6px rgba(255,255,255,0.04);
+  /* wetter = glossier, bluer */
+  filter: saturate(calc(1 + var(--wet) * 0.6)) brightness(calc(1 + var(--wet) * 0.12));
+}
+.knob-sheen {
+  position: absolute; inset: 9%; border-radius: 50%;
+  background: conic-gradient(from var(--sheen-a), transparent 0deg, rgba(190, 225, 255, var(--sheen-s)) 18deg, rgba(255,255,255, calc(var(--sheen-s) * 0.6)) 26deg, transparent 52deg);
+  mix-blend-mode: screen;
+  opacity: calc(0.35 + var(--wet) * 0.65);
+  pointer-events: none;
+}
+.knob-pointer {
+  position: absolute; left: 50%; top: 11%;
+  width: 4%; height: 22%;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: linear-gradient(rgba(var(--bone), 0.95), rgba(var(--bone), 0.5));
+  box-shadow: 0 0 6px rgba(var(--bone), 0.3);
+}
+.knob-fog {
+  /* a film of breath on the dial, thickest mid-way */
+  position: absolute; inset: 9%; border-radius: 50%;
+  background: radial-gradient(circle at 50% 60%, rgba(200, 225, 240, 0.18), rgba(200,225,240,0.05) 60%, transparent 80%);
+  opacity: calc(1 - min(1, abs(var(--wet) - 0.55) * 2.6));
+  pointer-events: none;
+}
+.knob-drops { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; pointer-events: none; }
+.drop {
+  position: absolute; display: block; border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.95), rgba(190,225,250,0.55) 40%, rgba(120,170,210,0.15) 75%, transparent 100%);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.5), inset 0 -1px 1px rgba(255,255,255,0.25);
+  animation: bead .6s cubic-bezier(.2,1.4,.4,1) both;
+}
+.drop.is-gone { animation: evaporate .9s ease-out both; }
+@keyframes bead { from { transform: translate(-50%,-50%) scale(0); } }
+@keyframes evaporate { to { transform: translate(-50%,-50%) scale(1.6); opacity: 0; } }
+
+.knob-label { width: 80%; height: auto; overflow: visible; }
+.knob-label text {
+  font: 400 24px var(--serif);
+  font-variant: small-caps;
+  letter-spacing: calc(.16em + var(--wet) * .08em);
+  fill: rgb(
+    calc(226 - var(--wet) * 90),
+    calc(218 - var(--wet) * 20),
+    calc(202 + var(--wet) * 50)
+  );
+  opacity: 0.55;
+}
+.label-drips circle { fill: rgba(var(--water), 0.7); opacity: calc(max(0, var(--wet) - 0.6) * 2.5); }
+
+/* ---------- motion preferences ---------- */
+@media (prefers-reduced-motion: reduce) {
+  #h.is-speaking { animation-duration: 1.6s; }
+  .drop { animation-duration: 1.4s; }
+  #ghost-dot[data-state="loading"] { animation-duration: 5s; }
+}
