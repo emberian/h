@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>h explorer</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>h explorer</h1>
+  <nav class="tabs">
+    <button data-tab="loom" class="on">Loom</button>
+    <button data-tab="provenance">Provenance</button>
+    <button data-tab="observatory">Observatory</button>
+    <button data-tab="compare">Compare</button>
+  </nav>
+  <span id="status" class="status"></span>
+  <span id="servers-status" class="servers"></span>
+  <button id="servers-refresh" title="re-probe the model servers">servers</button>
+</header>
+
+<main>
+<!-- ================================================================== loom -->
+<section id="tab-loom" class="tab on">
+  <aside class="panel controls">
+    <details open>
+      <summary>sampler</summary>
+      <label>server <select id="loom-server"></select></label>
+      <div class="grid2">
+        <label>N <input id="loom-n" type="number" value="4" min="1" max="64"></label>
+        <label>max_tokens <input id="loom-max" type="number" value="40" min="1" max="2048"></label>
+        <label>temperature <input id="loom-temp" type="number" value="0.7" min="0" step="0.05"></label>
+        <label>top_p <input id="loom-topp" type="number" value="0.9" min="0" max="1" step="0.05"></label>
+      </div>
+      <label>stop <input id="loom-stop" value="\n\n" title="escapes are interpreted; empty = none"></label>
+    </details>
+    <details open>
+      <summary>prompt (root node)</summary>
+      <textarea id="loom-prompt" rows="9" spellcheck="false" placeholder="frame, blank line, turns as 'name: text', ending with h:"></textarea>
+      <div class="row">
+        <button id="loom-frame" title="insert the bare room frame">frame</button>
+        <button id="loom-expand-root" title="sample N continuations of the active node">expand active</button>
+      </div>
+    </details>
+    <details open>
+      <summary>weave</summary>
+      <div class="row">
+        <input id="weave-name" placeholder="name" spellcheck="false">
+        <button id="weave-save">save</button>
+        <button id="weave-new" title="start an empty weave">new</button>
+      </div>
+      <div class="row">
+        <select id="weave-list"></select>
+        <button id="weave-load">load</button>
+      </div>
+      <div id="weave-info" class="hint"></div>
+    </details>
+    <details open>
+      <summary>bookmarks</summary>
+      <ul id="bookmarks" class="bookmarks"></ul>
+    </details>
+    <details>
+      <summary>tree</summary>
+      <div class="row">
+        <button id="haunt-all" title="provenance-scan every node in one call">scan all nodes</button>
+        <button id="collapse-all">collapse all</button>
+        <button id="expand-all">uncollapse</button>
+      </div>
+      <div class="legend">
+        <span class="tok" data-lp="0">p≈1</span>
+        <span class="tok" data-lp="-1">−1</span>
+        <span class="tok" data-lp="-2">−2</span>
+        <span class="tok" data-lp="-4">−4</span>
+        <span class="tok" data-lp="-8">≤−8</span>
+        <span class="hint">token logprob</span>
+      </div>
+    </details>
+  </aside>
+
+  <div class="panel tree-wrap">
+    <div id="tree"></div>
+  </div>
+
+  <aside class="panel reading-wrap">
+    <h3>active path <span id="reading-stats" class="hint"></span></h3>
+    <div id="reading" class="reading"></div>
+  </aside>
+</section>
+
+<!-- ================================================================== provenance -->
+<section id="tab-provenance" class="tab">
+  <aside class="panel controls">
+    <details open>
+      <summary>scan</summary>
+      <label><input type="radio" name="prov-scope" value="node" checked> active node text</label>
+      <label><input type="radio" name="prov-scope" value="path"> whole active path</label>
+      <div class="row">
+        <button id="prov-scan">scan</button>
+        <button id="prov-scan-all">scan all nodes</button>
+      </div>
+      <p class="hint">exact token-sequence matches against the training corpus (hghost-haunt). results are cached per text.</p>
+    </details>
+    <details open>
+      <summary>text</summary>
+      <div id="prov-text" class="reading"></div>
+    </details>
+  </aside>
+  <div class="panel">
+    <div id="prov-results"></div>
+  </div>
+</section>
+
+<!-- ================================================================== observatory -->
+<section id="tab-observatory" class="tab">
+  <aside class="panel controls">
+    <details open>
+      <summary>day</summary>
+      <div class="row">
+        <select id="obs-date"></select>
+        <button id="obs-reload">reload</button>
+      </div>
+      <div id="obs-summary" class="summary"></div>
+    </details>
+    <details open>
+      <summary>records</summary>
+      <div id="obs-list" class="obs-list"></div>
+    </details>
+  </aside>
+  <div class="panel">
+    <div id="obs-detail"></div>
+  </div>
+</section>
+
+<!-- ================================================================== compare -->
+<section id="tab-compare" class="tab">
+  <aside class="panel controls">
+    <details open>
+      <summary>prompt</summary>
+      <textarea id="cmp-prompt" rows="9" spellcheck="false"></textarea>
+      <div class="row"><button id="cmp-frame">frame</button><button id="cmp-from-loom" title="use the loom's active path">from loom</button></div>
+    </details>
+    <details open>
+      <summary>servers</summary>
+      <label>A <select id="cmp-a"></select></label>
+      <label>B <select id="cmp-b"></select></label>
+    </details>
+    <details open>
+      <summary>sampler</summary>
+      <div class="grid2">
+        <label>K <input id="cmp-k" type="number" value="4" min="1" max="64"></label>
+        <label>max_tokens <input id="cmp-max" type="number" value="40" min="1" max="2048"></label>
+        <label>temperature <input id="cmp-temp" type="number" value="0.7" min="0" step="0.05"></label>
+        <label>top_p <input id="cmp-topp" type="number" value="0.9" min="0" max="1" step="0.05"></label>
+      </div>
+      <label>stop <input id="cmp-stop" value="\n\n"></label>
+      <div class="row"><button id="cmp-run">run</button></div>
+    </details>
+  </aside>
+  <div class="panel compare">
+    <div class="col"><h3 id="cmp-a-title">A</h3><div id="cmp-a-stats" class="hint"></div><div id="cmp-a-out"></div></div>
+    <div class="col"><h3 id="cmp-b-title">B</h3><div id="cmp-b-stats" class="hint"></div><div id="cmp-b-out"></div></div>
+  </div>
+</section>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
