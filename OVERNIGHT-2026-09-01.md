@@ -575,3 +575,7 @@ New main line, h first:
   preview and ping-pong, seam view with a pixel-difference score and a scan for the cleanest end within 0.5 s,
   export via MediaRecorder to mp4/webm with download and Share sheet, ffmpeg line for a lossless cut). Headless test:
   load, seam, scan, preview, export (45 KB mp4) with zero console errors.
+- 17:11: h-span holdout loss (first 512 room sequences, same sidecar): e2 2.774, e2-v3 2.762 (their other-room tokens ~2.578),
+  arm h x8 2.579 in-kernel (other 2.601, library 2.864). The weighting moves the objective by 0.18 nats on h lines for
+  ~0.02 elsewhere. Roombank echo/lift evaluation of the arm running; arm 2 on the TPU. loop v2 fork spawned (loop finder
+  with a rhythm curve, seam+motion candidates, crossfade, multi-clip sequence editor).
