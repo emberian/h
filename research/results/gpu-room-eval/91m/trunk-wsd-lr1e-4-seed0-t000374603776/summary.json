@@ -1,0 +1,153 @@
+{
+  "name": "trunk-wsd-lr1e-4-seed0-t000374603776",
+  "checkpoint": "/kaggle/working/gpu-room-eval/checkpoints/trunk-wsd-lr1e-4-seed0-t000374603776",
+  "model_safetensors_sha256": "f772f847c4f34cd14ebd492ce3f1e9466c6bd03f7c1bcfeaa0d8f11c47df509b",
+  "config_dtype": "float32",
+  "sequence_length": 512,
+  "batch": 8,
+  "kernel": {
+    "requested": "reference",
+    "triton": null,
+    "losses": "reference",
+    "generation": "reference"
+  },
+  "timings": {
+    "load_seconds": 5.752,
+    "losses": {
+      "first-512": {
+        "seconds": 179.766,
+        "tokens_per_second": 1458.3
+      },
+      "clean-512": {
+        "seconds": 179.128,
+        "tokens_per_second": 1463.4
+      },
+      "retention": {
+        "seconds": 9.787,
+        "tokens_per_second": 1464.8
+      },
+      "room": {
+        "seconds": 179.076,
+        "tokens_per_second": 1463.9
+      }
+    },
+    "generation_seconds": 375.526,
+    "room_seconds": 101.522,
+    "total_seconds": 1043.201
+  },
+  "slices": {
+    "first-512": {
+      "sequences": 512,
+      "tokens": 262144,
+      "loss": 3.284131901111626,
+      "perplexity": 26.68580833626951,
+      "accuracy": 0.3831977844238281,
+      "furniture_fraction": 0.10590744018554688,
+      "furniture_free_loss": 3.4954332385881326,
+      "furniture_free_accuracy": 0.35358668151428657,
+      "furniture_loss": 1.500282217032774,
+      "matched_fraction": 0.2052764892578125,
+      "unseen_loss": 3.6184239863164875,
+      "unseen_accuracy": 0.3409893823320469
+    },
+    "clean-512": {
+      "sequences": 512,
+      "tokens": 262144,
+      "loss": 2.9641940011674133,
+      "perplexity": 19.37907743133864,
+      "accuracy": 0.4244499206542969,
+      "furniture_fraction": 0.06396102905273438,
+      "furniture_free_loss": 3.093490824688771,
+      "furniture_free_accuracy": 0.40595899371171706,
+      "furniture_loss": 1.071997027039653,
+      "matched_fraction": 0.12954330444335938,
+      "unseen_loss": 3.186542011101878,
+      "unseen_accuracy": 0.39538970572123494
+    },
+    "retention": {
+      "sequences": 28,
+      "tokens": 14336,
+      "loss": 3.562057720126976,
+      "perplexity": 35.23562765890677,
+      "accuracy": 0.33914620535714285
+    },
+    "room": {
+      "sequences": 512,
+      "tokens": 262144,
+      "loss": 3.6902558336525217,
+      "perplexity": 40.05509308734503,
+      "accuracy": 0.3338470458984375
+    },
+    "first-32": {
+      "sequences": 32,
+      "tokens": 16384,
+      "loss": 3.2662001205825177,
+      "perplexity": 26.21154914188839,
+      "accuracy": 0.41461181640625,
+      "furniture_fraction": 0.153564453125,
+      "furniture_free_loss": 3.7937021785323712,
+      "furniture_free_accuracy": 0.32398327083934236,
+      "furniture_loss": 0.3586490316919899,
+      "matched_fraction": 0.199951171875,
+      "unseen_loss": 3.9133394544802087,
+      "unseen_accuracy": 0.30592004882514495
+    }
+  },
+  "kernel_check": {
+    "slice": "first-32",
+    "reference_path_batch1_loss": 3.266200065612793,
+    "reference_path_seconds": 11.571,
+    "run_first32_loss": 3.2662001205825177,
+    "run_kernel": "reference",
+    "run_batch": 8,
+    "run_minus_reference_path": 5.496972477203599e-08
+  },
+  "retention": {
+    "path": "/kaggle/input/datasets/emberian64/hghost-jax-code-public/retention.txt",
+    "bytes": 52449,
+    "tokens": 14643,
+    "sequences": 28
+  },
+  "room_validation": {
+    "path": "/kaggle/input/datasets/emberian64/hghost-curated-tokens-v1-2-room/room-validation.bin",
+    "tokens": 1000497,
+    "sequences": 512
+  },
+  "masks": [
+    "clean-512",
+    "first-512"
+  ],
+  "generation": {
+    "prompts": 12,
+    "samples_per_prompt": 4,
+    "greedy_per_prompt": 1,
+    "completions": 60,
+    "generated_tokens": 7680,
+    "seconds": 375.526,
+    "tokens_per_second": 20.45,
+    "per_call_tokens_per_second_median": 20.47,
+    "base_seed": 20260901,
+    "max_new_tokens": 128,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "repetition_penalty": 1.08
+  },
+  "room": {
+    "prompts": 12,
+    "samples_per_prompt": 8,
+    "greedy_per_prompt": 1,
+    "completions": 108,
+    "generated_tokens": 1501,
+    "seconds": 101.522,
+    "tokens_per_second": 14.78,
+    "seed": 20260902,
+    "max_new_tokens": 64,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "repetition_penalty": 1.0
+  },
+  "gpu": {
+    "max_memory_allocated_bytes": 5889841152,
+    "max_memory_reserved_bytes": 7509901312
+  }
+}

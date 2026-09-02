@@ -511,3 +511,5 @@ New main line, h first:
 - 07:50: e3 on hbox: first-512 2.848 (better) but clean-512 2.651 (e2-v3 2.626), furniture-free clean 2.774 (2.747),
   retention 3.163 (3.146): the third epoch memorizes; it improves only the leaky slice and degrades the clean and
   out-of-corpus ones. e2-v3 is the right resident. Night's TPU work ends here; ~8.9 TPU h left for the week.
+- 08:04: 91M GPU table recovered (own kernel id, T4): room loss base 3.578 -> trunk ~3.68 -> leaf-e4 3.664. The library
+  epochs made the 91M worse at room text; the 0.5B room line sits at 2.58. That is the Discord failure as a number.
