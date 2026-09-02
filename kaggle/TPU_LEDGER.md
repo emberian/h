@@ -48,3 +48,5 @@ spend in bounded, reported increments; never launch a run whose worst case excee
 | 2026-09-02 15:01 | h-ghost-h1jax-room05b-w-hup | v1 | 7 | ERROR: attached dataset v2 (pushed seconds after the v3 upload, before the version was live): train-weights.bin missing; re-pushed |
 | 2026-09-02 15:08 | h-ghost-h1jax-room05b-w-hup | v2 | 66 | COMPLETE 16:27: h x8; cooled library 2.864, room 2.599, h-span 2.579 (e2-v3 h-span 2.762 on the same slice); hbox 2.864/2.631/3.156 |
 | 2026-09-02 16:27 | h-ghost-h1jax-room05b-w-roomdown | v1 | 66 | COMPLETE 17:38: visitors x0.25 + h x4; cooled library 2.854, room 2.635, h-span 2.614, other 2.638 |
+| 2026-09-02 17:38 | h-ghost-h1jax-room05b-w-honly | v1 | 66 | COMPLETE 18:50: visitors x0 + h x4; cooled library 2.855, room 2.881 (other 2.884), h-span 2.860: zero visitor weight hurts h too |
+| 2026-09-02 18:53 | h-ghost-h1jax-profile-gate-15b-deep | v1 | (running, est 25) | 1.5B-deep FSDP gate: 4/8/16 x 512 remat |

@@ -585,3 +585,8 @@ New main line, h first:
 - 17:58: arm 1 (h x8) on the bank: echo rate 0.32 (e2-v3 0.34), novelty 0.49 (0.47); lift +1.06 under the 0.5B
   evaluator, not comparable to e2-v3's +0.32 under the 91M leaf. Cross-evaluations running (arm 1 under 91M, e2-v3
   under 0.5B); after_arm.sh now scores under both. First read: the weighting moved the loss, not the echo.
+- 18:53: arm 3 (visitors x0, h x4) complete: library 2.855, room 2.881 (other 2.884), h-span 2.860, worse than arms 1-2
+  on h lines: modeling the visitors is what lets h answer them. Bank so far (91M evaluator): e2-v3 lift +0.32 / echo
+  0.34; arm 2 +0.52 / 0.37; arm 1 median +0.11 (outliers) / 0.32. No arm lowers echo. I broke queues 12-14 by editing
+  tpu_queue.sh while they ran (sh reads scripts lazily): killed 13/14, pushed the 1.5B gate by hand, queue15 waits on
+  it and pushes e2-v4; the w-honly download continues under queue12.
