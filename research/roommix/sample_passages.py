@@ -7,7 +7,7 @@ Output: JSONL with id, source, path, doc_id, passage.
 import gzip, json, random, re, sys
 from pathlib import Path
 
-random.seed(20260901)
+random.seed(int(__import__("os").environ.get("HGHOST_PASSAGE_SEED", "20260901")))
 root = Path("artifacts/dataset")
 out = Path(sys.argv[1]); n_target = int(sys.argv[2])
 shards = sorted(root.glob("train-*.jsonl.gz"))

@@ -446,3 +446,5 @@ New main line, h first:
   at 16+, replies read alive with the bare frame. Served in Discord as `h-05b-room-e1` on :8124 with the bare
   frame and the blank-line stop; the 91M bot config saved as h.yaml.pre-05b. hbox room table (old frame) confirms
   the frame lines get quoted back.
+- 02:59: first words of the 0.5B in the room ("hi h, are you the new one?"): "The New One is not so sure at first."
+  Pushed room05b-e2: a second epoch of the mix branched from the pre-cooldown checkpoint, cooled; queue9 waits.
