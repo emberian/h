@@ -463,3 +463,6 @@ New main line, h first:
 - 03:36: corpus-v1.3-room is on Kaggle (private, ready). Writer 02 rewrote its part in place to 248 whole-sentence
   scenes; writers 00 and 01 redoing 49 and 201 fragments. If the redos land before e2 finishes (~04:45), v1.3
   gets a version 2 and e2-v3 (queued behind e2) picks it up at push time.
+- 03:43: quota: TPU 8.47 h used / 11.53 left; GPU 4.26 h used / 25.74 left (refresh 2026-09-05). Backing up the 0.5B
+  room checkpoint to the Hub as a private repo (emberian/h-05b-room-e1, weights + config + tokenizer, no optimizer).
+  Writer 01 redo at 82/201; writer 00 redo done (38/49).
