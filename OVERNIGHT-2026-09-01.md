@@ -472,3 +472,5 @@ New main line, h first:
   regenerated for the exact stream size, still queued behind e2.
 - 04:04: status: e2 running on the TPU since ~03:20 (expect ~04:45); GPU eval v2 running since 00:48 (11 checkpoints),
   v3 queued behind it; e2-v3 queued behind e2 (queue10). Bot live on the 0.5B. Waiting on notifications.
+- 04:13: e2 COMPLETE (66 min): cooled library 2.858 (e1 2.893), room 2.582 (2.609), fixed-32 3.016 (3.021); the uncooled
+  second epoch (751.6M) sits at 2.886/2.606, about equal to the first cooled epoch. e2-v3 pushed and running.
