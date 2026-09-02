@@ -457,3 +457,6 @@ New main line, h first:
   e2, so the scene effect is measured at matched compute.
 - 03:29: building corpus-v1.3-room (scenes A 1,579 x6 + B 561 x8, sentence-shaped only) and uploading as a new
   private dataset; version 2 follows if the writers' redos land before e2 finishes.
+- 03:33: corpus-v1.3-room built (417,906,970 tokens; 137,078 room docs, 10.4%; 13,962 scene copies) and uploading as
+  a new private dataset; room05b-e2-v3 generated (branch from e1 pre-cooldown, same as e2, dataset v1.3) and
+  queued behind e2 (queue10).
