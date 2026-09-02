@@ -579,3 +579,6 @@ New main line, h first:
   arm h x8 2.579 in-kernel (other 2.601, library 2.864). The weighting moves the objective by 0.18 nats on h lines for
   ~0.02 elsewhere. Roombank echo/lift evaluation of the arm running; arm 2 on the TPU. loop v2 fork spawned (loop finder
   with a rhythm curve, seam+motion candidates, crossfade, multi-clip sequence editor).
+- 17:39: arm 2 (visitors x0.25, h x4) complete: cooled library 2.854 (e2-v3 2.852), fixed-32 3.013, room 2.635 (other room
+  tokens 2.638 vs 2.578: down-weighted tokens get worse), h-span 2.614 (e2-v3 2.762, arm 1 2.579). Arm 3 (visitors x0,
+  h x4) running; then the 1.5B gate and e2-v4.
