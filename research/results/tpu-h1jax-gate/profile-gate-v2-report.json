@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "jax": "0.10.2",
+  "optax": "0.2.8",
+  "backend": "tpu",
+  "device_count": 8,
+  "devices": [
+    "TPU_0(process=0,(0,0,0,0))",
+    "TPU_1(process=0,(1,0,0,0))",
+    "TPU_2(process=0,(0,1,0,0))",
+    "TPU_3(process=0,(1,1,0,0))",
+    "TPU_4(process=0,(0,2,0,0))",
+    "TPU_5(process=0,(1,2,0,0))",
+    "TPU_6(process=0,(0,3,0,0))",
+    "TPU_7(process=0,(1,3,0,0))"
+  ],
+  "device_kind": "TPU v5 lite",
+  "python": "3.12.13",
+  "parameters": 91131072,
+  "hashes": {
+    "model": "ee1d547c2d78df42a52afd55b23459301ca21126851b82e0900f1e313dbcf5ef",
+    "train": "fdaa8b8514b006942e410f7044d5e9da8be852089f7380e5d05eff5b3573f124",
+    "validation": "07bce22a3de6101d4d946d1592a500c30a3790afffdecb8da6bd99777b985928"
+  },
+  "peak_flops_per_second": 1576000000000000.0,
+  "shapes": [
+    {
+      "name": "16x512",
+      "per_chip": 16,
+      "seq_len": 512,
+      "remat": false,
+      "global_batch": 128,
+      "tokens_per_step": 65536,
+      "analytic_flops_per_token": {
+        "dense_6n": 546786432.0,
+        "attention": 75497472.0,
+        "ssd": 56623104.0,
+        "total": 678907008.0
+      },
+      "analytic_flops_per_step": 44492849676288.0,
+      "ok": false,
+      "error": "JaxRuntimeError: RESOURCE_EXHAUSTED: XLA:TPU compile permanent error. Ran out of memory in memory space hbm. Used 24.42G of 15.75G hbm. Exceeded hbm capacity by 8.67G.\n\nTotal hbm usage >= 24.67G:\n    reserved        258.00M \n    program          24.42G \n    arguments            0B \n\nOutput size 0B; shares 0B with arguments.\n\nProgram hbm requirement 24.42G:\n    global            48.5K\n    scoped           241.0K\n    HLO temp         24.42G (98.5% utilization: Unpadded (23.10G) Padded (23.45G), 4.0% fragmentation (991.65M))\n\n  Largest program allocations in hbm:\n\n  1. Size: 3.00G\n     Operator: op_name=\"broadcast.1324\"\n     Shape: f32[24,16,8,512,512]{3,4,2,1,0:T(8,128)}\n     Unpadded size: 3.00G\n     XLA label: custom-call.68 = custom-call(), custom_call_target=\"AllocateBuffer\"\n     Allocation type: HLO temp\n     ==========================\n\n  2. Size: 2.25G\n     Operator: op_name=\"broadcast.1356\"\n     Shape: f32[24,16,24,4,128,128]{4,5,2,3,1,0:T(8,128)}\n     Unpadded size: 2.25G\n     XLA label: custom-call.43 = custom-call(), custom_call_target=\"AllocateBuffer\"\n     Allocation type: HLO temp\n     ==========================\n\n  3. Size: 2.25G\n     Operator: op_name=\"broadcast.1352\"\n     Shape: f32[24,16,4,128,24,128]{5,3,4,2,1,0:T(8,128)}\n     Unpadded size: 2.25G\n     XLA label: custom-call.46 = custom-call(), custom_call_target=\"AllocateBuffer\"\n     Allocation type: HLO temp\n     ==========================\n\n  4. Size: 1.50G\n     Operator: op_name=\"broadcast.1320\"\n     Shape: bf16[24,16,8,512,512]{3,4,2,1,0:T(8,128)(2,1)}\n     Unpadded size: 1.50G\n     XLA label: custom-call.72 = custom-call(), custom_call_target=\"AllocateBuffer\"\n     Allocation type: HLO temp\n     ==========================\n\n  5. Size: 1.12G\n     Operator: op_name=\"broadcast.1352\"\n     Shape: bf16[24,16,4,128,24,128]{5,3,4,2,1,0:T(8,128)(2,1)}\n     Unpadded size: 1.12G\n     XLA label: custom-call.48 = custom-call(), custom_call_target=\"AllocateBuffer\"\n     Allocation type: HLO temp\n     ==========================\n\n  ",
+      "oom": true
+    },
+    {
+      "name": "32x512",
+      "per_chip": 32,
+      "seq_len": 512,
+      "remat": false,
+      "global_batch": 256,
+      "tokens_per_step": 131072,
+      "analytic_flops_per_token": {
+        "dense_6n": 546786432.0,
+        "attention": 75497472.0,
+        "ssd": 56623104.0,
+        "total": 678907008.0
+      },
+      "analytic_flops_per_step": 88985699352576.0,
+      "ok": false,
+      "error": "JaxRuntimeError: RESOURCE_EXHAUSTED: XLA:TPU compile permanent error. Ran out of memory in memory space hbm. Used 48.67G of 15.75G hbm. Exceeded hbm capacity by 32.92G.\n\nTotal hbm usage >= 48.92G:\n    reserved        258.00M \n    program          48.67G \n    arguments            0B \n\nOutput size 0B; shares 0B with arguments.\n\nProgram hbm requirement 48.67G:\n    global            48.5K\n    scoped           241.0K\n    HLO temp         48.66G (98.5% utilization: Unpadded (46.04G) Padded (46.74G), 3.9% fragmentation (1.92G))\n\n  Largest program allocations in hbm:\n\n  1. Size: 6.00G\n     Operator: op_name=\"broadcast.1322\"\n     Shape: f32[24,32,8,512,512]{3,4,2,1,0:T(8,128)}\n     Unpadded size: 6.00G\n     XLA label: custom-call.68 = custom-call(), custom_call_target=\"AllocateBuffer\"\n     Allocation type: HLO temp\n     ==========================\n\n  2. Size: 4.50G\n     Operator: op_name=\"broadcast.1354\"\n     Shape: f32[24,32,24,4,128,128]{4,5,2,3,1,0:T(8,128)}\n     Unpadded size: 4.50G\n     XLA label: custom-call.43 = custom-call(), custom_call_target=\"AllocateBuffer\"\n     Allocation type: HLO temp\n     ==========================\n\n  3. Size: 4.50G\n     Operator: op_name=\"broadcast.1350\"\n     Shape: f32[24,32,4,128,24,128]{5,3,4,2,1,0:T(8,128)}\n     Unpadded size: 4.50G\n     XLA label: custom-call.46 = custom-call(), custom_call_target=\"AllocateBuffer\"\n     Allocation type: HLO temp\n     ==========================\n\n  4. Size: 3.00G\n     Operator: op_name=\"broadcast.1318\"\n     Shape: bf16[24,32,8,512,512]{3,4,2,1,0:T(8,128)(2,1)}\n     Unpadded size: 3.00G\n     XLA label: custom-call.72 = custom-call(), custom_call_target=\"AllocateBuffer\"\n     Allocation type: HLO temp\n     ==========================\n\n  5. Size: 2.25G\n     Operator: op_name=\"broadcast.1350\"\n     Shape: bf16[24,32,4,128,24,128]{5,3,4,2,1,0:T(8,128)(2,1)}\n     Unpadded size: 2.25G\n     XLA label: custom-call.48 = custom-call(), custom_call_target=\"AllocateBuffer\"\n     Allocation type: HLO temp\n     ==========================\n\n  6",
+      "oom": true
+    },
+    {
+      "name": "64x512r",
+      "per_chip": 64,
+      "seq_len": 512,
+      "remat": true,
+      "global_batch": 512,
+      "tokens_per_step": 262144,
+      "analytic_flops_per_token": {
+        "dense_6n": 546786432.0,
+        "attention": 75497472.0,
+        "ssd": 56623104.0,
+        "total": 678907008.0
+      },
+      "analytic_flops_per_step": 177971398705152.0,
+      "compile_seconds": 186.48882850199993,
+      "memory": {
+        "argument_size_in_bytes": 1093863936,
+        "output_size_in_bytes": 1093706752,
+        "temp_size_in_bytes": 8434415104,
+        "generated_code_size_in_bytes": 68347904,
+        "alias_size_in_bytes": 1093700096
+      },
+      "cost": {
+        "transcendentals": 5371292160.0,
+        "flops": 4415921586176.0,
+        "bytes accessed": 61508702208.0
+      },
+      "predicted_peak_bytes_per_chip": 9528279040,
+      "predicted_peak_fraction_of_hbm": 0.5546188354492188,
+      "sync_step_seconds": [
+        1.2044489260001683,
+        1.2053616369998963,
+        1.2047308950000115,
+        1.2048367869999765,
+        1.2044844170000033
+      ],
+      "sync_step_seconds_median": 1.2047308950000115,
+      "async_step_seconds": 1.193072510549996,
+      "tokens_per_second": 219721.7668515,
+      "losses": [
+        3.5389487743377686,
+        3.5142269134521484,
+        3.4909746646881104,
+        3.4644694328308105,
+        3.4878671169281006,
+        3.5115773677825928,
+        3.4765472412109375,
+        3.4689130783081055,
+        3.453371286392212,
+        3.510188579559326,
+        3.506049394607544,
+        3.465441942214966,
+        3.4731383323669434,
+        3.4633824825286865,
+        3.4224753379821777,
+        3.468961715698242,
+        3.435969352722168,
+        3.480273485183716,
+        3.4773764610290527,
+        3.4553446769714355,
+        3.5194687843322754,
+        3.4669113159179688,
+        3.4767439365386963,
+        3.470519542694092,
+        3.432816982269287
+      ],
+      "finite": true,
+      "pass_hours_374m": 0.4733324752848344,
+      "mfu": 0.09465142596803644,
+      "achieved_tflops": 149.17064732562542,
+      "trace_dir": "/kaggle/working/h1jax-profile-gate/profile/64x512r",
+      "ok": true
+    },
+    {
+      "name": "8x1024",
+      "per_chip": 8,
+      "seq_len": 1024,
+      "remat": false,
+      "global_batch": 64,
+      "tokens_per_step": 65536,
+      "analytic_flops_per_token": {
+        "dense_6n": 546786432.0,
+        "attention": 150994944.0,
+        "ssd": 56623104.0,
+        "total": 754404480.0
+      },
+      "analytic_flops_per_step": 49440652001280.0,
+      "ok": false,
+      "error": "JaxRuntimeError: RESOURCE_EXHAUSTED: XLA:TPU compile permanent error. Ran out of memory in memory space hbm. Used 28.89G of 15.75G hbm. Exceeded hbm capacity by 13.14G.\n\nTotal hbm usage >= 29.14G:\n    reserved        258.00M \n    program          28.89G \n    arguments            0B \n\nOutput size 0B; shares 0B with arguments.\n\nProgram hbm requirement 28.89G:\n    global            48.5K\n    scoped           241.0K\n    HLO temp         28.89G (98.8% utilization: Unpadded (27.59G) Padded (27.92G), 3.4% fragmentation (991.90M))\n\n  Largest program allocations in hbm:\n\n  1. Size: 6.00G\n     Operator: op_name=\"broadcast.1324\"\n     Shape: f32[24,8,8,1024,1024]{3,4,2,1,0:T(8,128)}\n     Unpadded size: 6.00G\n     XLA label: custom-call.68 = custom-call(), custom_call_target=\"AllocateBuffer\"\n     Allocation type: HLO temp\n     ==========================\n\n  2. Size: 3.00G\n     Operator: op_name=\"broadcast.1320\"\n     Shape: bf16[24,8,8,1024,1024]{3,4,2,1,0:T(8,128)(2,1)}\n     Unpadded size: 3.00G\n     XLA label: custom-call.72 = custom-call(), custom_call_target=\"AllocateBuffer\"\n     Allocation type: HLO temp\n     ==========================\n\n  3. Size: 2.25G\n     Operator: op_name=\"broadcast.1352\"\n     Shape: f32[24,8,8,128,24,128]{5,3,4,2,1,0:T(8,128)}\n     Unpadded size: 2.25G\n     XLA label: custom-call.46 = custom-call(), custom_call_target=\"AllocateBuffer\"\n     Allocation type: HLO temp\n     ==========================\n\n  4. Size: 2.25G\n     Operator: op_name=\"broadcast.1356\"\n     Shape: f32[24,8,24,8,128,128]{4,5,2,3,1,0:T(8,128)}\n     Unpadded size: 2.25G\n     XLA label: custom-call.43 = custom-call(), custom_call_target=\"AllocateBuffer\"\n     Allocation type: HLO temp\n     ==========================\n\n  5. Size: 1.12G\n     Operator: op_name=\"broadcast.1352\"\n     Shape: bf16[24,8,8,128,24,128]{5,3,4,2,1,0:T(8,128)(2,1)}\n     Unpadded size: 1.12G\n     XLA label: custom-call.48 = custom-call(), custom_call_target=\"AllocateBuffer\"\n     Allocation type: HLO temp\n     ==========================\n\n  ",
+      "oom": true
+    }
+  ],
+  "components": {
+    "attention_layer_fwd_bwd": {
+      "first_call_seconds": 1.709386712999958,
+      "seconds": 0.005386706300009791
+    },
+    "mamba_mixer_fwd_bwd": {
+      "first_call_seconds": 14.66139587900011,
+      "seconds": 0.028421642600005726
+    },
+    "mlp_fwd_bwd": {
+      "first_call_seconds": 1.5066489539999566,
+      "seconds": 0.0010840235999921787
+    },
+    "ssd_scan_fwd_bwd": {
+      "first_call_seconds": 13.437285231000033,
+      "seconds": 0.026555662600003416
+    },
+    "embed_head_loss_fwd_bwd": {
+      "first_call_seconds": 3.88682859000005,
+      "seconds": 0.024359903000004124
+    },
+    "matmul_bf16_in_proj": {
+      "first_call_seconds": 0.4347087260000535,
+      "seconds": 0.00043143299999428566,
+      "tflops": 1050.2651622244973,
+      "fraction_of_peak": 0.6664119049647826
+    },
+    "_decomposition": {
+      "best_shape": "64x512r",
+      "step_seconds": 1.193072510549996,
+      "layers_times_component_sum_seconds": 0.8374169400001846,
+      "head_seconds": 0.024359903000004124,
+      "note": "component benches include their own all-reduce of parameter gradients; sums are indicative, not exact"
+    }
+  },
+  "base_eval": {
+    "accuracy": 0.34991455078125,
+    "loss": 3.745767116546631,
+    "sequences": 32,
+    "predicted_tokens": 16384,
+    "hbox_transformers_bf16": {
+      "loss": 3.745613,
+      "accuracy": 0.349426
+    },
+    "loss_delta_vs_hbox": 0.00015411654663077812,
+    "seconds_including_compile": 10.466578407000043
+  },
+  "sanity": {
+    "shape": "64x512r",
+    "learning_rate": 3e-05,
+    "steps": 40,
+    "tokens": 10485760,
+    "seconds": 233.42965272599986,
+    "losses_first_5": [
+      3.484861135482788,
+      3.9175076484680176,
+      3.7230939865112305,
+      3.6570396423339844,
+      3.5915257930755615
+    ],
+    "losses_last_5": [
+      3.385669231414795,
+      3.3717446327209473,
+      3.318808078765869,
+      3.387622117996216,
+      3.390777826309204
+    ],
+    "loss_mean_first_10": 3.5873703002929687,
+    "loss_mean_last_10": 3.3819252490997314,
+    "gradient_norm_max": 68.46024322509766,
+    "finite": true,
+    "eval_after": {
+      "accuracy": 0.39422607421875,
+      "loss": 3.411346673965454
+    },
+    "eval_loss_delta": -0.33442044258117676
+  },
+  "best_shape": "64x512r",
+  "ok": true
+}

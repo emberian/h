@@ -1,3 +1,8 @@
+> **Superseded 2026-09-01 evening.** Do not push this kernel. Source verification of EasyDeL 0.3.0 showed its
+> Falcon-H1 Mamba-2 path is a per-token `lax.scan` with no TPU kernel whose custom VJP pins ~38.7 GB per chip of
+> state history at this shape (v5e has 16 GiB). See `FABLETHOUGHT.md` section 2. The replacement is
+> `kaggle/tpu_h1jax_profile_gate` (measurement) and `kaggle/tpu_h1jax_cpt` (training) on the exact `h1jax` port.
+
 # 91M TPU production-shape gate
 
 This is the boundary between the successful EasyDeL correctness smoke and a real

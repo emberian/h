@@ -7,7 +7,6 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import pytest
-
 from h1jax.config import FalconH1Config, born_10m_config, born_20m_config
 from h1jax.model import (
     causal_lm_loss,
@@ -68,7 +67,14 @@ def test_forward_loss_and_gradient() -> None:
         params, tokens, cfg, compute_dtype=jnp.float32, gradient_checkpointing=True
     )
     assert bool(jnp.isfinite(loss))
-    assert float(jax.tree_util.tree_reduce(lambda total, x: total + jnp.sum(x * x), grads, 0.0)) > 0
+    assert (
+        float(
+            jax.tree_util.tree_reduce(
+                lambda total, x: total + jnp.sum(x * x), grads, 0.0
+            )
+        )
+        > 0
+    )
     assert count_parameters(params) > 0
 
 
@@ -211,7 +217,9 @@ def test_training_checkpoint_and_resume_are_complete(tmp_path, capsys) -> None:
         )
     )
     events = [json.loads(line) for line in capsys.readouterr().out.splitlines()]
-    validation_tokens = [event["tokens"] for event in events if event["event"] == "validation"]
+    validation_tokens = [
+        event["tokens"] for event in events if event["event"] == "validation"
+    ]
     assert validation_tokens == [24, 32]
     assert not (resumed_output / "tokens-000000000016").exists()
     assert (resumed_output / "tokens-000000000032" / "model.safetensors").is_file()
@@ -220,3 +228,48 @@ def test_training_checkpoint_and_resume_are_complete(tmp_path, capsys) -> None:
 def test_resume_settings_must_match() -> None:
     with pytest.raises(ValueError, match="Resume settings"):
         _resume_compatibility({"sequence_length": 8}, {"sequence_length": 16})
+
+
+@pytest.mark.parametrize("remat", [False, True])
+def test_layer_scan_matches_unrolled(remat: bool) -> None:
+    cfg = tiny_config()
+    params = init_params(cfg, seed=3)
+    tokens = jnp.asarray(
+        np.random.default_rng(5).integers(0, cfg.vocab_size, (2, 9)), dtype=jnp.int32
+    )
+    unrolled_logits = falcon_h1_forward(
+        params, tokens, cfg, compute_dtype=jnp.float32, gradient_checkpointing=remat
+    )
+    scanned_logits = falcon_h1_forward(
+        params,
+        tokens,
+        cfg,
+        compute_dtype=jnp.float32,
+        gradient_checkpointing=remat,
+        layer_scan=True,
+    )
+    np.testing.assert_allclose(
+        np.asarray(scanned_logits), np.asarray(unrolled_logits), rtol=1e-5, atol=1e-5
+    )
+
+    def loss(p, scan):
+        return causal_lm_loss(
+            p,
+            tokens,
+            cfg,
+            compute_dtype=jnp.float32,
+            gradient_checkpointing=remat,
+            layer_scan=scan,
+        )[0]
+
+    unrolled_loss, unrolled_grads = jax.value_and_grad(loss)(params, False)
+    scanned_loss, scanned_grads = jax.value_and_grad(loss)(params, True)
+    assert abs(float(unrolled_loss) - float(scanned_loss)) < 1e-5
+    for key in params:
+        np.testing.assert_allclose(
+            np.asarray(scanned_grads[key]),
+            np.asarray(unrolled_grads[key]),
+            rtol=1e-4,
+            atol=1e-5,
+            err_msg=key,
+        )

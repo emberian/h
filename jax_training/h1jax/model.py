@@ -42,9 +42,7 @@ def _apply_rope(q: Array, k: Array, cfg: FalconH1Config) -> tuple[Array, Array]:
         cfg.rope_theta
         ** (jnp.arange(0, cfg.head_dim, 2, dtype=jnp.float32) / cfg.head_dim)
     )
-    freqs = jnp.einsum(
-        "l,d->ld", jnp.arange(seq_len, dtype=jnp.float32), inv_freq
-    )
+    freqs = jnp.einsum("l,d->ld", jnp.arange(seq_len, dtype=jnp.float32), inv_freq)
     emb = jnp.concatenate((freqs, freqs), axis=-1)
     cos = jnp.cos(emb).astype(q.dtype)[None, None, :, :]
     sin = jnp.sin(emb).astype(q.dtype)[None, None, :, :]
@@ -161,7 +159,10 @@ def ssd_forward(
 
     def chunk(tensor: Array) -> Array:
         return tensor.reshape(
-            tensor.shape[0], tensor.shape[1] // chunk_size, chunk_size, *tensor.shape[2:]
+            tensor.shape[0],
+            tensor.shape[1] // chunk_size,
+            chunk_size,
+            *tensor.shape[2:],
         )
 
     x_blocks = chunk(x_discrete)
@@ -237,7 +238,10 @@ def _mup_vector(cfg: FalconH1Config, dtype: jnp.dtype) -> Array:
         cfg.mamba_n_heads,
     )
     return jnp.concatenate(
-        [jnp.full((size,), multiplier, dtype=dtype) for size, multiplier in zip(sizes, cfg.ssm_multipliers)]
+        [
+            jnp.full((size,), multiplier, dtype=dtype)
+            for size, multiplier in zip(sizes, cfg.ssm_multipliers)
+        ]
     )
 
 
@@ -274,15 +278,9 @@ def mamba(
         axis=-1,
     )
     batch, seq_len, _ = hidden.shape
-    hidden = hidden.reshape(
-        batch, seq_len, cfg.mamba_n_heads, cfg.mamba_d_head
-    )
-    b_matrix = b_matrix.reshape(
-        batch, seq_len, cfg.mamba_n_groups, cfg.mamba_d_state
-    )
-    c_matrix = c_matrix.reshape(
-        batch, seq_len, cfg.mamba_n_groups, cfg.mamba_d_state
-    )
+    hidden = hidden.reshape(batch, seq_len, cfg.mamba_n_heads, cfg.mamba_d_head)
+    b_matrix = b_matrix.reshape(batch, seq_len, cfg.mamba_n_groups, cfg.mamba_d_state)
+    c_matrix = c_matrix.reshape(batch, seq_len, cfg.mamba_n_groups, cfg.mamba_d_state)
     head_repeats = cfg.mamba_n_heads // cfg.mamba_n_groups
     b_matrix = jnp.repeat(b_matrix, head_repeats, axis=2)
     c_matrix = jnp.repeat(c_matrix, head_repeats, axis=2)
@@ -315,8 +313,14 @@ def mamba(
 
 
 def mlp(layer: Params, x: Array, cfg: FalconH1Config) -> Array:
-    gate = _linear(x, layer["feed_forward.gate_proj.weight"], layer.get("feed_forward.gate_proj.bias"))
-    up = _linear(x, layer["feed_forward.up_proj.weight"], layer.get("feed_forward.up_proj.bias"))
+    gate = _linear(
+        x,
+        layer["feed_forward.gate_proj.weight"],
+        layer.get("feed_forward.gate_proj.bias"),
+    )
+    up = _linear(
+        x, layer["feed_forward.up_proj.weight"], layer.get("feed_forward.up_proj.bias")
+    )
     hidden = up * jax.nn.silu(gate * jnp.asarray(cfg.mlp_multipliers[0], x.dtype))
     return _linear(
         hidden,
@@ -336,9 +340,7 @@ def decoder_layer(
     normalized = _rms_norm(hidden, layer["input_layernorm.weight"], cfg.rms_norm_eps)
     mamba_output = mamba(
         layer, normalized, cfg, ssd_precision=ssd_precision
-    ) * jnp.asarray(
-        cfg.ssm_out_multiplier, hidden.dtype
-    )
+    ) * jnp.asarray(cfg.ssm_out_multiplier, hidden.dtype)
     attention_output = attention(
         layer,
         normalized * jnp.asarray(cfg.attention_in_multiplier, hidden.dtype),
@@ -354,7 +356,27 @@ def decoder_layer(
 
 def _layer_params(params: Params, index: int) -> dict[str, Array]:
     prefix = f"model.layers.{index}."
-    return {key[len(prefix) :]: value for key, value in params.items() if key.startswith(prefix)}
+    return {
+        key[len(prefix) :]: value
+        for key, value in params.items()
+        if key.startswith(prefix)
+    }
+
+
+def stacked_layer_params(params: Params, cfg: FalconH1Config) -> dict[str, Array]:
+    """Stack every per-layer tensor along a new leading layer axis for `lax.scan`."""
+
+    prefix = "model.layers.0."
+    names = sorted(key[len(prefix) :] for key in params if key.startswith(prefix))
+    return {
+        name: jnp.stack(
+            [
+                params[f"model.layers.{index}.{name}"]
+                for index in range(cfg.num_hidden_layers)
+            ]
+        )
+        for name in names
+    }
 
 
 def falcon_h1_forward(
@@ -365,15 +387,32 @@ def falcon_h1_forward(
     compute_dtype: jnp.dtype = jnp.bfloat16,
     gradient_checkpointing: bool = False,
     ssd_precision: jax.lax.Precision = jax.lax.Precision.DEFAULT,
+    layer_scan: bool = False,
 ) -> Array:
+    """Full forward pass to logits.
+
+    `layer_scan=True` runs the decoder stack as one `lax.scan` over stacked layer parameters
+    instead of unrolling 24 copies of the layer graph. The arithmetic is identical; the traced
+    program and XLA compile cost stop growing with depth, which matters on TPU where the
+    unrolled 24-layer training step exhausted the host during compilation.
+    """
+
     hidden = params["model.embed_tokens.weight"][input_ids].astype(compute_dtype)
     hidden = hidden * jnp.asarray(cfg.embedding_multiplier, compute_dtype)
-    for index in range(cfg.num_hidden_layers):
-        layer_params = _layer_params(params, index)
-        apply_layer = partial(decoder_layer, cfg=cfg, ssd_precision=ssd_precision)
+    apply_layer = partial(decoder_layer, cfg=cfg, ssd_precision=ssd_precision)
+    if layer_scan:
+
+        def body(carry: Array, layer: dict[str, Array]) -> tuple[Array, None]:
+            return apply_layer(layer, carry), None
+
+        if gradient_checkpointing:
+            body = jax.checkpoint(body)
+        hidden, _ = jax.lax.scan(body, hidden, stacked_layer_params(params, cfg))
+    else:
         if gradient_checkpointing:
             apply_layer = jax.checkpoint(apply_layer)
-        hidden = apply_layer(layer_params, hidden)
+        for index in range(cfg.num_hidden_layers):
+            hidden = apply_layer(_layer_params(params, index), hidden)
     hidden = _rms_norm(hidden, params["model.final_layernorm.weight"], cfg.rms_norm_eps)
     lm_head = (
         params["model.embed_tokens.weight"]
@@ -390,6 +429,7 @@ def causal_lm_loss(
     *,
     compute_dtype: jnp.dtype = jnp.bfloat16,
     gradient_checkpointing: bool = True,
+    layer_scan: bool = False,
 ) -> tuple[Array, dict[str, Array]]:
     logits = falcon_h1_forward(
         params,
@@ -397,6 +437,7 @@ def causal_lm_loss(
         cfg,
         compute_dtype=compute_dtype,
         gradient_checkpointing=gradient_checkpointing,
+        layer_scan=layer_scan,
     ).astype(jnp.float32)
     labels = tokens[:, 1:]
     log_normalizer = jax.nn.logsumexp(logits, axis=-1)
@@ -453,18 +494,32 @@ def init_params(cfg: FalconH1Config, seed: int = 0) -> dict[str, Array]:
 
     rng = np.random.default_rng(seed)
     params: dict[str, Array] = {}
-    embedding = rng.normal(0.0, cfg.initializer_range, (cfg.vocab_size, cfg.hidden_size)).astype(np.float32)
+    embedding = rng.normal(
+        0.0, cfg.initializer_range, (cfg.vocab_size, cfg.hidden_size)
+    ).astype(np.float32)
     if 0 <= cfg.pad_token_id < cfg.vocab_size:
         embedding[cfg.pad_token_id] = 0
     params["model.embed_tokens.weight"] = jnp.asarray(embedding)
     for index in range(cfg.num_hidden_layers):
         prefix = f"model.layers.{index}."
-        params[prefix + "input_layernorm.weight"] = jnp.ones((cfg.hidden_size,), jnp.float32)
-        params[prefix + "pre_ff_layernorm.weight"] = jnp.ones((cfg.hidden_size,), jnp.float32)
+        params[prefix + "input_layernorm.weight"] = jnp.ones(
+            (cfg.hidden_size,), jnp.float32
+        )
+        params[prefix + "pre_ff_layernorm.weight"] = jnp.ones(
+            (cfg.hidden_size,), jnp.float32
+        )
         for name, output, input_size in (
             ("self_attn.q_proj.weight", cfg.attention_width, cfg.hidden_size),
-            ("self_attn.k_proj.weight", cfg.num_key_value_heads * cfg.head_dim, cfg.hidden_size),
-            ("self_attn.v_proj.weight", cfg.num_key_value_heads * cfg.head_dim, cfg.hidden_size),
+            (
+                "self_attn.k_proj.weight",
+                cfg.num_key_value_heads * cfg.head_dim,
+                cfg.hidden_size,
+            ),
+            (
+                "self_attn.v_proj.weight",
+                cfg.num_key_value_heads * cfg.head_dim,
+                cfg.hidden_size,
+            ),
             ("self_attn.o_proj.weight", cfg.hidden_size, cfg.attention_width),
             ("feed_forward.gate_proj.weight", cfg.intermediate_size, cfg.hidden_size),
             ("feed_forward.up_proj.weight", cfg.intermediate_size, cfg.hidden_size),
@@ -472,7 +527,9 @@ def init_params(cfg: FalconH1Config, seed: int = 0) -> dict[str, Array]:
             ("mamba.in_proj.weight", cfg.mamba_projection_size, cfg.hidden_size),
             ("mamba.out_proj.weight", cfg.hidden_size, cfg.mamba_d_ssm),
         ):
-            params[prefix + name] = _normal(rng, (output, input_size), cfg.initializer_range)
+            params[prefix + name] = _normal(
+                rng, (output, input_size), cfg.initializer_range
+            )
         if cfg.attention_bias:
             for name, size in (
                 ("self_attn.q_proj.bias", cfg.attention_width),
@@ -489,21 +546,29 @@ def init_params(cfg: FalconH1Config, seed: int = 0) -> dict[str, Array]:
             ):
                 params[prefix + name] = jnp.zeros((size,), jnp.float32)
         if cfg.mamba_proj_bias:
-            params[prefix + "mamba.in_proj.bias"] = jnp.zeros((cfg.mamba_projection_size,), jnp.float32)
+            params[prefix + "mamba.in_proj.bias"] = jnp.zeros(
+                (cfg.mamba_projection_size,), jnp.float32
+            )
         if cfg.projectors_bias:
-            params[prefix + "mamba.out_proj.bias"] = jnp.zeros((cfg.hidden_size,), jnp.float32)
+            params[prefix + "mamba.out_proj.bias"] = jnp.zeros(
+                (cfg.hidden_size,), jnp.float32
+            )
         params[prefix + "mamba.conv1d.weight"] = _normal(
             rng, (cfg.mamba_conv_dim, 1, cfg.mamba_d_conv), cfg.initializer_range
         )
         if cfg.mamba_conv_bias:
-            params[prefix + "mamba.conv1d.bias"] = jnp.zeros((cfg.mamba_conv_dim,), jnp.float32)
+            params[prefix + "mamba.conv1d.bias"] = jnp.zeros(
+                (cfg.mamba_conv_dim,), jnp.float32
+            )
         params[prefix + "mamba.A_log"] = jnp.log(
             jnp.arange(1, cfg.mamba_n_heads + 1, dtype=jnp.float32)
         )
         params[prefix + "mamba.D"] = jnp.ones((cfg.mamba_n_heads,), jnp.float32)
         params[prefix + "mamba.dt_bias"] = jnp.ones((cfg.mamba_n_heads,), jnp.float32)
         if cfg.mamba_rms_norm:
-            params[prefix + "mamba.norm.weight"] = jnp.ones((cfg.mamba_d_ssm,), jnp.float32)
+            params[prefix + "mamba.norm.weight"] = jnp.ones(
+                (cfg.mamba_d_ssm,), jnp.float32
+            )
     params["model.final_layernorm.weight"] = jnp.ones((cfg.hidden_size,), jnp.float32)
     if not cfg.tie_word_embeddings:
         params["lm_head.weight"] = _normal(
