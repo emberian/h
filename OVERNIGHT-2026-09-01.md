@@ -434,3 +434,10 @@ New main line, h first:
   newline tokens. Investigating missing turn separators.
 - 02:44: mlx_lm.server bug found: a bare "\n" stop strips newlines and keeps generating; "\n\n" stops cleanly. Live
   91M bot switched to the "\n\n" stop, repetition penalty off, restarted. 0.5B bot config drafted with the bare frame.
+- 02:45: quotation scan of 72 room replies (bare frame, stop \n\n): longest training match 11 tokens, none at 16+,
+  9/72 with an 8-token match (phrases like the Rosycross greeting). No verbatim quotation.
+- 02:46: judge on the 72 0.5B room replies: NLL 3.361 under the 91M library leaf vs 3.422 under the 91M base
+  (delta -0.061: mildly library-like). Comparing against the 91M leaf's own room replies next.
+- 02:47: judge comparison: 91M leaf room replies NLL 4.567 (base) / 4.865 (leaf), delta +0.30; 0.5B room replies
+  3.422 / 3.361, delta -0.06. The 0.5B replies are fluent under both models and lean library; the 91M replies are
+  odd under both.
