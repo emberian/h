@@ -347,3 +347,24 @@ Evaluate everything with `hghost-evalpack` (subagent building it) plus the haunt
   companion file of speak/silent decisions, woven into v1 as corpus-v1.2-room (Kaggle-ready, not uploaded).
 - CPT kernel now logs in-run rollouts (greedy + sampled, twelve fixed prompts) at every checkpoint;
   rehearsing on CPU. Applies to kernels generated after tonight's queue.
+
+## 00:05 (Sep 2): reorientation, after ember's question
+
+Ember, before sleeping: "are we sure we actually WANT to be doing that? ... this doesn't seem like the
+right thing to be doing at all if we actually wanted to accomplish *h*." Re-read the pre-compaction span
+with `cv` (FUTURETHOUGHT north star, FABLETHOUGHT §5, the Discord hour, the last three asks). Verdict: the
+plan had drifted into a trunk hyperparameter sweep (seeds, WD, LR, MIR, SimReg) with the resident as an
+afterthought. The sweep improves validation loss by hundredths; the resident failed in the room tonight for
+reasons no sweep touches (never saw the room format, no h-in-the-room data, junk from OCR columns).
+
+New main line, h first:
+1. The room run: continue the seed-0 epoch-4 trunk one epoch on corpus-v1.2-room (room genre at ~12%:
+   corpus-native dialogues incl. an h-relabeled interview copy, Gutenberg dialogue, When2Speak rooms with
+   h as a participant, Plato) plus ~2,400 reading-room scenes (visitor lines written by Sonnet agents,
+   h's lines verbatim corpus sentences, checker-verified; greeting and assistant-deflection scenes
+   included; frames incl. the bot's live prompt verbatim), cooled. Then serve it in Discord.
+2. Resident evaluation in the harness format on hbox (room prompts, not only corpus prompts), plus the
+   evaluation pack for retention and the haunting scan for quotation.
+3. Sweep trimmed: queue4 stops after trunk-mir and plain32 (already pushed / next); seed2, wd0.3, lr3e-4,
+   SimReg, 8-epoch continuation are parked as generated kernels for later weeks. SimReg stays rehearsed
+   (CPU: finite, total = loss + 0.1*simreg) but its wheel is not uploaded tonight.

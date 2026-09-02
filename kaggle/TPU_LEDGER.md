@@ -31,3 +31,6 @@ spend in bounded, reported increments; never launch a run whose worst case excee
 
 | 2026-09-01 22:04 | h-ghost-h1jax-ssd-bench | v1 | 15 | **v1 219,716 / v2 359,360 / v2-bf16 369,196 / v2+dotsave 338,226 tok/s**; SSD fwd+bwd 24.4 → 7.2 ms; losses identical |
 | 2026-09-01 22:20 | h-ghost-h1jax-trunk-seed-1 | v1 | 76 | COMPLETE 23:36: seed-1 replicate trunk, 4 epochs, SSD v2 |
+| 2026-09-01 23:36 | h-ghost-h1jax-leaf-s1-e1 | v1 | 9 | COMPLETE: seed-1 cooled epoch-1 leaf, val 3.285 → 3.235 (seed 0: 3.234) |
+| 2026-09-01 23:50 | h-ghost-h1jax-leaf-s1-e4 | v1 | 9 | COMPLETE: seed-1 cooled epoch-4 leaf, val 3.164 → 3.134 (seed 0: 3.136) |
+| 2026-09-01 23:59 | h-ghost-h1jax-trunk-mir | v1 | (running) | MIR 0.4 arm, 32×512, one epoch |
