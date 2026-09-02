@@ -1,0 +1,49 @@
+== server hbox room05b-e2-v3-final on cuda, states float32, read mode chunk, 521M params, empty state 28.0 MB + 18.0 KB/token
+== room smoke-http-1: frame 35 tokens read in 0.2354s
+== event 'ember: hi h': 5 tokens in 0.224s (22.32 tok/s, chunk); state 2, 40 tokens read
+== candidates 1: 3.5098s for 4 (34 steps, 103 ms/step, 0.8774s/candidate)
+  persistent:
+    [b1] 'The wall was white and shiny, and the floor was carpeted in a brilliant green that glided up and down the length of the room.'  (tokens 32, logprob -35.3332, stop)
+    [b2] 'This is a non-profit organization of people who take an active interest in unusual happenings along the borderland between the visible and invisible worlds.'  (tokens 30, logprob -4.7101, stop)
+    [b3] '1 The life of the Church is the sacred duty of man, and the state of society is to be the state of the Church.'  (tokens 29, logprob -35.4152, stop)
+    [b4] 'The “primordial myths” are being revived in our own day as dubious historical accounts are being reconstructed for our television screens.'  (tokens 33, logprob -32.7366, stop)
+  first-token top: ' The' -2.3586, ' In' -2.6711, ' A' -3.4211, ' This' -3.4836, ' For' -3.4836
+== committed b1: 'The wall was white and shiny, and the floor was carpeted in a brilliant green that glided up and down the length of the room.' (+34 tokens, separator added: False, 0.1036s); 74 tokens in memory
+== snapshot s1 at state 3 (29.3 MB)
+== event 'ember: what did you just say?': 9 tokens in 0.2229s (40.38 tok/s)
+== candidates 2 (same seed both arms): persistent 4.3923s, control re-render 83 tokens in 0.1834s + 6.4324s
+  persistent cache:
+    [b5] 'The only sound in the room was the sound of my heartbeats.'  (tokens 15, logprob -9.8302, eos, not clean)
+    [b6] 'We walked together for a time, past the radiator and the staircase leading to the top story.'  (tokens 23, logprob -22.1194, eos, not clean)
+    [b7] 'There were no windows, no doors, and no walls to be seen except for the ones that surrounded the room, against which the green glided.'  (tokens 30, logprob -27.3285, eos, not clean)
+    [b8] "But we were in the midst of a very lively discussion, and each time Sullivan suggested something actually happened, Jupiter chuckled and says he'll never, ever, ever tell."  (tokens 42, logprob -46.7932, eos, not clean)
+  fresh-context control (re-rendered transcript):
+    [control-0] 'The only sound in the room was the sound of my hand on the paper as I wrote.'  (tokens 19, logprob -11.8, eos, not clean)
+    [control-1] 'Suddenly a large yellow sun burst into the sky, and then shined down again onto the earth.'  (tokens 22, logprob -22.3412, eos, not clean)
+    [control-2] 'I was reading a book, and it occurred to me that the wall was not only white and shiny, but glistening with a silver-white polish that glided across every perfect square inch of it.'  (tokens 44, logprob -32.7722, eos, not clean)
+    [control-3] 'We walked together for a few minutes, then she handed me a copy of an article she had just read in the magazine “Love” — a very long one, very in-depth, very analytical, very hard to read due to its objectivity and lack of any emotion, no cliches or'  (tokens 64, logprob -53.8051, length, not clean)
+  first-token divergence: max |dlogit| 0.9844, KL 0.009702, argmax equal True; identical samples per candidate: [False, False, False, False]
+  persistent first-token top: ' The' -1.8252, ' I' -2.4502, ' There' -2.5752, ' Then' -2.5752, ' A' -2.9502
+  control    first-token top: ' The' -2.0194, ' Then' -2.3944, ' I' -2.5194, ' There' -2.5194, ' A' -2.7694
+    b5 stop logprobs: {'separator': -4.8539, 'eos': -0.0101, 'sampled': -0.0101}
+    b6 stop logprobs: {'separator': -6.7512, 'eos': -0.0012, 'sampled': -0.0012}
+    b7 stop logprobs: {'separator': -10.2972, 'eos': -0.0003, 'sampled': -0.0003}
+    b8 stop logprobs: {'separator': -4.8525, 'eos': -0.0087, 'sampled': -0.0087}
+== correctness check over 83 tokens / 4 segments (states float32; fresh re-render 0.3809s):
+  baseline rerender_vs_rerender all positions: mean KL 0.00e+00 (max 0.00e+00 at 0), max |dlogit| 0.000, argmax agreement 1.0000; reply position (entropy 3.98 nats): KL 0.00e+00, max |dlogit| 0.000, argmax equal True; state rel err ssm 0.00e+00 conv 0.00e+00 K 0.00e+00 V 0.00e+00
+  baseline batch2_vs_rerender all positions: mean KL 9.41e-04 (max 9.48e-03 at 53), max |dlogit| 0.844, argmax agreement 0.9880 at [53]; reply position (entropy 3.98 nats): KL 8.81e-03, max |dlogit| 0.938, argmax equal True; state rel err ssm 4.28e-02 conv 2.80e-02 K 1.34e-02 V 2.70e-02
+  step vs re-render      all positions: mean KL 1.02e-03 (max 1.11e-02 at 70), max |dlogit| 0.844, argmax agreement 1.0000; reply position (entropy 3.98 nats): KL 8.62e-03, max |dlogit| 0.804, argmax equal True; state rel err ssm 4.05e-02 conv 2.88e-02 K 1.44e-02 V 2.85e-02; replay 4.8652s; ok=True
+  step vs live state     ssm rel err 3.61e-02, conv 2.85e-02; reply KL 6.27e-03, max |dlogit| 0.902, argmax equal True
+  chunk vs re-render     all positions: mean KL 8.92e-04 (max 6.10e-03 at 53), max |dlogit| 1.031, argmax agreement 0.9759 at [53, 61]; reply position (entropy 3.98 nats): KL 8.06e-03, max |dlogit| 0.625, argmax equal True; state rel err ssm 4.36e-02 conv 2.91e-02 K 1.42e-02 V 2.81e-02; replay 0.8795s; ok=True
+  chunk vs live state    ssm rel err 3.95e-02, conv 2.63e-02; reply KL 4.86e-03, max |dlogit| 0.750, argmax equal True
+  step vs chunk          all positions: mean KL 8.35e-04 (max 7.43e-03 at 70), max |dlogit| 0.812, argmax agreement 0.9759 at [53, 61]; reply position (entropy 3.93 nats): KL 5.92e-03, max |dlogit| 0.859, argmax equal True; state rel err ssm 3.68e-02 conv 2.75e-02 K 1.12e-02 V 2.25e-02
+  live vs re-render      reply KL 8.50e-03, max |dlogit| 0.844, argmax equal True; state rel err ssm 3.80e-02 conv 2.79e-02
+  bf16 states step       all positions: mean KL 9.42e-04 (max 8.61e-03 at 64), max |dlogit| 0.875, argmax agreement 1.0000; reply position (entropy 3.96 nats): KL 6.06e-03, max |dlogit| 0.688, argmax equal True; state rel err ssm 4.97e-02 conv 2.96e-02 K 1.45e-02 V 2.91e-02
+  bf16 states chunk      all positions: mean KL 9.64e-04 (max 1.06e-02 at 64), max |dlogit| 0.875, argmax agreement 1.0000; reply position (entropy 3.96 nats): KL 4.33e-03, max |dlogit| 0.605, argmax equal True; state rel err ssm 4.39e-02 conv 2.99e-02 K 1.43e-02 V 2.81e-02
+== committed b5: 'The only sound in the room was the sound of my heartbeats.' (+18 tokens, separator added: True, 0.1052s); 101 tokens
+== rollback to s1: 74 tokens (snapshot had 74); state 29.3 MB; ssm head-norm mean 50.5017, max 589.1154; conv norm mean 52.0945
+   per-layer ssm head-norm mean: [26.3962, 30.0855, 35.7185, 30.932, 34.3513, 48.6054, 21.6048, 37.4978, 58.2733, 23.3109, 78.8642, 73.5282, 32.7075, 58.7013, 44.8146, 54.5308, 45.6379, 56.0005, 142.2921, 85.6674, 52.1164, 47.2989, 39.7589, 30.7493, 42.8231, 37.2743, 39.3371, 31.9137, 33.1034, 27.6652, 45.1346, 52.7415, 91.6178, 111.777, 51.4806, 63.749]
+== latency: events {'count': 2, 'mean_tokens': 7.0, 'mean_seconds': 0.2234, 'mean_tokens_per_second': 31.35}, candidates {'count': 2, 'mean_n': 4.0, 'mean_seconds': 3.951, 'mean_steps': 39.0, 'mean_seconds_per_step': 0.1015, 'mean_seconds_per_candidate': 0.9878}, commits {'count': 2, 'mean_seconds': 0.1044, 'mean_tokens': 26.0}
+== gpu: allocated 1.06 GiB, peak 1.94 GiB, free 9.19 of 11.98 GiB
+== persisted s2 (29.3 MB -> /othersys/h1-ghost/rooms/smoke-http-1/s2.pt), deleted the room, restored from disk: 74 tokens (expected 74); 2 candidates from the restored state in 1.6562s: 'The ceiling was blue, and there was a window in ea' | 'The room was dark, the light coming in from the wi'
+== wrote /Users/ember/dev/h/research/results/room-state-server/smoke-20260902-145656.json
