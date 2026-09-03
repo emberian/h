@@ -93,31 +93,52 @@ HARD_MAX_MINUTES = float(os.environ.get("HGHOST_GATE_MAX_MINUTES", "45"))
 
 
 # ---- watchdog: a job that stalls (hung collective, post-OOM limbo) must kill itself, never wait to be cancelled.
-import threading
+# A separate PROCESS (immune to the GIL and to a main thread stuck in native code) watches a heartbeat file that
+# every emitted event touches; a stale heartbeat or the hard time limit -> SIGKILL to this process.
+import subprocess
+import tempfile
 
-_LAST_EVENT = [time.time()]
+_HEARTBEAT = Path(tempfile.gettempdir()) / f"hghost-heartbeat-{os.getpid()}"
+_HEARTBEAT.write_text(str(time.time()))
 _ORIGINAL_EMIT = emit
 
 
 def emit(event: str, **values: Any) -> None:
-    _LAST_EVENT[0] = time.time()
+    try:
+        _HEARTBEAT.write_text(str(time.time()))
+    except OSError:
+        pass
     _ORIGINAL_EMIT(event, **values)
 
 
-def _watchdog(stall_minutes: float, hard_minutes: float) -> None:
-    started = time.time()
-    while True:
-        time.sleep(30)
-        now = time.time()
-        if now - _LAST_EVENT[0] > stall_minutes * 60:
-            _ORIGINAL_EMIT("watchdog", reason="no progress event", minutes=round((now - _LAST_EVENT[0]) / 60, 1))
-            sys.stdout.flush(); os._exit(3)
-        if now - started > hard_minutes * 60:
-            _ORIGINAL_EMIT("watchdog", reason="hard time limit", minutes=round((now - started) / 60, 1))
-            sys.stdout.flush(); os._exit(4)
-
-
-threading.Thread(target=_watchdog, args=(WATCHDOG_MINUTES, HARD_MAX_MINUTES), daemon=True).start()
+_WATCHDOG_CODE = r"""
+import os, sys, time, signal
+pid, path, stall, hard = int(sys.argv[1]), sys.argv[2], float(sys.argv[3]), float(sys.argv[4])
+started = time.time()
+while True:
+    time.sleep(15)
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        sys.exit(0)  # parent gone
+    try:
+        last = float(open(path).read())
+    except Exception:
+        last = started
+    now = time.time()
+    reason = None
+    if now - last > stall * 60:
+        reason = f"no progress event for {(now - last) / 60:.1f} min"
+    elif now - started > hard * 60:
+        reason = f"hard time limit {hard:.0f} min"
+    if reason:
+        print('{"event": "watchdog", "reason": "%s"}' % reason, flush=True)
+        os.kill(pid, signal.SIGKILL)
+        sys.exit(0)
+"""
+_WATCHDOG = subprocess.Popen(
+    [sys.executable, "-c", _WATCHDOG_CODE, str(os.getpid()), str(_HEARTBEAT), str(WATCHDOG_MINUTES), str(HARD_MAX_MINUTES)]
+)
 SANITY_LR = float(os.environ.get("HGHOST_SANITY_LR", "3e-5"))
 EVAL_SEQUENCES = int(os.environ.get("HGHOST_EVAL_SEQUENCES", "32"))
 EVAL_SEQUENCE_LENGTH = 512

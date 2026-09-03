@@ -662,3 +662,7 @@ New main line, h first:
 - 10:31: full blend sweep: alpha 0.8 minimizes clean (2.609) and furniture-free (2.728), 0.7 minimizes retention (3.118);
   0.9 keeps voice, EOS behaviour and echo, improves lift and clean/retention vs e2-v4, loses code deflection. Resident
   unchanged pending ember. Report section written.
+- 10:34: watchdog is now a separate PROCESS (heartbeat file touched by every event; SIGKILL on stall or hard limit;
+  verified: stalled parent killed in 15 s). Both kernels and tonight's arm kernels carry it. The v2 gate (thread
+  watchdog) is still RUNNING at 10:33, past its 45-min limit unless it queued long; if it is still running at 10:50 it
+  must be cancelled from the Kaggle UI (no CLI cancel exists).
