@@ -735,3 +735,6 @@ New main line, h first:
 - 15:06: resident switched to the replay arm (h-05b-replay): audit 0.525 vs e2-v4 0.504 (base 0.563), hbox clean 2.622 vs
   2.627, retention 3.139 vs 3.147, bank echo 0.33 vs 0.39, lift +0.25 vs +0.21, voice and deflection intact. services.sh
   updated; bot restarted; liveness check passed.
+- 15:25: corpus-v1.6-replay25 built and live (558.5M tokens, 25.0% FineWeb-Edu; v1.4 bytes verified unchanged); first spec
+  kernel kaggle/runs/room05b-e2-v6-replay25-lr5e5 (LR 5e-5, 934M total, watchdog 30) rehearsed OK; Saturday 00:05 queue =
+  HBM probe then this run. Replay arm's bank results committed (echo 0.33 under both evaluators).
