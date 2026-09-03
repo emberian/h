@@ -606,3 +606,7 @@ New main line, h first:
 - 22:12: CORRECTION: on the same 512 hbox room sequences, h-span loss is e2-v3 2.762 / h x8 2.763 / visitors x0.25
   2.747 / visitors x0 2.748: the weighting does not improve held-out h lines at all (the earlier "2.76 -> 2.58" compared
   the kernel's permuted subset with hbox's). Report corrected. e2-v4 losses identical to e2-v3.
+- 08:52: EOS-after-two-exchanges probe (research/eval/eos_after_turns.py, 4 transcripts): e2-v3 P(EOS) 0.996; e2-v4 0.000
+  (P(blank line) 0.98). Stitching fixed the belief that rooms end after two exchanges, with every loss slice
+  unchanged. Bank: e2-v4 lift +0.21 (91M) / echo 0.39 (e2-v3 +0.32 / 0.34). e2-v4 passes the gate (hbox identical to
+  e2-v3) and is now the resident in Discord (h-05b-room-e2v4).

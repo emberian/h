@@ -18,7 +18,7 @@ EOS = 11
 nl_ids = tok.encode("\n\n", add_special_tokens=False).ids
 for ckpt in sys.argv[1:]:
     cfg = FalconH1Config.from_json(f"{ckpt}/config.json")
-    params = load_hf_params(ckpt, cfg)
+    params = load_hf_params(ckpt, dtype=jnp.float32)
     p_eos, p_nl = [], []
     for t in TRANSCRIPTS:
         text = FRAME + "\n\n" + "\n\n".join(f"{n}: {x}" for n, x in t)
