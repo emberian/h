@@ -590,3 +590,7 @@ New main line, h first:
   0.34; arm 2 +0.52 / 0.37; arm 1 median +0.11 (outliers) / 0.32. No arm lowers echo. I broke queues 12-14 by editing
   tpu_queue.sh while they ran (sh reads scripts lazily): killed 13/14, pushed the 1.5B gate by hand, queue15 waits on
   it and pushes e2-v4; the w-honly download continues under queue12.
+- 21:03: 1.5B-deep gate CANCELLED after 2.2 h: base eval 3.279 on the fixed slice (0.5B 3.490, 91M 3.746); 4x512r compiled in
+  755 s with FSDP then OOM ("reserve 2.02G, 1.98G free"): automatic SPMD sharding gathers whole weights, so the 1.5B needs
+  per-layer all-gathers inside the layer scan (next week; TPU quota now 16.59 h used, 3.41 h left, refresh Fri 00:00).
+  e2-v4 pushed by hand (queue16 downloads it): this week's last TPU run.
