@@ -610,3 +610,7 @@ New main line, h first:
   (P(blank line) 0.98). Stitching fixed the belief that rooms end after two exchanges, with every loss slice
   unchanged. Bank: e2-v4 lift +0.21 (91M) / echo 0.39 (e2-v3 +0.32 / 0.34). e2-v4 passes the gate (hbox identical to
   e2-v3) and is now the resident in Discord (h-05b-room-e2v4).
+- 08:59: ember: too behavioural (bitter lesson), stalled-until-cancelled is a methodology defect, Friday is tomorrow, stop
+  deferring. Now: per-layer FSDP gathers inside the h1jax layer scan (layer_hooks: stacked params stay sharded outside,
+  each layer gathered inside the rematerialised body); watchdog thread in both kernels (no progress event for N min ->
+  exit 3; hard limit -> exit 4). Rehearsing on CPU; then a bounded 1.5B gate today (~30 TPU min of the 2.3 h left).

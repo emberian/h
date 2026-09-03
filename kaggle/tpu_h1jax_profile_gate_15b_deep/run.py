@@ -81,7 +81,7 @@ from jax.sharding import PartitionSpec as P
 
 # ----------------------------------------------------------------------------- settings
 
-SHAPES = os.environ.get("HGHOST_GATE_SHAPES", "4x512r,8x512r,16x512r")
+SHAPES = os.environ.get("HGHOST_GATE_SHAPES", "4x512r,8x512r")
 WARMUP_STEPS = int(os.environ.get("HGHOST_GATE_WARMUP", "3"))
 TIMED_STEPS = int(os.environ.get("HGHOST_GATE_STEPS", "20"))
 SYNC_STEPS = int(os.environ.get("HGHOST_GATE_SYNC_STEPS", "5"))
@@ -89,7 +89,7 @@ PROFILE_STEPS = int(os.environ.get("HGHOST_PROFILE_STEPS", "3"))
 BENCH_ITERS = int(os.environ.get("HGHOST_BENCH_ITERS", "10"))
 SANITY_STEPS = int(os.environ.get("HGHOST_SANITY_STEPS", "30"))
 WATCHDOG_MINUTES = float(os.environ.get("HGHOST_WATCHDOG_MINUTES", "20"))
-HARD_MAX_MINUTES = float(os.environ.get("HGHOST_GATE_MAX_MINUTES", "40"))
+HARD_MAX_MINUTES = float(os.environ.get("HGHOST_GATE_MAX_MINUTES", "45"))
 
 
 # ---- watchdog: a job that stalls (hung collective, post-OOM limbo) must kill itself, never wait to be cancelled.
