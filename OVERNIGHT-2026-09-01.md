@@ -642,3 +642,6 @@ New main line, h first:
 - 09:55: corpus-v1.5-replay visible on Kaggle. queue18: the replay arm (second epoch on v1.5 from the e1 pre-cooldown, LR 1e-4,
   matched branch to e2-v4) pushes as soon as the bounded 1.5B gate finishes; it fits in the ~1.5 TPU h left today. The
   lower-LR arm waits for the midnight refresh.
+- 09:55: EOS-after-two-exchanges on blends: base 0.000, alpha 0.6 0.248, 0.75 0.178, 0.8 0.057, 0.9 0.001, e2-v4 0.000.
+  Intermediate blends re-expose the two-exchange ending that e1 carried (weight space is not linear in behaviour);
+  alpha 0.9 keeps the stitched-room behaviour. Finer hbox sweep running to see which alpha keeps the clean/retention gain.
