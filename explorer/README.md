@@ -1,19 +1,64 @@
-# h explorer (v1)
+# h explorer (v2)
 
 A local causal workbench for reading the small models that live in the library. Not a chat UI: a loom over
 `/v1/completions` with every token shaded by its logprob, an exact-match provenance view over the training
-corpus, a replay of the room proxy's observatory ledger, a side-by-side comparison of two checkpoints, a
+corpus, a replay of the room proxy's observatory ledger, a side-by-side comparison of model servers, a
 counterfactual room editor with fixed-reply scoring, a branch debugger for the persistent-state room server on
 hbox, a population grid over every checkpoint, and a failure-label ledger that turns what you see into training
-records. Press `?` in the page for the keys.
+records. The page opens on **Start here**; `? help` on any pane lists what each pane does and the keys.
 
 ```sh
 python3 explorer/serve.py --port 8130      # stdlib only; no venv needed for the server itself
 open http://127.0.0.1:8130
 ```
 
-Options: `--server NAME@URL` (repeatable; default `http://127.0.0.1:8124` and `:8125`, names resolved from the
-symlinks in `artifacts/serving/`), `--tokenizer`, `--haunt-index`, `--observatory`, `--verbose`.
+Options: `--server NAME@URL` (repeatable; default `:8124` `:8125` `:8127` `:8128`, names resolved from the
+symlinks in `artifacts/serving/`; the first one is treated as the resident), `--tokenizer`, `--haunt-index`,
+`--observatory`, `--verbose`.
+
+## Start here (the guided path)
+
+The first tab is a landing pane, shown on load unless a *named* weave (one you saved or loaded) was open, in
+which case the loom opens on it. It carries one selector, **line for h** (the prompt library, below), and three
+actions:
+
+- **Ask h** — puts the chosen prompt at the root of the loom (reusing a root with the same text if there is
+  one), labels the root with the library kind, selects the resident server, and expands four samples from it.
+- **Compare the models** — the same prompt to every server that is up, three samples each, one column per
+  server in the compare pane.
+- **Replay the room** — the observatory on the newest day, opened at its most recent record.
+
+Below them: what this is, a one-sentence list of the panes (click one to open it; the same list is in `? help`),
+and **recent**: the last three weaves saved or loaded and the last three compare prompts, from `localStorage`,
+each a click away.
+
+**Prompt library** (`/api/library`; the `library` dropdown in the loom, compare, counterfactual and population
+panes, and the start pane's selector): three "greet h" one-liners on the bare frame (`A room in the library,
+late. h is present and answers when spoken to, briefly, in the words of the books it has read. The others are
+visitors.` + `ember: hi h` + `h:`), the twelve fixed room prompts of `research/eval/room_prompts.json` grouped by
+kind (greeting / talk / deflect, verbatim with their own frame), five raw library openings (no frame), and
+"custom". Selecting an item fills the pane's prompt and resets its sampler to the defaults the room models
+handle best: temperature 0.7, top_p 0.9, max_tokens 64, stop `\n\n` (N=4 in the loom, K=3 in compare).
+Selecting one in the counterfactual pane makes its turns the editable room.
+
+**Seeded loom**: opening the loom on an empty weave seeds it with the bare frame + `ember: hi h` and expands four
+samples from the resident, so there is a tree to click. The selected node carries its own buttons: `↑ parent
+↓ child ← prev next →`, one `+N <server>` per live server, and bookmark / deactivate / edit / note / label /
+split / merge / haunt / → cf / delete; other nodes show `+N <sampler server>` and `select`. The keys are
+shortcuts for the same things.
+
+**Empties**: every pane, with nothing to show, says in one sentence what to do first.
+
+**Headless test** (playwright driving the installed Chrome, against a running server; the bar is zero console
+errors):
+
+```sh
+cd explorer && NODE_PATH=/Users/ember/tools/playwright/node_modules node test.cjs     # SHOT_DIR=<dir> for screenshots
+```
+
+load → start pane → Ask h (root labelled, 4 samples within 60 s, the selected node's buttons) → Compare the models
+(samples from ≥ 2 servers) → Replay the room (list + open record) → `? help` → recent → library fills the loom
+and compare boxes.
 
 ## What it talks to
 
@@ -49,10 +94,10 @@ symlinks in `artifacts/serving/`), `--tokenizer`, `--haunt-index`, `--observator
 
 ## Daily use
 
-- **Keys** (loom): `← →` siblings, `↑ ↓` parent / first child, `Enter` expand the active node, `e` edit, `n` note,
+- **Keys** (loom): `← →` siblings, `↑ ↓` parent / first child, `Enter` expand the selected node, `e` edit, `n` note,
   `l` label, `b` bookmark, `x` deactivate, `c` collapse, `h` haunt, `Delete` delete, `⌘Z`/`⇧⌘Z` undo/redo,
-  `⌘S` save (also inside fields), `⌘⇧C` copy the active path as a transcript, `1…8` tabs, `Esc` cancel. Shortcuts
-  are off while typing in a field.
+  `⌘S` save (also inside fields), `⌘⇧C` copy the selected path as a transcript, `1…9` tabs, `?` help, `Esc`
+  cancel. Shortcuts are off while typing in a field; every one has a button on the selected node.
 - **Undo/redo** records a full snapshot (weave + collapsed set) before every mutation, mirroring the crate's
   action-queue wrapper at the granularity of one user action (an expand of N samples is one undo step).
 - **Tidy**: on load, nodes below depth 2 that are not on the active path start collapsed; the tree panel's
@@ -69,14 +114,15 @@ symlinks in `artifacts/serving/`), `--tokenizer`, `--haunt-index`, `--observator
 
 ## Panes
 
-- **Loom** — prompt box edits the root node (the "frame" button inserts the bare room frame plus one turn).
-  Every node shows its text with tokens shaded by logprob (hover for id / logprob / p), plus token count, mean
-  logprob, and the entropy proxy (mean surprisal, nats; the header also shows ppl = exp of it). Per node:
-  `+<model>` expands N continuations from that server (N, temperature, top_p, max_tokens, stop in the sampler
-  panel), bookmark, activate / deactivate, edit, split (then click the token that starts the new child), merge
-  into parent (only-children), haunt, delete. Clicking a node makes it the active tip; the right column shows
-  the active path as one shaded reading. Weaves save to `explorer/weaves/<name>.json`; the current weave is
-  also kept in `localStorage` so a reload does not lose it.
+- **Loom** — the library dropdown or the prompt box sets the root node (the "frame" button inserts the bare room
+  frame plus one turn); a root from the library is labelled with its kind. Every node shows its text with tokens
+  shaded by logprob (hover for id / logprob / p), plus token count, mean logprob, and the entropy proxy (mean
+  surprisal, nats; the header also shows ppl = exp of it). The selected node carries the navigation buttons,
+  `+N <model>` for every live server (N, temperature, top_p, max_tokens, stop in the sampler panel), bookmark,
+  deactivate, edit, note, label, split (then click the token that starts the new child), merge into parent
+  (only-children), haunt, → cf, delete; other nodes carry `+N <sampler server>` and `select`. Clicking a node
+  makes it the selected tip; the right column shows the selected path as one shaded reading. Weaves save to
+  `explorer/weaves/<name>.json`; the current weave is also kept in `localStorage` so a reload does not lose it.
 - **Provenance** — for the active node (or its whole path): longest exact match, coverage at 8/16/32 tokens,
   top documents (source, path, quoted tokens, offset) and the longest spans with their text. Matched token
   ranges are underlined in the node text when the scan's tokenisation has the same length as the sample's.
@@ -86,9 +132,10 @@ symlinks in `artifacts/serving/`), `--tokenizer`, `--haunt-index`, `--observator
   proxy dropped struck through, the cleaned prompt, and every candidate with overlap score, accepted flag,
   logprob shading, and the chosen one outlined. "Open in loom" turns the record into a weave (prompt root,
   candidates as children, chosen bookmarked).
-- **Compare** — one prompt, two servers, K samples each, streamed side by side with shading and per-side
-  aggregates (mean logprob, surprisal, length, stop rate, seconds). "→ loom" files a sample under a root with
-  that prompt in the current weave.
+- **Compare** — one prompt, K samples per server, streamed side by side with shading and per-server aggregates
+  (mean logprob, surprisal, length, stop rate, seconds): "run A vs B" for the two selected servers, "run all up
+  servers" for one column per live server. "→ loom" files a sample under a root with that prompt in the current
+  weave. Each run is remembered in the start pane's recent list.
 - **Counterfactual** — "from loom" (or "→ cf" on a node, or "→ counterfactual" on an observatory record) turns
   the active path into an editable list of room turns (frame blocks and `name: text` turns) and takes the active
   node's text as the fixed reply. Edit, delete, reorder (↑↓), or reassign a speaker (⇄) on the right, pick a
@@ -141,6 +188,7 @@ strangeness`, `overquotation`, `proxy false positive`, `other`. Records append t
 | POST | `/api/weaves` | `{name, weave}` | validates (see below) and writes `explorer/weaves/<name>.json` |
 | POST | `/api/weaves/delete` | `{name}` | deletes a saved weave |
 | GET | `/api/version` | | `{explorer: <git rev>, tokenizer_sha, proxy_sha, python}` (also under `version` in `/api/servers`, with the `:8125` switching state under `serve`) |
+| GET | `/api/library` | | `{frame, sampler, items:[{id, group, kind, title, prompt, source?}], room_prompts}` — the prompt library (greetings on the bare frame, the twelve room prompts by kind, raw openings) |
 | GET | `/api/scorers` | | scorable checkpoint dirs (the two bases + every TPU checkpoint), the judge pair, worker status |
 | POST | `/api/score` | `{checkpoint, items:[{id, context?, text}], ranks?}` | NDJSON: `start`, one `result` per item (`{n, nll_sum, nll_mean, context_tokens, bucket, tokens:[{id,text,logprob,rank}]}`, cached per checkpoint+context+text), `done` |
 | GET / POST | `/api/labels` | POST body: the record above (`label`, `candidate` required) | GET: `{labels, counts, total, recent}` |
@@ -195,6 +243,21 @@ Semantics mirrored from the crate (`src/dependent/mod.rs`):
   when both sides have them (else `null`), children re-parent, the tip and bookmark carry to the parent.
 - `POST /api/weaves` re-validates the way `DependentWeave::validate` does (link symmetry, roots = parentless
   nodes, single active tip, bookmark consistency, acyclic and fully reachable) and rejects anything else.
+
+## Verified 2026-09-03 (v2)
+
+`explorer/test.cjs` against the live `:8124` (`h-05b-replay`), `:8125` (`h-05b-rblend090`), `:8127`
+(`h1-15b-deep-base`) and `:8128` (`qwen38-27b-4bit`): the start pane with 21 library options and 9 pane
+blurbs; Ask h → root `greet · ember: hi h` with 4 shaded samples from the resident in 6 s, the selected sample
+carrying 4 navigation and 13 action buttons; Compare the models → 4 columns with samples from all four servers;
+Replay the room → 2026-09-03 with 78 records and the latest one open; `? help` with 9 panes and 17 keys; the
+recent list holding the compare; the library filling the loom root and the compare box. Zero console errors.
+
+Behaviour changed from v1: the page lands on Start here (loom only when a named weave was open); the loom seeds
+itself on an empty weave; the full action row is on the selected node only (other nodes: `+N` and `select`);
+compare is n-column (`#cmp-cols`), K defaults to 3, and `run` became `run A vs B` beside `run all up servers`;
+max_tokens defaults to 64 everywhere (was 40); `1…9` switches tabs (was `1…8`); "active" reads "selected" in
+the UI.
 
 ## Verified 2026-09-02 (v1)
 
