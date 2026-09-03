@@ -64,7 +64,7 @@ CFG = {
     "serve_session": "hghost-serve05b",
     "mlx_python": Path.home() / ".cache/h1-distributed/venv/bin/python",
 }
-SERVER_URLS: list[str] = ["http://127.0.0.1:8124", "http://127.0.0.1:8125"]
+SERVER_URLS: list[str] = ["http://127.0.0.1:8124", "http://127.0.0.1:8125", "http://127.0.0.1:8127", "http://127.0.0.1:8128"]
 SERVER_NAMES: dict[str, str] = {}  # url -> model name override (--server name@url)
 
 WEAVE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")

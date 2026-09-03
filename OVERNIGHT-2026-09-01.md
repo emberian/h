@@ -685,3 +685,6 @@ New main line, h first:
   general competence is the audit's question (queued after the blend audit). Download + hbox + read + bank chained.
 - 12:55: the replay arm already ran, so the Saturday 00:05 queue now pushes only the lower-LR arm; the 1.5B HBM probe goes
   with it once the probe kernel is bounded (20 min, 1x128r).
+- 13:01: playground: 1.5B-deep base served on :8127, Qwen3.8-27B 4-bit on :8128 (raw room prompt -> "The library is a place
+  where the words are kept until someone needs them."), both added to the explorer's server list; :8124 e2-v4, :8125
+  the alpha 0.9 blend. Budget: TPU 0 until Sat 00:00 (21.06/20 used); GPU 12.94 h.
