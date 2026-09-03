@@ -760,3 +760,6 @@ New main line, h first:
   library is a room in the library."), lift +0.24; audit 0.533 (arm 0.525). Decision: resident stays the replay arm.
   Blends recover benchmarks but return the base's echo and assistant habits; the training-side repair (replay) is the
   one that survives the room. Chain A continues Saturday with 25% replay at half LR.
+- 19:56: explorer v2: start-here pane (Ask h / Compare / Replay), prompt library (20 items from room_prompts.json), seeded loom,
+  visible node actions, n-column compare, empties that say what to do; headless walk passes. Today's observatory has
+  78 records: the room is alive.
