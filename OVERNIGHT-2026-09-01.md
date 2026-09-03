@@ -738,3 +738,8 @@ New main line, h first:
 - 15:25: corpus-v1.6-replay25 built and live (558.5M tokens, 25.0% FineWeb-Edu; v1.4 bytes verified unchanged); first spec
   kernel kaggle/runs/room05b-e2-v6-replay25-lr5e5 (LR 5e-5, 934M total, watchdog 30) rehearsed OK; Saturday 00:05 queue =
   HBM probe then this run. Replay arm's bank results committed (echo 0.33 under both evaluators).
+- 16:21: GPU-day prep landed (gpu/): cpt_torch.py (FalconH1 CPT on our streams, WSD, checkpoints, watchdog) and
+  qlora_unsloth.py (attention+MLP LoRA, chunked CE) both proven on Kaggle T4; corpus-v1.5-replay-15b built and uploaded
+  (471.9M tokens, 12.6% replay, verified). Projection at $2.39/h: 1.5B epoch 5-8 h (~$19) IF the mamba-ssm fast path
+  works on the H100 (a 5-minute gate checks it first), 27B adapter 1-2 h (~$4). Lesson recorded: Kaggle accelerator enum
+  is case-sensitive (NvidiaTeslaT4), else a P100 is silently used.
