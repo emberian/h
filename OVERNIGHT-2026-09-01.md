@@ -626,3 +626,7 @@ New main line, h first:
   -Base is gated); mlx_lm 0.32 has LoRA, and the Mac has 103 GB, so a local QLoRA is feasible.
 - 09:09: Qwen lane opened (plumbing on the instruct weights until the gated base arrives; ember applying): MLX 4-bit
   conversion, a 6M-token clean library slice, a 200-iteration QLoRA on the Mac to measure tok/s, memory, and loss.
+- 09:13: ember: use community quantizations, research recipes rather than assume; GRPO induces capabilities SFT does not
+  (introspection in some works) and small models are likely subject to the same dynamics. Recipe researched via Kagi and
+  primary sources -> qwen/RECIPE.md; sent to the Qwen lane (r=16/alpha 16, all language-block projections, LR 5e-5 raw
+  text, no chat template, seq 2048, book-level holdout).
