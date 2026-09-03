@@ -600,3 +600,6 @@ New main line, h first:
   on h lines (2.76 -> 2.58) but does not reduce the echo rate; the echo is not a role-confusion artifact of the loss.
   Arm 3's scratch dir was harvested empty (downloads kept failing) and deleted; harvester now refuses to delete an
   incomplete harvest; re-downloading arm 3.
+- 22:12: e2-v4 COMPLETE: library 2.8518 (e2-v3 2.8517), fixed-32 3.0096 (3.0108), room 2.5806 (2.5805): stitched rooms and
+  set C leave the losses unchanged at matched compute; what changed (if anything) is behaviour: EOS after two
+  exchanges, callbacks, repairs. Evaluation chained on its download.

@@ -50,4 +50,4 @@ spend in bounded, reported increments; never launch a run whose worst case excee
 | 2026-09-02 16:27 | h-ghost-h1jax-room05b-w-roomdown | v1 | 66 | COMPLETE 17:38: visitors x0.25 + h x4; cooled library 2.854, room 2.635, h-span 2.614, other 2.638 |
 | 2026-09-02 17:38 | h-ghost-h1jax-room05b-w-honly | v1 | 66 | COMPLETE 18:50: visitors x0 + h x4; cooled library 2.855, room 2.881 (other 2.884), h-span 2.860: zero visitor weight hurts h too |
 | 2026-09-02 18:53 | h-ghost-h1jax-profile-gate-15b-deep | v1 | 130 | CANCELLED 21:01: base eval 3.279 (fixed slice); 4x512r compiled in 755 s then OOM (XLA gathers full weights under automatic sharding), stalled on the next shape until cancelled |
-| 2026-09-02 21:03 | h-ghost-h1jax-room05b-e2-v4 | v1 | (running, est 66) | second epoch on corpus-v1.4-room (stitched A+B+C), matched to e2-v3 |
+|  | h-ghost-h1jax-room05b-e2-v4 | v1 | 66 | COMPLETE 22:11: second epoch on corpus-v1.4-room (stitched A+B+C); library 2.852 (e2-v3 2.852), fixed-32 3.010 (3.011), room 2.581 (2.581): no loss change from stitching + set C |
