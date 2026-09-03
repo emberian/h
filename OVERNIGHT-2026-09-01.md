@@ -683,3 +683,5 @@ New main line, h first:
 - 12:55: replay arm COMPLETE (Kaggle let it finish past quota; 21.06/20 h used): library 2.857, fixed-32 3.016, room 2.586,
   h-span 2.569 vs e2-v4 2.852 / 3.010 / 2.581 / 2.559: general text costs ~0.005 on the library slices. Whether it keeps
   general competence is the audit's question (queued after the blend audit). Download + hbox + read + bank chained.
+- 12:55: the replay arm already ran, so the Saturday 00:05 queue now pushes only the lower-LR arm; the 1.5B HBM probe goes
+  with it once the probe kernel is bounded (20 min, 1x128r).
