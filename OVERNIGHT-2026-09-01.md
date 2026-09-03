@@ -728,3 +728,7 @@ New main line, h first:
 - 14:17: kernel-as-package refactor landed: h1jax.kernels.{cpt,gate}.main(spec), kaggle/spec_kernel.py generates a ~44-line
   run.py + spec.json + kernel-metadata.json per run; CPU parity vs the old kernel bit-identical (plain, weighted, fsdp;
   gate). Wheel 0.2.0 publishing as code dataset v020. Old kernel dirs untouched (Saturday queue uses them).
+- 15:04: audit (500 docs/task, same subset): base 0.563; blend alpha 0.9 of e2-v4 0.517 (-4.6); replay arm 0.525 (-3.8;
+  PIQA -0.2, WinoGrande +0.2, HellaSwag -0.6; LAMBADA -7.2, ARC-e -6.4, ARC-c -8.6). Against e2-v4's -6.2: replay
+  recovers 2.4 points with the voice intact; the blend 1.6. Next: blend the replay arm at 0.9/0.8 and audit; 25% replay
+  at half LR for Saturday.
