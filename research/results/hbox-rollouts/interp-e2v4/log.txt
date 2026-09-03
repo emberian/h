@@ -1,0 +1,60 @@
+/opt/amdgpu/share/libdrm/amdgpu.ids: No such file or directory
+{"event": "rocm_triton_ssd_enabled", "enabled": true, "already_enabled": false, "mamba_ssm": "2.3.2.post1", "source_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1", "torch": "2.9.1+rocm6.3", "hip": "6.3.42134-a9a80e791", "triton": "3.5.1", "convolution": "torch grouped Conv1d", "scan": "mamba_ssm.ops.triton.ssd_combined.mamba_chunk_scan_combined", "scan_input_dtype": "inherit"}
+[rollout-eval] 09:37:59 hbox: load (0.833984375, 0.49462890625, 0.4267578125), gpu busy 0%, losses on triton, generation on reference
+The fast path is not available because one of `(selective_state_update, causal_conv1d_fn, causal_conv1d_update)` is None. Falling back to the naive implementation. To install follow https://github.com/state-spaces/mamba/#installation and https://github.com/Dao-AILab/causal-conv1d
+[rollout-eval] 09:38:06 interp025: loaded in 5.9s from /othersys/h1-ghost/checkpoints/tpu/extra/interp025
+[rollout-eval] 09:38:49 interp025: first-32 on the reference path at batch 1: 3.243412
+[rollout-eval] 09:39:14 interp025: first-512 128/512 rows
+[rollout-eval] 09:39:34 interp025: first-512 256/512 rows
+[rollout-eval] 09:39:54 interp025: first-512 384/512 rows
+[rollout-eval] 09:40:13 interp025: first-512 512/512 rows
+[rollout-eval] 09:40:13 interp025: first-512 loss 3.2256 (3,093 tok/s, triton)
+[rollout-eval] 09:40:33 interp025: clean-512 128/512 rows
+[rollout-eval] 09:40:53 interp025: clean-512 256/512 rows
+[rollout-eval] 09:41:12 interp025: clean-512 384/512 rows
+[rollout-eval] 09:41:32 interp025: clean-512 512/512 rows
+[rollout-eval] 09:41:32 interp025: clean-512 loss 2.7343 (3,330 tok/s, triton)
+[rollout-eval] 09:41:36 interp025: retention loss 3.1464 (3,322 tok/s, triton)
+[rollout-eval] 09:41:56 interp025: room 128/512 rows
+[rollout-eval] 09:42:16 interp025: room 256/512 rows
+[rollout-eval] 09:42:36 interp025: room 384/512 rows
+[rollout-eval] 09:42:55 interp025: room 512/512 rows
+[rollout-eval] 09:42:55 interp025: room loss 3.0360 (3,326 tok/s, triton)
+[rollout-eval] 09:43:05 interp050: loaded in 8.8s from /othersys/h1-ghost/checkpoints/tpu/extra/interp050
+[rollout-eval] 09:43:47 interp050: first-32 on the reference path at batch 1: 3.070027
+[rollout-eval] 09:44:07 interp050: first-512 128/512 rows
+[rollout-eval] 09:44:27 interp050: first-512 256/512 rows
+[rollout-eval] 09:44:46 interp050: first-512 384/512 rows
+[rollout-eval] 09:45:06 interp050: first-512 512/512 rows
+[rollout-eval] 09:45:06 interp050: first-512 loss 3.0537 (3,325 tok/s, triton)
+[rollout-eval] 09:45:26 interp050: clean-512 128/512 rows
+[rollout-eval] 09:45:46 interp050: clean-512 256/512 rows
+[rollout-eval] 09:46:05 interp050: clean-512 384/512 rows
+[rollout-eval] 09:46:25 interp050: clean-512 512/512 rows
+[rollout-eval] 09:46:25 interp050: clean-512 loss 2.6561 (3,330 tok/s, triton)
+[rollout-eval] 09:46:29 interp050: retention loss 3.1229 (3,317 tok/s, triton)
+[rollout-eval] 09:46:49 interp050: room 128/512 rows
+[rollout-eval] 09:47:09 interp050: room 256/512 rows
+[rollout-eval] 09:47:28 interp050: room 384/512 rows
+[rollout-eval] 09:47:48 interp050: room 512/512 rows
+[rollout-eval] 09:47:48 interp050: room loss 2.8299 (3,330 tok/s, triton)
+[rollout-eval] 09:47:54 interp075: loaded in 4.3s from /othersys/h1-ghost/checkpoints/tpu/extra/interp075
+[rollout-eval] 09:48:35 interp075: first-32 on the reference path at batch 1: 3.015142
+[rollout-eval] 09:48:55 interp075: first-512 128/512 rows
+[rollout-eval] 09:49:15 interp075: first-512 256/512 rows
+[rollout-eval] 09:49:34 interp075: first-512 384/512 rows
+[rollout-eval] 09:49:54 interp075: first-512 512/512 rows
+[rollout-eval] 09:49:54 interp075: first-512 loss 2.9047 (3,328 tok/s, triton)
+[rollout-eval] 09:50:14 interp075: clean-512 128/512 rows
+[rollout-eval] 09:50:34 interp075: clean-512 256/512 rows
+[rollout-eval] 09:50:53 interp075: clean-512 384/512 rows
+[rollout-eval] 09:51:13 interp075: clean-512 512/512 rows
+[rollout-eval] 09:51:13 interp075: clean-512 loss 2.6117 (3,327 tok/s, triton)
+[rollout-eval] 09:51:17 interp075: retention loss 3.1198 (3,314 tok/s, triton)
+[rollout-eval] 09:51:37 interp075: room 128/512 rows
+[rollout-eval] 09:51:57 interp075: room 256/512 rows
+[rollout-eval] 09:52:16 interp075: room 384/512 rows
+[rollout-eval] 09:52:36 interp075: room 512/512 rows
+[rollout-eval] 09:52:36 interp075: room loss 2.6137 (3,327 tok/s, triton)
+[rollout-eval] 09:52:36 done in 877.3s: /othersys/h1-ghost/rollouts/interp-e2v4
+{"interp025": "done", "interp050": "done", "interp075": "done"}

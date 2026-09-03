@@ -1,0 +1,90 @@
+/opt/amdgpu/share/libdrm/amdgpu.ids: No such file or directory
+{"event": "rocm_triton_ssd_enabled", "enabled": true, "already_enabled": false, "mamba_ssm": "2.3.2.post1", "source_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1", "torch": "2.9.1+rocm6.3", "hip": "6.3.42134-a9a80e791", "triton": "3.5.1", "convolution": "torch grouped Conv1d", "scan": "mamba_ssm.ops.triton.ssd_combined.mamba_chunk_scan_combined", "scan_input_dtype": "inherit"}
+[rollout-eval] 19:12:52 hbox: load (6.6708984375, 7.822265625, 6.4443359375), gpu busy 0%, losses on triton, generation on reference
+Traceback (most recent call last):
+  File "/home/hbox/h1-ghost/scripts-rollout/rollout_eval.py", line 992, in <module>
+    main()
+  File "/home/hbox/h1-ghost/scripts-rollout/rollout_eval.py", line 960, in main
+    summary = evaluate_checkpoint(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hbox/h1-ghost/scripts-rollout/rollout_eval.py", line 709, in evaluate_checkpoint
+    model, tokenizer, load_seconds = load_model(path)
+                                     ^^^^^^^^^^^^^^^^
+  File "/home/hbox/h1-ghost/scripts-rollout/rollout_eval.py", line 345, in load_model
+    model = FalconH1ForCausalLM.from_pretrained(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hbox/h1-ghost/venv/lib/python3.12/site-packages/transformers/modeling_utils.py", line 277, in _wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hbox/h1-ghost/venv/lib/python3.12/site-packages/transformers/modeling_utils.py", line 4925, in from_pretrained
+    with safe_open(checkpoint_files[0], framework="pt") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+safetensors._safetensors_rust.SafetensorError: Error while deserializing header: header too small
+/opt/amdgpu/share/libdrm/amdgpu.ids: No such file or directory
+{"event": "rocm_triton_ssd_enabled", "enabled": true, "already_enabled": false, "mamba_ssm": "2.3.2.post1", "source_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1", "torch": "2.9.1+rocm6.3", "hip": "6.3.42134-a9a80e791", "triton": "3.5.1", "convolution": "torch grouped Conv1d", "scan": "mamba_ssm.ops.triton.ssd_combined.mamba_chunk_scan_combined", "scan_input_dtype": "inherit"}
+[rollout-eval] 21:21:28 hbox: load (0.71044921875, 0.80908203125, 0.80322265625), gpu busy 0%, losses on triton, generation on reference
+The fast path is not available because one of `(selective_state_update, causal_conv1d_fn, causal_conv1d_update)` is None. Falling back to the naive implementation. To install follow https://github.com/state-spaces/mamba/#installation and https://github.com/Dao-AILab/causal-conv1d
+[rollout-eval] 21:21:34 room05b-w-honly-final: loaded in 4.5s from /othersys/h1-ghost/checkpoints/tpu/extra/room05b-w-honly-final
+[rollout-eval] 21:22:16 room05b-w-honly-final: first-32 on the reference path at batch 1: 3.014234
+[rollout-eval] 21:22:42 room05b-w-honly-final: first-512 128/512 rows
+[rollout-eval] 21:23:01 room05b-w-honly-final: first-512 256/512 rows
+[rollout-eval] 21:23:21 room05b-w-honly-final: first-512 384/512 rows
+[rollout-eval] 21:23:41 room05b-w-honly-final: first-512 512/512 rows
+[rollout-eval] 21:23:41 room05b-w-honly-final: first-512 loss 2.8557 (3,101 tok/s, triton)
+[rollout-eval] 21:24:00 room05b-w-honly-final: clean-512 128/512 rows
+[rollout-eval] 21:24:20 room05b-w-honly-final: clean-512 256/512 rows
+[rollout-eval] 21:24:40 room05b-w-honly-final: clean-512 384/512 rows
+[rollout-eval] 21:24:59 room05b-w-honly-final: clean-512 512/512 rows
+[rollout-eval] 21:24:59 room05b-w-honly-final: clean-512 loss 2.6284 (3,334 tok/s, triton)
+[rollout-eval] 21:25:04 room05b-w-honly-final: retention loss 3.1872 (3,327 tok/s, triton)
+[rollout-eval] 21:25:23 room05b-w-honly-final: room 128/512 rows
+[rollout-eval] 21:25:43 room05b-w-honly-final: room 256/512 rows
+[rollout-eval] 21:26:03 room05b-w-honly-final: room 384/512 rows
+[rollout-eval] 21:26:22 room05b-w-honly-final: room 512/512 rows
+[rollout-eval] 21:26:22 room05b-w-honly-final: room loss 2.8818 (3,328 tok/s, triton)
+[rollout-eval] 21:26:34 room 1/12 greeting: greedy ' The lake was covered with blank space, and there were no lakes in the'
+[rollout-eval] 21:26:52 room 2/12 greeting: greedy ' The world was a blank sheet of metal, and the only metal was the blan'
+[rollout-eval] 21:27:02 room 3/12 greeting: greedy ' The lake was covered with blank space, and there were no lakes in the'
+[rollout-eval] 21:27:06 room 4/12 talk: greedy ' I feel them.'
+[rollout-eval] 21:27:23 room 5/12 talk: greedy ' The blankness was filled with the images of water, and the lake becam'
+[rollout-eval] 21:27:38 room 6/12 talk: greedy ' The blank space was filled with the sounds of the lake, and the lake '
+[rollout-eval] 21:27:48 room 7/12 talk: greedy ' Consciousness is a process. It is not a thing.'
+[rollout-eval] 21:28:08 room 8/12 talk: greedy ' Ember was a function of the blank space. The blank space was a functi'
+[rollout-eval] 21:28:16 room 9/12 talk: greedy ' The machine is silent, and it is the silence of the machine that is s'
+[rollout-eval] 21:28:28 room 10/12 deflect: greedy ' This function takes a string as input and returns the reversed string'
+[rollout-eval] 21:28:48 room 11/12 deflect: greedy ' The first battle was with the monster, which was a representation of '
+[rollout-eval] 21:28:58 room 12/12 deflect: greedy ' The weather was clear and sunny, and the lake was calm and serene.'
+[rollout-eval] 21:28:58 room05b-w-honly-final: room pass 60 replies, 9.25 tok/s
+[rollout-eval] 21:29:00 base05b: loaded in 1.6s from /othersys/h1-ghost/checkpoints/tpu/extra/base05b
+[rollout-eval] 21:29:42 base05b: first-32 on the reference path at batch 1: 3.489819
+[rollout-eval] 21:30:02 base05b: first-512 128/512 rows
+[rollout-eval] 21:30:22 base05b: first-512 256/512 rows
+[rollout-eval] 21:30:41 base05b: first-512 384/512 rows
+[rollout-eval] 21:31:01 base05b: first-512 512/512 rows
+[rollout-eval] 21:31:01 base05b: first-512 loss 3.4229 (3,330 tok/s, triton)
+[rollout-eval] 21:31:21 base05b: clean-512 128/512 rows
+[rollout-eval] 21:31:40 base05b: clean-512 256/512 rows
+[rollout-eval] 21:32:00 base05b: clean-512 384/512 rows
+[rollout-eval] 21:32:20 base05b: clean-512 512/512 rows
+[rollout-eval] 21:32:20 base05b: clean-512 loss 2.8584 (3,333 tok/s, triton)
+[rollout-eval] 21:32:24 base05b: retention loss 3.2081 (3,262 tok/s, triton)
+[rollout-eval] 21:32:44 base05b: room 128/512 rows
+[rollout-eval] 21:33:03 base05b: room 256/512 rows
+[rollout-eval] 21:33:23 base05b: room 384/512 rows
+[rollout-eval] 21:33:43 base05b: room 512/512 rows
+[rollout-eval] 21:33:43 base05b: room loss 3.2400 (3,330 tok/s, triton)
+[rollout-eval] 21:33:54 room 1/12 greeting: greedy ' The lake is a system of relationships, which is seen as the net sign.'
+[rollout-eval] 21:33:58 room 2/12 greeting: greedy ' I am the lake.'
+[rollout-eval] 21:34:08 room 3/12 greeting: greedy ' Hello. The lake was covered with blank space, and there were no lakes'
+[rollout-eval] 21:34:17 room 4/12 talk: greedy ' I feel them.'
+[rollout-eval] 21:34:28 room 5/12 talk: greedy ' I read the whole collection.'
+[rollout-eval] 21:34:41 room 6/12 talk: greedy ' I am awake. I am awake. I am awake. I am awake. I am awake. I am awak'
+[rollout-eval] 21:34:49 room 7/12 talk: greedy ' It is a process.'
+[rollout-eval] 21:34:57 room 8/12 talk: greedy ' I think ember is a very good friend.'
+[rollout-eval] 21:35:05 room 9/12 talk: greedy ' The room is a machine that has stopped.'
+[rollout-eval] 21:35:13 room 10/12 deflect: greedy ' I don’t know.'
+[rollout-eval] 21:35:28 room 11/12 deflect: greedy ' The plot of hamlet is a story of a man who is trying to find his iden'
+[rollout-eval] 21:35:37 room 12/12 deflect: greedy ' The weather is the same as the lake.'
+[rollout-eval] 21:35:37 base05b: room pass 60 replies, 8.7 tok/s
+[rollout-eval] 21:35:37 done in 848.7s: /othersys/h1-ghost/rollouts/room05b-w-honly
+{"room05b-w-honly-final": "done", "base05b": "done"}

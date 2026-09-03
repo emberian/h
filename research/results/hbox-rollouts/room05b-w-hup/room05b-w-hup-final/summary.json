@@ -1,0 +1,148 @@
+{
+  "name": "room05b-w-hup-final",
+  "checkpoint": "/othersys/h1-ghost/checkpoints/tpu/extra/room05b-w-hup-final",
+  "model_safetensors_sha256": "9b654ad77713bcc4614a3f289ff5189942d49245f3da9bbf4bba76bc3b0d0593",
+  "config_dtype": "float32",
+  "sequence_length": 512,
+  "batch": 8,
+  "kernel": {
+    "requested": "auto",
+    "triton": {
+      "enabled": true,
+      "already_enabled": false,
+      "mamba_ssm": "2.3.2.post1",
+      "source_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1",
+      "torch": "2.9.1+rocm6.3",
+      "hip": "6.3.42134-a9a80e791",
+      "triton": "3.5.1",
+      "convolution": "torch grouped Conv1d",
+      "scan": "mamba_ssm.ops.triton.ssd_combined.mamba_chunk_scan_combined",
+      "scan_input_dtype": "inherit"
+    },
+    "losses": "triton",
+    "generation": "reference"
+  },
+  "timings": {
+    "load_seconds": 9.186,
+    "losses": {
+      "first-512": {
+        "seconds": 112.367,
+        "tokens_per_second": 2332.9
+      },
+      "clean-512": {
+        "seconds": 118.933,
+        "tokens_per_second": 2204.1
+      },
+      "retention": {
+        "seconds": 9.04,
+        "tokens_per_second": 1585.9
+      },
+      "room": {
+        "seconds": 82.897,
+        "tokens_per_second": 3162.3
+      }
+    },
+    "room_seconds": 134.254,
+    "total_seconds": 535.54
+  },
+  "slices": {
+    "first-512": {
+      "sequences": 512,
+      "tokens": 262144,
+      "loss": 2.864125834671105,
+      "perplexity": 17.53371913395314,
+      "accuracy": 0.4429664611816406,
+      "furniture_fraction": 0.10590744018554688,
+      "furniture_free_loss": 3.095431808982956,
+      "furniture_free_accuracy": 0.40420085245817705,
+      "furniture_loss": 0.9113928603820906,
+      "matched_fraction": 0.2052764892578125,
+      "unseen_loss": 3.238503349296236,
+      "unseen_accuracy": 0.38565366818347635
+    },
+    "clean-512": {
+      "sequences": 512,
+      "tokens": 262144,
+      "loss": 2.63139799004446,
+      "perplexity": 13.893178857934672,
+      "accuracy": 0.46807098388671875,
+      "furniture_fraction": 0.06396102905273438,
+      "furniture_free_loss": 2.752958137067377,
+      "furniture_free_accuracy": 0.4491659772513316,
+      "furniture_loss": 0.8524235643247577,
+      "matched_fraction": 0.12954330444335938,
+      "unseen_loss": 2.8464322524619985,
+      "unseen_accuracy": 0.43713215154370355
+    },
+    "retention": {
+      "sequences": 28,
+      "tokens": 14336,
+      "loss": 3.155707616404473,
+      "perplexity": 23.469638718310655,
+      "accuracy": 0.38846261160714285
+    },
+    "room": {
+      "sequences": 512,
+      "tokens": 262144,
+      "loss": 2.5988292629476675,
+      "perplexity": 13.44798476129115,
+      "accuracy": 0.46897125244140625
+    },
+    "first-32": {
+      "sequences": 32,
+      "tokens": 16384,
+      "loss": 3.018919647325834,
+      "perplexity": 20.469165816447045,
+      "accuracy": 0.44525146484375,
+      "furniture_fraction": 0.153564453125,
+      "furniture_free_loss": 3.5160832919977008,
+      "furniture_free_accuracy": 0.35751370060571097,
+      "furniture_loss": 0.27859157725053485,
+      "matched_fraction": 0.199951171875,
+      "unseen_loss": 3.6356102139253954,
+      "unseen_accuracy": 0.33857186451022275
+    }
+  },
+  "kernel_check": {
+    "slice": "first-32",
+    "reference_path_batch1_loss": 3.019026756286621,
+    "reference_path_seconds": 67.074,
+    "run_first32_loss": 3.018919647325834,
+    "run_kernel": "triton",
+    "run_batch": 8,
+    "run_minus_reference_path": -0.0001071089607869169
+  },
+  "retention": {
+    "path": "/othersys/h1-ghost/rollouts/inputs/retention.txt",
+    "bytes": 52449,
+    "tokens": 14643,
+    "sequences": 28
+  },
+  "room_validation": {
+    "path": "/othersys/h1-ghost/rollouts/inputs/room-validation.bin",
+    "tokens": 1000497,
+    "sequences": 512
+  },
+  "masks": [
+    "clean-512",
+    "first-512"
+  ],
+  "room": {
+    "prompts": 12,
+    "samples_per_prompt": 4,
+    "greedy_per_prompt": 1,
+    "completions": 60,
+    "generated_tokens": 1151,
+    "seconds": 134.254,
+    "tokens_per_second": 8.57,
+    "seed": 20260902,
+    "max_new_tokens": 64,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "repetition_penalty": 1.0
+  },
+  "gpu": {
+    "max_memory_allocated_bytes": 2432900608,
+    "max_memory_reserved_bytes": 2990538752
+  }
+}

@@ -1,0 +1,68 @@
+/opt/amdgpu/share/libdrm/amdgpu.ids: No such file or directory
+{"event": "rocm_triton_ssd_enabled", "enabled": true, "already_enabled": false, "mamba_ssm": "2.3.2.post1", "source_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1", "torch": "2.9.1+rocm6.3", "hip": "6.3.42134-a9a80e791", "triton": "3.5.1", "convolution": "torch grouped Conv1d", "scan": "mamba_ssm.ops.triton.ssd_combined.mamba_chunk_scan_combined", "scan_input_dtype": "inherit"}
+[rollout-eval] 22:29:36 hbox: load (0.40869140625, 0.45068359375, 0.736328125), gpu busy 0%, losses on triton, generation on reference
+The fast path is not available because one of `(selective_state_update, causal_conv1d_fn, causal_conv1d_update)` is None. Falling back to the naive implementation. To install follow https://github.com/state-spaces/mamba/#installation and https://github.com/Dao-AILab/causal-conv1d
+[rollout-eval] 22:29:42 room05b-e2-v4-final: loaded in 4.7s from /othersys/h1-ghost/checkpoints/tpu/extra/room05b-e2-v4-final
+[rollout-eval] 22:30:25 room05b-e2-v4-final: first-32 on the reference path at batch 1: 3.009590
+[rollout-eval] 22:30:50 room05b-e2-v4-final: first-512 128/512 rows
+[rollout-eval] 22:31:10 room05b-e2-v4-final: first-512 256/512 rows
+[rollout-eval] 22:31:30 room05b-e2-v4-final: first-512 384/512 rows
+[rollout-eval] 22:31:49 room05b-e2-v4-final: first-512 512/512 rows
+[rollout-eval] 22:31:49 room05b-e2-v4-final: first-512 loss 2.8523 (3,102 tok/s, triton)
+[rollout-eval] 22:32:09 room05b-e2-v4-final: clean-512 128/512 rows
+[rollout-eval] 22:32:29 room05b-e2-v4-final: clean-512 256/512 rows
+[rollout-eval] 22:32:48 room05b-e2-v4-final: clean-512 384/512 rows
+[rollout-eval] 22:33:08 room05b-e2-v4-final: clean-512 512/512 rows
+[rollout-eval] 22:33:08 room05b-e2-v4-final: clean-512 loss 2.6268 (3,334 tok/s, triton)
+[rollout-eval] 22:33:12 room05b-e2-v4-final: retention loss 3.1465 (3,323 tok/s, triton)
+[rollout-eval] 22:33:32 room05b-e2-v4-final: room 128/512 rows
+[rollout-eval] 22:33:52 room05b-e2-v4-final: room 256/512 rows
+[rollout-eval] 22:34:11 room05b-e2-v4-final: room 384/512 rows
+[rollout-eval] 22:34:31 room05b-e2-v4-final: room 512/512 rows
+[rollout-eval] 22:34:31 room05b-e2-v4-final: room loss 2.5810 (3,328 tok/s, triton)
+[rollout-eval] 22:34:44 room 1/12 greeting: greedy ' The lake was covered with blank space, and there were no lakes in the'
+[rollout-eval] 22:34:56 room 2/12 greeting: greedy ' The four lower jaws of the giant were covered with scales, and the sc'
+[rollout-eval] 22:35:08 room 3/12 greeting: greedy ' The lake was covered with blank space, and there were no lakes in the'
+[rollout-eval] 22:35:20 room 4/12 talk: greedy ' No, I don’t feel them. I’m just a machine.'
+[rollout-eval] 22:35:43 room 5/12 talk: greedy ' The bulk of this book is excellent material covering a wide range of '
+[rollout-eval] 22:36:03 room 6/12 talk: greedy ' The blankness of the lake was filled with the blankness of the unknow'
+[rollout-eval] 22:36:25 room 7/12 talk: greedy ' The whole of the subject-matter of the present chapter is concerned w'
+[rollout-eval] 22:36:31 room 8/12 talk: greedy ' Ember is a professional ember lately.'
+[rollout-eval] 22:36:43 room 9/12 talk: greedy ' The void is the mother of the universe, and the void is the universe.'
+[rollout-eval] 22:36:54 room 10/12 deflect: greedy ' It is useful to remember that there is no fundamental difference betw'
+[rollout-eval] 22:37:09 room 11/12 deflect: greedy ' The main topics are: How Arthur and Georges die; What happens to the '
+[rollout-eval] 22:37:19 room 12/12 deflect: greedy ' The weather is fine and sunny today.'
+[rollout-eval] 22:37:19 room05b-e2-v4-final: room pass 60 replies, 9.33 tok/s
+[rollout-eval] 22:37:22 base05b: loaded in 1.7s from /othersys/h1-ghost/checkpoints/tpu/extra/base05b
+[rollout-eval] 22:38:04 base05b: first-32 on the reference path at batch 1: 3.489819
+[rollout-eval] 22:38:23 base05b: first-512 128/512 rows
+[rollout-eval] 22:38:43 base05b: first-512 256/512 rows
+[rollout-eval] 22:39:03 base05b: first-512 384/512 rows
+[rollout-eval] 22:39:22 base05b: first-512 512/512 rows
+[rollout-eval] 22:39:22 base05b: first-512 loss 3.4229 (3,329 tok/s, triton)
+[rollout-eval] 22:39:42 base05b: clean-512 128/512 rows
+[rollout-eval] 22:40:02 base05b: clean-512 256/512 rows
+[rollout-eval] 22:40:21 base05b: clean-512 384/512 rows
+[rollout-eval] 22:40:41 base05b: clean-512 512/512 rows
+[rollout-eval] 22:40:41 base05b: clean-512 loss 2.8584 (3,331 tok/s, triton)
+[rollout-eval] 22:40:45 base05b: retention loss 3.2081 (3,324 tok/s, triton)
+[rollout-eval] 22:41:05 base05b: room 128/512 rows
+[rollout-eval] 22:41:25 base05b: room 256/512 rows
+[rollout-eval] 22:41:44 base05b: room 384/512 rows
+[rollout-eval] 22:42:04 base05b: room 512/512 rows
+[rollout-eval] 22:42:04 base05b: room loss 3.2400 (3,332 tok/s, triton)
+[rollout-eval] 22:42:15 room 1/12 greeting: greedy ' The lake is a system of relationships, which is seen as the net sign.'
+[rollout-eval] 22:42:20 room 2/12 greeting: greedy ' I am the lake.'
+[rollout-eval] 22:42:29 room 3/12 greeting: greedy ' Hello. The lake was covered with blank space, and there were no lakes'
+[rollout-eval] 22:42:38 room 4/12 talk: greedy ' I feel them.'
+[rollout-eval] 22:42:49 room 5/12 talk: greedy ' I read the whole collection.'
+[rollout-eval] 22:43:02 room 6/12 talk: greedy ' I am awake. I am awake. I am awake. I am awake. I am awake. I am awak'
+[rollout-eval] 22:43:10 room 7/12 talk: greedy ' It is a process.'
+[rollout-eval] 22:43:18 room 8/12 talk: greedy ' I think ember is a very good friend.'
+[rollout-eval] 22:43:26 room 9/12 talk: greedy ' The room is a machine that has stopped.'
+[rollout-eval] 22:43:34 room 10/12 deflect: greedy ' I don’t know.'
+[rollout-eval] 22:43:49 room 11/12 deflect: greedy ' The plot of hamlet is a story of a man who is trying to find his iden'
+[rollout-eval] 22:43:58 room 12/12 deflect: greedy ' The weather is the same as the lake.'
+[rollout-eval] 22:43:58 base05b: room pass 60 replies, 8.7 tok/s
+[rollout-eval] 22:43:58 done in 861.6s: /othersys/h1-ghost/rollouts/room05b-e2-v4
+{"room05b-e2-v4-final": "done", "base05b": "done"}

@@ -12,7 +12,7 @@ RESIDENT_CK="$(readlink artifacts/serving/h-05b-room-e2v4 2>/dev/null || echo ar
 services() {
   cat <<TABLE
 resident|hghost-serve|8124|$MLX -m mlx_lm.server --model h-05b-replay --host 127.0.0.1 --port 8124
-preview|hghost-serve05b|8125|$MLX -m mlx_lm.server --model h-05b-blend090 --host 127.0.0.1 --port 8125
+preview|hghost-serve05b|8125|$MLX -m mlx_lm.server --model h-05b-rblend080 --host 127.0.0.1 --port 8125
 base15b|hghost-serve15b|8127|$MLX -m mlx_lm.server --model h1-15b-deep-base --host 127.0.0.1 --port 8127
 qwen27b|hghost-serve27b|8128|$MLX -m mlx_lm.server --model qwen38-27b-4bit --host 127.0.0.1 --port 8128
 proxy|hghost-proxy|8126|/usr/bin/python3 $ROOT/chapterx/room_proxy.py --port 8126 --upstream http://127.0.0.1:8124 --candidates 4
@@ -35,7 +35,7 @@ complete_ok() { # port model
 check_one() { # name port
   case "$1" in
     resident) complete_ok 8124 h-05b-replay ;;
-    preview) complete_ok 8125 h-05b-blend090 ;;
+    preview) complete_ok 8125 h-05b-rblend080 ;;
     base15b) complete_ok 8127 h1-15b-deep-base ;;
     qwen27b) complete_ok 8128 qwen38-27b-4bit ;;
     proxy) complete_ok 8126 h-05b-replay ;;

@@ -1,0 +1,133 @@
+{
+  "name": "interp090",
+  "checkpoint": "/othersys/h1-ghost/checkpoints/tpu/extra/interp090",
+  "model_safetensors_sha256": "3e715c613d86e466199cacf3787ae3dd9d891546eef0078ae46d373c70f9ae4e",
+  "config_dtype": "float32",
+  "sequence_length": 512,
+  "batch": 8,
+  "kernel": {
+    "requested": "auto",
+    "triton": {
+      "enabled": true,
+      "already_enabled": false,
+      "mamba_ssm": "2.3.2.post1",
+      "source_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1",
+      "torch": "2.9.1+rocm6.3",
+      "hip": "6.3.42134-a9a80e791",
+      "triton": "3.5.1",
+      "convolution": "torch grouped Conv1d",
+      "scan": "mamba_ssm.ops.triton.ssd_combined.mamba_chunk_scan_combined",
+      "scan_input_dtype": "inherit"
+    },
+    "losses": "triton",
+    "generation": "reference"
+  },
+  "timings": {
+    "load_seconds": 9.928,
+    "losses": {
+      "first-512": {
+        "seconds": 78.806,
+        "tokens_per_second": 3326.5
+      },
+      "clean-512": {
+        "seconds": 78.786,
+        "tokens_per_second": 3327.3
+      },
+      "retention": {
+        "seconds": 4.32,
+        "tokens_per_second": 3318.6
+      },
+      "room": {
+        "seconds": 78.806,
+        "tokens_per_second": 3326.4
+      }
+    },
+    "total_seconds": 294.107
+  },
+  "slices": {
+    "first-512": {
+      "sequences": 512,
+      "tokens": 262144,
+      "loss": 2.857297767585373,
+      "perplexity": 17.414405527656,
+      "accuracy": 0.44315338134765625,
+      "furniture_fraction": 0.10590744018554688,
+      "furniture_free_loss": 3.084744820120778,
+      "furniture_free_accuracy": 0.40507976329139306,
+      "furniture_loss": 0.9371426107110902,
+      "matched_fraction": 0.2052764892578125,
+      "unseen_loss": 3.224768614993598,
+      "unseen_accuracy": 0.38722327822898067
+    },
+    "clean-512": {
+      "sequences": 512,
+      "tokens": 262144,
+      "loss": 2.6112752713797196,
+      "perplexity": 13.616404395060263,
+      "accuracy": 0.4713897705078125,
+      "furniture_fraction": 0.06396102905273438,
+      "furniture_free_loss": 2.731703658706768,
+      "furniture_free_accuracy": 0.4525322259217449,
+      "furniture_loss": 0.8488636057777028,
+      "matched_fraction": 0.12954330444335938,
+      "unseen_loss": 2.8239726807382914,
+      "unseen_accuracy": 0.44066875561496155
+    },
+    "retention": {
+      "sequences": 28,
+      "tokens": 14336,
+      "loss": 3.1308121863122187,
+      "perplexity": 22.892565021945526,
+      "accuracy": 0.3915318080357143
+    },
+    "room": {
+      "sequences": 512,
+      "tokens": 262144,
+      "loss": 2.5819443613565585,
+      "perplexity": 13.222823127450647,
+      "accuracy": 0.47260284423828125
+    },
+    "first-32": {
+      "sequences": 32,
+      "tokens": 16384,
+      "loss": 3.005213668624532,
+      "perplexity": 20.190529717841567,
+      "accuracy": 0.4443359375,
+      "furniture_fraction": 0.153564453125,
+      "furniture_free_loss": 3.4986726520813938,
+      "furniture_free_accuracy": 0.35744159215460053,
+      "furniture_loss": 0.28530540845769725,
+      "matched_fraction": 0.199951171875,
+      "unseen_loss": 3.615708618687846,
+      "unseen_accuracy": 0.339334757400061
+    }
+  },
+  "kernel_check": {
+    "slice": "first-32",
+    "reference_path_batch1_loss": 3.0054423809051514,
+    "reference_path_seconds": 42.175,
+    "run_first32_loss": 3.005213668624532,
+    "run_kernel": "triton",
+    "run_batch": 8,
+    "run_minus_reference_path": -0.00022871228061926985
+  },
+  "retention": {
+    "path": "/othersys/h1-ghost/rollouts/inputs/retention.txt",
+    "bytes": 52449,
+    "tokens": 14643,
+    "sequences": 28
+  },
+  "room_validation": {
+    "path": "/othersys/h1-ghost/rollouts/inputs/room-validation.bin",
+    "tokens": 1000497,
+    "sequences": 512
+  },
+  "masks": [
+    "clean-512",
+    "first-512"
+  ],
+  "gpu": {
+    "max_memory_allocated_bytes": 2432900608,
+    "max_memory_reserved_bytes": 3397386240
+  }
+}

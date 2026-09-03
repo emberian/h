@@ -1,0 +1,137 @@
+{
+  "started": "2026-09-03T10:10:30-0400",
+  "environment": {
+    "host": "hbox",
+    "python": "3.12.7",
+    "torch": "2.9.1+rocm6.3",
+    "hip": "6.3.42134-a9a80e791",
+    "transformers": "4.57.1",
+    "triton": "3.5.1",
+    "device": "AMD Radeon Graphics",
+    "hsa_override_gfx_version": "10.3.0",
+    "load_average": [
+      1.2900390625,
+      1.3623046875,
+      0.962890625
+    ],
+    "memory_available_bytes": 14654771200,
+    "gpu_busy_percent": 0
+  },
+  "kernel": {
+    "requested": "auto",
+    "triton": {
+      "enabled": true,
+      "already_enabled": false,
+      "mamba_ssm": "2.3.2.post1",
+      "source_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1",
+      "torch": "2.9.1+rocm6.3",
+      "hip": "6.3.42134-a9a80e791",
+      "triton": "3.5.1",
+      "convolution": "torch grouped Conv1d",
+      "scan": "mamba_ssm.ops.triton.ssd_combined.mamba_chunk_scan_combined",
+      "scan_input_dtype": "inherit"
+    },
+    "losses": "triton",
+    "generation": "reference"
+  },
+  "slices": {
+    "first-512": {
+      "sequences": 512
+    },
+    "clean-512": {
+      "sequences": 512
+    }
+  },
+  "validation": {
+    "path": "/othersys/h1-ghost/data/corpus-v1/validation.bin",
+    "sha256": "07bce22a3de6101d4d946d1592a500c30a3790afffdecb8da6bd99777b985928",
+    "tokens": 2380464,
+    "eos_token_id": 11,
+    "dataset_manifest_sha256": "6a059742543cde4822f95605e8f0f42e1e89bbad829a95e27234d59a2fc8b7ae"
+  },
+  "settings": {
+    "output": "/othersys/h1-ghost/rollouts/interp-e2v4-fine",
+    "slices": "/othersys/h1-ghost/rollouts/inputs/slices.json",
+    "validation": "/othersys/h1-ghost/data/corpus-v1/validation.bin",
+    "prompts": "/othersys/h1-ghost/rollouts/inputs/prompts.json",
+    "retention": "/othersys/h1-ghost/rollouts/inputs/retention.txt",
+    "room_validation": "/othersys/h1-ghost/rollouts/inputs/room-validation.bin",
+    "room_validation_sequences": 512,
+    "masks": "/othersys/h1-ghost/rollouts/inputs/masks.npz",
+    "batch": 8,
+    "kernel": "auto",
+    "mamba_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1",
+    "reference": [
+      "base",
+      3.745613
+    ],
+    "reference_tolerance": 0.005,
+    "samples": 4,
+    "max_new_tokens": 128,
+    "temperature": 0.8,
+    "top_p": 0.95,
+    "repetition_penalty": 1.08,
+    "room_prompts": null,
+    "room_samples": 4,
+    "room_max_new_tokens": 64,
+    "room_temperature": 0.7,
+    "room_top_p": 0.9,
+    "room_repetition_penalty": 1.0,
+    "room_seed": 20260902,
+    "skip_losses": false,
+    "skip_generation": true,
+    "force": false
+  },
+  "checkpoints": {
+    "interp060": {
+      "path": "/othersys/h1-ghost/checkpoints/tpu/extra/interp060",
+      "status": "done",
+      "seconds": 298.807,
+      "losses": {
+        "first-512": 2.9888532525829845,
+        "clean-512": 2.633067311972428,
+        "retention": 3.118881230023469,
+        "room": 2.7250124529107373,
+        "first-32": 3.0406894205687593
+      }
+    },
+    "interp070": {
+      "path": "/othersys/h1-ghost/checkpoints/tpu/extra/interp070",
+      "status": "done",
+      "seconds": 297.001,
+      "losses": {
+        "first-512": 2.929451231824796,
+        "clean-512": 2.6167737370857136,
+        "retention": 3.118366522212219,
+        "room": 2.6373455505724257,
+        "first-32": 3.0219917804064655
+      }
+    },
+    "interp080": {
+      "path": "/othersys/h1-ghost/checkpoints/tpu/extra/interp080",
+      "status": "done",
+      "seconds": 293.842,
+      "losses": {
+        "first-512": 2.8839920583620593,
+        "clean-512": 2.6088915518788056,
+        "retention": 3.122051783844069,
+        "room": 2.598235371902435,
+        "first-32": 3.0099774727043274
+      }
+    },
+    "interp090": {
+      "path": "/othersys/h1-ghost/checkpoints/tpu/extra/interp090",
+      "status": "done",
+      "seconds": 294.107,
+      "losses": {
+        "first-512": 2.857297767585373,
+        "clean-512": 2.6112752713797196,
+        "retention": 3.1308121863122187,
+        "room": 2.5819443613565585,
+        "first-32": 3.005213668624532
+      }
+    }
+  },
+  "complete": true,
+  "seconds": 1183.9
+}

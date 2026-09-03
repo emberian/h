@@ -1,0 +1,42 @@
+/opt/amdgpu/share/libdrm/amdgpu.ids: No such file or directory
+{"event": "rocm_triton_ssd_enabled", "enabled": true, "already_enabled": false, "mamba_ssm": "2.3.2.post1", "source_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1", "torch": "2.9.1+rocm6.3", "hip": "6.3.42134-a9a80e791", "triton": "3.5.1", "convolution": "torch grouped Conv1d", "scan": "mamba_ssm.ops.triton.ssd_combined.mamba_chunk_scan_combined", "scan_input_dtype": "inherit"}
+[rollout-eval] 16:29:37 hbox: load (4.7734375, 4.8603515625, 5.65087890625), gpu busy 0%, losses on triton, generation on reference
+The fast path is not available because one of `(selective_state_update, causal_conv1d_fn, causal_conv1d_update)` is None. Falling back to the naive implementation. To install follow https://github.com/state-spaces/mamba/#installation and https://github.com/Dao-AILab/causal-conv1d
+[rollout-eval] 16:29:45 room05b-e2-v3-final: loaded in 6.3s from /othersys/h1-ghost/checkpoints/tpu/extra/room05b-e2-v3-final
+[rollout-eval] 16:30:28 room05b-e2-v3-final: first-32 on the reference path at batch 1: 3.011173
+[rollout-eval] 16:30:53 room05b-e2-v3-final: first-512 128/512 rows
+[rollout-eval] 16:31:13 room05b-e2-v3-final: first-512 256/512 rows
+[rollout-eval] 16:31:33 room05b-e2-v3-final: first-512 384/512 rows
+[rollout-eval] 16:31:52 room05b-e2-v3-final: first-512 512/512 rows
+[rollout-eval] 16:31:52 room05b-e2-v3-final: first-512 loss 2.8523 (3,102 tok/s, triton)
+[rollout-eval] 16:32:12 room05b-e2-v3-final: clean-512 128/512 rows
+[rollout-eval] 16:32:32 room05b-e2-v3-final: clean-512 256/512 rows
+[rollout-eval] 16:32:51 room05b-e2-v3-final: clean-512 384/512 rows
+[rollout-eval] 16:33:11 room05b-e2-v3-final: clean-512 512/512 rows
+[rollout-eval] 16:33:11 room05b-e2-v3-final: clean-512 loss 2.6259 (3,325 tok/s, triton)
+[rollout-eval] 16:33:15 room05b-e2-v3-final: retention loss 3.1464 (3,321 tok/s, triton)
+[rollout-eval] 16:33:35 room05b-e2-v3-final: room 128/512 rows
+[rollout-eval] 16:33:55 room05b-e2-v3-final: room 256/512 rows
+[rollout-eval] 16:34:15 room05b-e2-v3-final: room 384/512 rows
+[rollout-eval] 16:34:34 room05b-e2-v3-final: room 512/512 rows
+[rollout-eval] 16:34:34 room05b-e2-v3-final: room loss 2.5809 (3,323 tok/s, triton)
+[rollout-eval] 16:34:44 room05b-e2-final: loaded in 8.2s from /othersys/h1-ghost/checkpoints/tpu/extra/room05b-e2-final
+[rollout-eval] 16:35:26 room05b-e2-final: first-32 on the reference path at batch 1: 3.015615
+[rollout-eval] 16:35:46 room05b-e2-final: first-512 128/512 rows
+[rollout-eval] 16:36:06 room05b-e2-final: first-512 256/512 rows
+[rollout-eval] 16:36:26 room05b-e2-final: first-512 384/512 rows
+[rollout-eval] 16:36:46 room05b-e2-final: first-512 512/512 rows
+[rollout-eval] 16:36:46 room05b-e2-final: first-512 loss 2.8584 (3,293 tok/s, triton)
+[rollout-eval] 16:37:06 room05b-e2-final: clean-512 128/512 rows
+[rollout-eval] 16:37:26 room05b-e2-final: clean-512 256/512 rows
+[rollout-eval] 16:37:45 room05b-e2-final: clean-512 384/512 rows
+[rollout-eval] 16:38:05 room05b-e2-final: clean-512 512/512 rows
+[rollout-eval] 16:38:05 room05b-e2-final: clean-512 loss 2.6277 (3,300 tok/s, triton)
+[rollout-eval] 16:38:09 room05b-e2-final: retention loss 3.1416 (3,317 tok/s, triton)
+[rollout-eval] 16:38:29 room05b-e2-final: room 128/512 rows
+[rollout-eval] 16:38:49 room05b-e2-final: room 256/512 rows
+[rollout-eval] 16:39:10 room05b-e2-final: room 384/512 rows
+[rollout-eval] 16:39:29 room05b-e2-final: room 512/512 rows
+[rollout-eval] 16:39:29 room05b-e2-final: room loss 2.5820 (3,280 tok/s, triton)
+[rollout-eval] 16:39:29 done in 592.2s: /othersys/h1-ghost/rollouts/baseline-roomslice
+{"room05b-e2-v3-final": "done", "room05b-e2-final": "done"}

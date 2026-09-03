@@ -9,6 +9,7 @@ description = "Corpus preparation and training tools for the h.fg-goose.online F
 license = "CC0-1.0"
 requires-python = ">=3.11"
 dependencies = [
+  "datasets>=5.0.1",
   "matplotlib>=3.11.1",
   "numpy>=2,<3",
   "pydivsufsort>=0.0.20",
