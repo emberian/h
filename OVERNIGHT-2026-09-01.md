@@ -680,3 +680,6 @@ New main line, h first:
 - 12:45: 0.5B base audit row (1000 docs/task): mean 0.566, LAMBADA ppl 12.7. Against it: e1 0.512 (-5.4 points; ARC-c 0.413
   -> 0.314, ARC-e 0.657 -> 0.566), e2-v3 0.500, e2-v4 0.504. The first epoch broke the 0.5B measurably; the second cost
   another point. Blend audit (alpha 0.9) pushing next under the same kernel.
+- 12:55: replay arm COMPLETE (Kaggle let it finish past quota; 21.06/20 h used): library 2.857, fixed-32 3.016, room 2.586,
+  h-span 2.569 vs e2-v4 2.852 / 3.010 / 2.581 / 2.559: general text costs ~0.005 on the library slices. Whether it keeps
+  general competence is the audit's question (queued after the blend audit). Download + hbox + read + bank chained.
