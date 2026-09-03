@@ -41,6 +41,22 @@ OUTPUT = Path(os.environ.get("HGHOST_OUTPUT", "/kaggle/working/h1jax-profile-gat
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
 
+def hbm_stats() -> dict:
+    """Per-device HBM bytes in use / limit / peak from the runtime (empty on backends without stats)."""
+    out = {}
+    try:
+        for d in jax.devices():
+            st = d.memory_stats() or {}
+            out[str(d.id)] = {
+                "in_use": st.get("bytes_in_use"),
+                "limit": st.get("bytes_limit"),
+                "peak": st.get("peak_bytes_in_use"),
+            }
+    except Exception as exc:  # noqa: BLE001
+        out["error"] = str(exc)[:200]
+    return out
+
+
 def emit(event: str, **values: Any) -> None:
     print(json.dumps({"event": event, **values}, default=str), flush=True)
 
@@ -186,7 +202,7 @@ def memory_probe(tag: str) -> None:
         ) * os.sysconf("SC_PAGE_SIZE")
     except (OSError, ValueError):
         pass
-    emit("memory", tag=tag, **info)
+    emit("memory", tag=tag, hbm=hbm_stats(), **info)
 
 
 # ----------------------------------------------------------------------------- hardware

@@ -574,7 +574,10 @@ def falcon_h1_forward(
             inner = body
 
             def body(carry: Array, layer: dict[str, Array]) -> tuple[Array, None]:
-                return inner(carry, inside(layer))
+                # The barrier pins the gathered layer to this iteration: without it XLA may hoist a
+                # loop-invariant all-gather of the whole stack out of the scan and keep it resident.
+                carry, gathered = jax.lax.optimization_barrier((carry, inside(layer)))
+                return inner(carry, gathered)
 
         if gradient_checkpointing:
             body = jax.checkpoint(body, policy=policy) if policy else jax.checkpoint(body)
