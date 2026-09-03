@@ -10,13 +10,30 @@ const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls)
 const FRAME = 'A room in the library, late. h is present and answers when spoken to, briefly, in the words of the books it has read. The others are visitors.';
 const DEFAULT_PROMPT = FRAME + '\n\nember: hello h. what are you reading tonight?\n\nh:';
 const LS_KEY = 'h-explorer.weave.v1';
+const LS_RECENT = 'h-explorer.recent.v1';
 const AUTO_COLLAPSE_DEPTH = 2;
+const LIB_SAMPLER = { n: 4, temperature: 0.7, top_p: 0.9, max_tokens: 64, stop: ['\n\n'] };  // what the room models handle best
+const SEED_LINE = 'ember: hi h';
+// [tab, name, one sentence] — rendered on the start pane and in the ? help.
+const PANES = [
+  ['start', 'Start here', 'three ways in and this map; the ? help button brings the map back from any pane.'],
+  ['loom', 'Loom', 'a tree of completions: expand a node to sample continuations, click one to select it, and read the selected path on the right with every token shaded by its logprob.'],
+  ['provenance', 'Provenance', 'exact-match search of the selected node against the training corpus: how much of what h said is quotation, and from which books.'],
+  ['observatory', 'Observatory', 'replay of the Discord room proxy: for each turn, the prompt h saw, the candidates it tried, and the one it said.'],
+  ['compare', 'Compare', 'one prompt to two (or all) model servers, K samples each, side by side with per-server statistics.'],
+  ['counterfactual', 'Counterfactual', 'edit the earlier turns of a room and score a fixed reply under the true and the edited context, token by token.'],
+  ['roomstate', 'Room state', 'drive the persistent-state room server on hbox: read events into the state, fork candidates, commit one, and watch the state norms.'],
+  ['population', 'Population', 'one prompt across many checkpoints, each served in turn on :8125, with a library-likeness judge and a provenance scan per sample.'],
+  ['labels', 'Labels', 'the ledger of failure labels and the blind pairwise sheets; a label from any pane lands here as a training record.'],
+];
 
 const S = {
   servers: [], serving: {}, checkpoints: [], version: {}, serve: {},
   weave: null, weaveName: '', collapsed: new Set(), splitMode: null, editing: null, noting: null,
   prov: new Map(),          // text -> haunt record
-  obs: { dates: [], day: null, selected: null },
+  obs: { dates: [], day: null, selected: null, loading: null },
+  library: { frame: FRAME, sampler: LIB_SAMPLER, items: [] },
+  seeding: false, probed: false, probe: null,   // the first /api/servers probe: the start actions wait for it
   busy: 0,
   history: { past: [], future: [] },
   cf: { turns: [], edited: [], reply: '', results: null },
@@ -229,6 +246,8 @@ function syncPromptBox() {
   const r = rootOfActive(); const ta = $('#loom-prompt');
   const text = r ? S.weave.nodes[r].contents.text : '';
   if (ta.value !== text) ta.value = text;
+  const sel = $('#loom-library'); const lib = r ? S.weave.nodes[r].contents.library : null;
+  if (sel.options.length) sel.value = (lib && libraryItem(lib.id)) ? lib.id : (libraryByText(text)?.id || 'custom');
 }
 let promptTimer = null;
 function onPromptInput() {
@@ -237,7 +256,7 @@ function onPromptInput() {
     const text = $('#loom-prompt').value; const r = rootOfActive();
     if (!r) { if (text) mutate('new prompt', w => { insert(w, mkNode({ contents: { kind: 'prompt', text, tokens: null, created: now() }, active: true })); }); return; }
     if (S.weave.nodes[r].contents.text === text) return;
-    mutate('edit prompt', w => { const n = w.nodes[r]; n.contents = { ...n.contents, kind: 'prompt', text, tokens: null, edited: now() }; });
+    mutate('edit prompt', w => { const n = w.nodes[r]; n.contents = { ...n.contents, kind: 'prompt', text, tokens: null, edited: now(), library: libraryByText(text) ? n.contents.library : undefined }; });
   }, 300);
 }
 
@@ -260,7 +279,7 @@ function fillServerSelect(sel, keep) {
 async function refreshServers() {
   try {
     const j = await api('/api/servers');
-    S.servers = j.servers; S.serving = j.serving; S.checkpoints = j.checkpoints; S.version = j.version || {}; S.serve = j.serve || {};
+    S.servers = j.servers; S.serving = j.serving; S.checkpoints = j.checkpoints; S.version = j.version || {}; S.serve = j.serve || {}; S.probed = true;
     fillServerSelect($('#loom-server'), true); fillServerSelect($('#cmp-a'), true); fillServerSelect($('#cmp-b'), true);
     if (liveServers().length > 1 && $('#cmp-a').value === $('#cmp-b').value) $('#cmp-b').value = liveServers()[1].url;
     const st = $('#servers-status'); st.innerHTML = '';
@@ -269,9 +288,11 @@ async function refreshServers() {
       t.title = s.path || s.error || ''; st.appendChild(t); if (i < S.servers.length - 1) st.appendChild(document.createTextNode('  '));
     });
     if (!liveServers().length) toast('no live model server: start mlx_lm.server on :8124 or :8125', 'err');
-    renderTree();
+    renderTree(); renderStart();
   } catch (e) { fail('servers', e); }
 }
+// The resident h is the first configured server (:8124 by default); fall back to any live one.
+function residentServer() { const first = S.servers[0]; return (first?.up && first?.model) ? first : (liveServers()[0] || null); }
 
 // ------------------------------------------------------------------------------------------ loom rendering
 function renderTokens(c, opts = {}) {
@@ -289,7 +310,7 @@ function renderTokens(c, opts = {}) {
 }
 function renderTree() {
   const w = S.weave; const root = $('#tree'); if (!w) return; root.innerHTML = '';
-  if (!w.roots.length) { root.appendChild(el('p', 'hint', 'no nodes yet: type a prompt on the left (or press "frame"), then expand (Enter). press ? for keys.')); return; }
+  if (!w.roots.length) { root.appendChild(el('p', 'hint', 'Empty weave: pick a prompt from the library on the left (or press "frame", or type one), then "expand selected" — or go to Start here and press Ask h.')); return; }
   const onPath = new Set(w.active ? pathTo(w, w.active) : []);
   const ul = el('ul'); for (const r of w.roots) ul.appendChild(renderNode(r, onPath)); root.appendChild(ul);
   const act = $('.node.active', root); if (act && !isVisible(act)) act.scrollIntoView({ block: 'nearest' });
@@ -301,6 +322,7 @@ function renderNode(id, onPath) {
   card.dataset.id = id;
   const head = el('div', 'head');
   head.appendChild(el('span', 'kind', c.kind || 'node'));
+  if (c.library) { const L = el('span', 'lib', `${c.library.kind} · ${c.library.title}`); L.title = 'from the prompt library'; head.appendChild(L); }
   if (c.model) { const m = el('span', null, modelShort(c.model)); m.title = `${c.model} @ ${c.server || ''}`; head.appendChild(m); }
   const st = statsOf(c.tokens);
   if (st) head.appendChild(el('span', null, `${st.n} tok · lp ${fmt(st.mean)} · surprisal ${fmt(st.surprisal)}`));
@@ -336,24 +358,38 @@ function renderNode(id, onPath) {
     };
     card.appendChild(body);
     if (c.note) card.appendChild(el('div', 'note-text', c.note));
-    const act = el('div', 'actions');
-    for (const s of liveServers()) {
-      const b = el('button', 'primary', `+${modelShort(s.model)}`); b.title = `sample N continuations from ${s.model} (${s.url})`;
-      b.onclick = e => { e.stopPropagation(); expand(id, s); }; act.appendChild(b);
+    const isActive = w.active === id; const N = +$('#loom-n').value || 1;
+    const mk = (row, label, title, fn, cls) => { const b = el('button', cls || null, label); b.title = title; b.onclick = e => { e.stopPropagation(); fn(); }; row.appendChild(b); return b; };
+    if (isActive) {
+      // The selected node carries its navigation as buttons (the arrow keys do the same).
+      const nav = el('div', 'nav'); nav.appendChild(el('span', 'sel', 'selected'));
+      const sibs = n.from !== null ? w.nodes[n.from].to : w.roots; const i = sibs.indexOf(id);
+      mk(nav, '↑ parent', 'select the parent (↑)', () => goTo(n.from)).disabled = n.from === null;
+      mk(nav, '↓ child', 'select the first child (↓)', () => { S.collapsed.delete(id); goTo(n.to[0]); }).disabled = !n.to.length;
+      mk(nav, '← prev', 'select the previous sibling (←)', () => goTo(sibs[i - 1])).disabled = i <= 0;
+      mk(nav, 'next →', 'select the next sibling (→)', () => goTo(sibs[i + 1])).disabled = i < 0 || i >= sibs.length - 1;
+      nav.appendChild(el('span', null, '· Enter expands · ? all keys'));
+      card.appendChild(nav);
     }
-    if (!liveServers().length) { const b = el('button', 'primary', '+ (no server)'); b.disabled = true; act.appendChild(b); }
-    const btn = (label, title, fn) => { const b = el('button', null, label); b.title = title; b.onclick = e => { e.stopPropagation(); fn(); }; act.appendChild(b); };
-    btn(n.bookmarked ? '★' : '☆', 'bookmark (b)', () => mutate('bookmark', w => setBookmarked(w, id, !n.bookmarked)));
-    if (w.active === id) btn('deactivate', 'move the active tip to the parent (x)', () => mutate('deactivate', w => setActive(w, id, false)));
-    else btn('activate', 'make this the active tip', () => selectNode(id));
-    btn('edit', 'edit the text (e); drops token logprobs', () => { S.editing = id; S.noting = null; S.splitMode = null; touch(); });
-    btn('note', 'attach a note (n)', () => { S.noting = id; S.editing = null; S.splitMode = null; touch(); });
-    btn('label', 'failure label or KEEP (l)', () => openLabelDialog({ kind: 'loom', id }));
-    btn(S.splitMode === id ? 'splitting…' : 'split', 'then click the token that should start the new child', () => { S.splitMode = S.splitMode === id ? null : id; touch(); });
-    if (n.from !== null && w.nodes[n.from]?.to.length === 1) btn('merge ↑', 'merge into the parent (only child)', () => mutate('merge', w => mergeWithParent(w, id) !== null));
-    btn('haunt', 'provenance scan this node (h)', () => haunt([{ id, text: c.text }]).then(() => touch()));
-    btn('→ cf', 'counterfactual: edit this path and score the reply', () => { cfFromNode(id); showTab('counterfactual'); });
-    btn('✕', 'delete this node and its subtree (Delete)', () => deleteNode(id));
+    const act = el('div', 'actions');
+    const expandBtn = s => mk(act, `+${N} ${modelShort(s.model)}`, `expand: sample ${N} continuation(s) of this node from ${s.model} (${s.url})${isActive ? ' — Enter' : ''}`, () => expand(id, s), 'primary');
+    const live = liveServers();
+    if (isActive) for (const s of live) expandBtn(s);
+    else if (live.length) expandBtn(serverByUrl($('#loom-server').value) || live[0]);
+    if (!live.length) { const b = el('button', 'primary', '+ (no server)'); b.disabled = true; b.title = 'no live model server: start one and press "servers"'; act.appendChild(b); }
+    if (!isActive) mk(act, 'select', 'make this the selected node (clicking its text does the same)', () => selectNode(id));
+    else {
+      mk(act, n.bookmarked ? '★' : '☆', 'bookmark (b)', () => mutate('bookmark', w => setBookmarked(w, id, !n.bookmarked)));
+      mk(act, 'deactivate', 'move the selection to the parent (x)', () => mutate('deactivate', w => setActive(w, id, false)));
+      mk(act, 'edit', 'edit the text (e); drops token logprobs', () => { S.editing = id; S.noting = null; S.splitMode = null; touch(); });
+      mk(act, 'note', 'attach a note (n)', () => { S.noting = id; S.editing = null; S.splitMode = null; touch(); });
+      mk(act, 'label', 'failure label or KEEP (l)', () => openLabelDialog({ kind: 'loom', id }));
+      mk(act, S.splitMode === id ? 'splitting…' : 'split', 'then click the token that should start the new child', () => { S.splitMode = S.splitMode === id ? null : id; touch(); });
+      if (n.from !== null && w.nodes[n.from]?.to.length === 1) mk(act, 'merge ↑', 'merge into the parent (only child)', () => mutate('merge', w => mergeWithParent(w, id) !== null));
+      mk(act, 'haunt', 'provenance scan this node (h)', () => haunt([{ id, text: c.text }]).then(() => touch()));
+      mk(act, '→ cf', 'counterfactual: edit this path and score the reply', () => { cfFromNode(id); showTab('counterfactual'); });
+      mk(act, '✕', 'delete this node and its subtree (Delete)', () => deleteNode(id));
+    }
     card.appendChild(act);
   }
   li.appendChild(card);
@@ -361,6 +397,7 @@ function renderNode(id, onPath) {
   return li;
 }
 function selectNode(id) { const w = S.weave; if (!w.nodes[id]) return; if (w.active === id) return; mutate('select', w2 => setActive(w2, id, true)); }
+function goTo(target) { if (!target || !S.weave.nodes[target]) return; for (const p of pathTo(S.weave, target)) if (p !== target) S.collapsed.delete(p); selectNode(target); }
 function toggleCollapse(id) { S.collapsed.has(id) ? S.collapsed.delete(id) : S.collapsed.add(id); touch(); }
 function deleteNode(id) {
   const n = S.weave.nodes[id]; if (!n) return;
@@ -368,7 +405,7 @@ function deleteNode(id) {
 }
 function renderReading() {
   const w = S.weave; const out = $('#reading'); out.innerHTML = '';
-  if (!w.active) { $('#reading-stats').textContent = ''; return; }
+  if (!w.active) { $('#reading-stats').textContent = ''; out.appendChild(el('span', 'hint', 'Click a node in the tree: its path from the root reads here as one text, sampled tokens shaded by logprob.')); return; }
   const ids = pathTo(w, w.active); let all = [];
   for (const id of ids) {
     const c = w.nodes[id].contents; const seg = el('span', 'seg ' + (c.tokens ? '' : 'prompt') + (id === w.active ? ' active' : ''));
@@ -381,10 +418,10 @@ function renderReading() {
 }
 function renderNodeInfo() {
   const w = S.weave; const box = $('#node-info'); box.innerHTML = '';
-  if (!w.active || !w.nodes[w.active]) { box.appendChild(el('span', 'hint', 'no active node')); return; }
+  if (!w.active || !w.nodes[w.active]) { box.appendChild(el('span', 'hint', 'No node selected: click one to see how it was produced (model, checkpoint, sampler).')); return; }
   const c = w.nodes[w.active].contents; const dl = el('dl');
   const row = (k, v) => { if (v == null || v === '') return; dl.appendChild(el('dt', null, k)); dl.appendChild(el('dd', null, typeof v === 'string' ? v : JSON.stringify(v))); };
-  row('id', w.active.slice(0, 8)); row('kind', c.kind); row('created', c.created); row('edited', c.edited);
+  row('id', w.active.slice(0, 8)); row('kind', c.kind); row('library', c.library ? `${c.library.kind} · ${c.library.title}` : null); row('created', c.created); row('edited', c.edited);
   const r = c.repro || {};
   row('model', c.model); row('checkpoint', r.checkpoint); row('server', c.server); row('backend', r.backend);
   row('sampler', c.sampler ? `t=${c.sampler.temperature} p=${c.sampler.top_p} max=${c.sampler.max_tokens} stop=${JSON.stringify(c.sampler.stop)}${c.sampler.repetition_penalty ? ' rp=' + c.sampler.repetition_penalty : ''}` : null);
@@ -409,18 +446,17 @@ function keyNav(e) {
   if (e.key === '?' ) { $('#help').showModal(); return; }
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
   if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'c') { e.preventDefault(); copyTranscript(); return; }
-  if (/^[1-8]$/.test(e.key) && !e.metaKey && !e.ctrlKey) { const b = $$('.tabs button')[+e.key - 1]; if (b) showTab(b.dataset.tab); return; }
+  if (/^[1-9]$/.test(e.key) && !e.metaKey && !e.ctrlKey) { const b = $$('.tabs button')[+e.key - 1]; if (b) showTab(b.dataset.tab); return; }
   if (e.key === 'Escape') { if (S.splitMode || S.editing || S.noting) { S.splitMode = null; S.editing = null; S.noting = null; touch(); } return; }
   if (tab !== 'loom' || !w) return;
   const id = w.active; const n = id ? w.nodes[id] : null;
-  const go = target => { if (target) { for (const p of pathTo(w, target)) S.collapsed.delete(p === target ? '' : p); selectNode(target); } };
   switch (e.key) {
-    case 'ArrowUp': e.preventDefault(); if (n?.from) go(n.from); break;
-    case 'ArrowDown': e.preventDefault(); if (n?.to.length) { S.collapsed.delete(id); go(n.to[0]); } break;
+    case 'ArrowUp': e.preventDefault(); if (n?.from) goTo(n.from); break;
+    case 'ArrowDown': e.preventDefault(); if (n?.to.length) { S.collapsed.delete(id); goTo(n.to[0]); } break;
     case 'ArrowLeft': case 'ArrowRight': {
       e.preventDefault(); if (!n) break;
       const sibs = n.from ? w.nodes[n.from].to : w.roots; const i = sibs.indexOf(id);
-      const j = e.key === 'ArrowLeft' ? i - 1 : i + 1; if (j >= 0 && j < sibs.length) go(sibs[j]); break;
+      const j = e.key === 'ArrowLeft' ? i - 1 : i + 1; if (j >= 0 && j < sibs.length) goTo(sibs[j]); break;
     }
     case 'Enter': e.preventDefault(); if (id) expand(id); break;
     case 'e': if (id) { S.editing = id; S.noting = null; touch(); } break;
@@ -486,10 +522,10 @@ function provTarget() {
 }
 function renderProvenance() {
   const w = S.weave; const t = provTarget(); const box = $('#prov-text'); box.innerHTML = ''; const out = $('#prov-results'); out.innerHTML = '';
-  if (!t) { box.appendChild(el('span', 'hint', 'no active node in the loom')); return; }
+  if (!t) { box.appendChild(el('span', 'hint', 'Nothing selected: pick a node in the loom first, then press scan here (or h there).')); out.appendChild(el('p', 'hint', 'Select a node in the loom, then scan: the longest exact corpus match, coverage, and the documents it came from appear here.')); return; }
   const c = w.nodes[t.id].contents; const rec = S.prov.get(t.text);
   box.appendChild(t.scope === 'node' ? renderTokens(c, { matches: rec }) : el('div', 'text plain', t.text));
-  if (!rec) { out.appendChild(el('p', 'hint', 'not scanned yet')); return; }
+  if (!rec) { out.appendChild(el('p', 'hint', 'Not scanned yet: press scan (or h in the loom) to search the training corpus for this text.')); return; }
   out.appendChild(provCard(rec));
 }
 function provCard(rec) {
@@ -520,18 +556,33 @@ function provCard(rec) {
 }
 
 // ------------------------------------------------------------------------------------------ observatory
-async function loadObsDates() {
-  try {
-    const j = await api('/api/observatory'); S.obs.dates = j.dates; const sel = $('#obs-date'); sel.innerHTML = '';
-    for (const d of j.dates) { const o = el('option', null, `${d.date} (${d.records})`); o.value = d.date; sel.appendChild(o); }
-    if (!j.dates.length) { $('#obs-summary').textContent = `no files in ${j.dir}`; return; }
-    await loadObsDay(sel.value);
-  } catch (e) { fail('observatory', e); }
+// Lists the days (newest first) and, unless day:false, loads the newest. Concurrent callers share one load.
+function loadObsDates({ day = true } = {}) {
+  if (S.obs.loading) return S.obs.loading;
+  S.obs.loading = (async () => {
+    try {
+      const j = await api('/api/observatory'); S.obs.dates = j.dates; const sel = $('#obs-date'); sel.innerHTML = '';
+      for (const d of j.dates) { const o = el('option', null, `${d.date} (${d.records})`); o.value = d.date; sel.appendChild(o); }
+      renderStart();
+      if (!j.dates.length) { $('#obs-summary').textContent = `Nothing to replay yet: no files in ${j.dir}. The room proxy writes one per day the room speaks to h.`; return; }
+      if (day) await loadObsDay(sel.value);
+    } catch (e) { fail('observatory', e); } finally { S.obs.loading = null; }
+  })();
+  return S.obs.loading;
 }
 async function loadObsDay(date) {
   busy(1, `loading ${date}…`);
   try { S.obs.day = await api(`/api/observatory?date=${encodeURIComponent(date)}`); S.obs.selected = null; renderObsSummary(); renderObsList(); renderObsDetail(); status(`${date}: ${S.obs.day.records.length} records`); }
   catch (e) { fail('observatory', e); } finally { S.busy--; }
+}
+// "Replay the room": the observatory on the newest day, opened at its most recent record.
+async function replayRoom() {
+  showTab('observatory');
+  if (!S.obs.day) await loadObsDates();
+  const latest = S.obs.dates[0]?.date;
+  if (latest && S.obs.day?.date !== latest) { $('#obs-date').value = latest; await loadObsDay(latest); }
+  const recs = S.obs.day?.records || [];
+  if (recs.length && S.obs.selected == null) { S.obs.selected = recs[recs.length - 1].index; renderObsList(); renderObsDetail(); }
 }
 function renderObsSummary() {
   const s = S.obs.day.summary; const box = $('#obs-summary');
@@ -540,6 +591,7 @@ function renderObsSummary() {
 }
 function renderObsList() {
   const box = $('#obs-list'); box.innerHTML = ''; const t = el('table');
+  if (!S.obs.day.records.length) { box.appendChild(el('p', 'hint', 'No records on this day: pick another day above.')); return; }
   t.innerHTML = '<tr><th>#</th><th>time</th><th>visitor</th><th class="num">tried</th><th>ok</th><th class="num">s</th></tr>';
   for (const r of S.obs.day.records) {
     const tr = el('tr', S.obs.selected === r.index ? 'on' : ''); const chosen = r.candidates?.find(c => c.text === r.chosen);
@@ -549,11 +601,12 @@ function renderObsList() {
     t.appendChild(tr);
   }
   box.appendChild(t);
+  $('tr.on', t)?.scrollIntoView({ block: 'nearest' });
 }
 function renderObsDetail() {
   const out = $('#obs-detail'); out.innerHTML = '';
   const r = S.obs.day?.records.find(x => x.index === S.obs.selected);
-  if (!r) { out.appendChild(el('p', 'hint', 'select a record')); return; }
+  if (!r) { out.appendChild(el('p', 'hint', 'Pick a record on the left to see the prompt h saw, every candidate it tried, and the one it said.')); return; }
   const head = el('div', 'stats');
   head.innerHTML = `<span>${r.time}</span><span>model <b></b></span><span>proxy ${r.proxy_sha || ''}</span><span>sampler <b></b></span><span>${fmt(r.seconds)} s</span><span>dropped echo turns <b>${r.dropped_echo_turns}</b></span>`;
   head.querySelectorAll('b')[0].textContent = r.model || ''; head.querySelectorAll('b')[1].textContent = JSON.stringify(r.sampler);
@@ -632,7 +685,7 @@ async function loadLabels() {
     const out = $('#labels-recent'); out.innerHTML = '';
     const t = el('table'); t.innerHTML = '<tr><th>time</th><th>label</th><th>candidate</th><th>correction</th><th>source</th><th>model</th></tr>';
     for (const r of [...j.recent].reverse().slice(0, 100)) { const tr = el('tr'); tr.innerHTML = `<td>${(r.time || '').slice(5, 16)}</td><td>${r.label}</td><td></td><td></td><td></td><td></td>`; tr.children[2].textContent = short(r.candidate, 70); tr.children[3].textContent = short(r.correction, 50); tr.children[4].textContent = r.source?.kind ? `${r.source.kind} ${r.source.date || r.source.weave || r.source.sheet || ''} ${r.source.index ?? r.source.n ?? ''}` : ''; tr.children[5].textContent = modelShort(r.model); t.appendChild(tr); }
-    out.appendChild(t);
+    if (j.recent.length) out.appendChild(t); else out.appendChild(el('p', 'hint', 'No labels yet: press l on a loom node, "label" on an observatory candidate, or judge a pair above.'));
     const pj = await api('/api/roombank'); S.pairs.sheets = pj.sheets; const sel = $('#pairs-list'); sel.innerHTML = '';
     for (const s of pj.sheets) { const o = el('option', null, s.stem); o.value = s.stem; sel.appendChild(o); }
     if (!pj.sheets.length) sel.appendChild(el('option', null, `(no sheets in ${pj.dir})`));
@@ -665,12 +718,19 @@ async function openPairs() {
 }
 
 // ------------------------------------------------------------------------------------------ compare
-async function runCompare() {
+// One column per server, K samples each, streamed in parallel. "run A vs B" passes two; "run all up servers" and
+// the start pane's "Compare the models" pass every live server.
+async function runCompare(servers) {
   const prompt = $('#cmp-prompt').value; const cfg = samplerFrom('cmp');
-  const a = serverByUrl($('#cmp-a').value), b = serverByUrl($('#cmp-b').value);
-  if (!a?.up || !b?.up) return fail('compare', new Error('pick two live servers'));
-  const run = async (srv, side) => {
-    const out = $(`#cmp-${side}-out`); out.innerHTML = ''; $(`#cmp-${side}-title`).textContent = `${side.toUpperCase()} · ${srv.model}`; $(`#cmp-${side}-stats`).textContent = 'sampling…';
+  servers = (servers || []).filter(s => s?.up && s.model);
+  if (!prompt.trim()) return fail('compare', new Error('pick a prompt from the library or type one, then run'));
+  if (!servers.length) return fail('compare', new Error('no live server to compare (press "servers")'));
+  recordRecent('compares', { prompt, servers: servers.map(s => s.model) });
+  const box = $('#cmp-cols'); box.innerHTML = '';
+  const run = async (srv, i) => {
+    const col = el('div', 'col'); col.dataset.server = srv.url;
+    const title = el('h3', null, `${servers.length === 2 ? 'AB'[i] + ' · ' : ''}${srv.model} @ ${srv.url.replace('http://', '')}`);
+    const stats = el('div', 'hint', 'sampling…'); const out = el('div'); col.append(title, stats, out); box.appendChild(col);
     const samples = []; const t0 = performance.now();
     try {
       for await (const msg of generate({ ...cfg, n: cfg.n, server: srv.url, model: srv.model, prompt })) {
@@ -679,10 +739,15 @@ async function runCompare() {
       }
     } catch (e) { fail('compare', e); }
     const st = statsOf(samples.flatMap(s => s.tokens)); const stops = samples.filter(s => s.finish_reason === 'stop').length;
-    $(`#cmp-${side}-stats`).textContent = `${samples.length} samples · ${statsText(st)} · mean ${fmt(samples.reduce((x, s) => x + s.tokens.length, 0) / (samples.length || 1), 1)} tok · stopped ${stops}/${samples.length} · ${fmt(samples.reduce((x, s) => x + s.seconds, 0) / (samples.length || 1))} s each · ${((performance.now() - t0) / 1000).toFixed(1)} s total`;
+    stats.textContent = samples.length ? `${samples.length} samples · ${statsText(st)} · mean ${fmt(samples.reduce((x, s) => x + s.tokens.length, 0) / samples.length, 1)} tok · stopped ${stops}/${samples.length} · ${fmt(samples.reduce((x, s) => x + s.seconds, 0) / samples.length)} s each · ${((performance.now() - t0) / 1000).toFixed(1)} s total` : 'no samples (see the status line)';
   };
-  busy(1, `compare: ${cfg.n}× ${a.model} vs ${cfg.n}× ${b.model}`);
-  try { await Promise.all([run(a, 'a'), run(b, 'b')]); } finally { S.busy--; status('compare done'); }
+  busy(1, `compare: ${cfg.n}× each from ${servers.map(s => s.model).join(', ')}`);
+  try { await Promise.all(servers.map(run)); } finally { S.busy--; status('compare done'); }
+}
+function runCompareAB() {
+  const a = serverByUrl($('#cmp-a').value), b = serverByUrl($('#cmp-b').value);
+  if (!a?.up || !b?.up) return fail('compare', new Error('pick two live servers'));
+  return runCompare([a, b]);
 }
 function renderSample(msg, prompt, extra) {
   const d = el('div', 'sample'); const h = el('div', 'head'); const st = statsOf(msg.tokens);
@@ -752,6 +817,10 @@ function cfChanged() {
 }
 function renderCf() {
   renderTurns($('#cf-true'), S.cf.turns, false); renderTurns($('#cf-edited'), S.cf.edited, true, cfChanged());
+  if (!S.cf.turns.length) {
+    $('#cf-true').appendChild(el('p', 'hint', 'Nothing here yet: take a path from the loom ("from loom", or "→ cf" on a node), pick a library prompt on the left, or send an observatory record here ("→ counterfactual").'));
+    $('#cf-edited').appendChild(el('p', 'hint', 'The same turns, editable, will appear here.'));
+  }
   const sel = $('#cf-scorer'); if (!sel.options.length) fillScorers(sel);
   renderCfResults();
 }
@@ -780,7 +849,7 @@ async function cfScore() {
 }
 function renderCfResults() {
   const box = $('#cf-tokens'); box.innerHTML = ''; const sum = $('#cf-summary'); const r = S.cf.results;
-  if (!r) { sum.innerHTML = 'not scored yet'; return; }
+  if (!r) { sum.textContent = S.cf.turns.length ? 'Not scored yet: change a turn on the right, keep or type the fixed reply, then "score both".' : 'Not scored yet.'; return; }
   const a = r.true, b = r.edited; if (!a || !b) { sum.textContent = 'incomplete'; return; }
   const dl = b.nll_sum != null && a.nll_sum != null ? (a.nll_sum - b.nll_sum) : null;
   sum.innerHTML = `scorer <b>${short(r.checkpoint.split('/').slice(-3).join('/'), 60)}</b><br>reply tokens <b>${a.n}</b><br>log p(reply | true) <b>${fmt(-a.nll_sum)}</b><br>log p(reply | edited) <b>${fmt(-b.nll_sum)}</b><br>Δ (edited − true) <b class="${dl > 0 ? 'ok' : 'bad'}">${fmt(dl)}</b> nats<br>mean per token <b>${fmt(-(a.nll_mean ?? 0), 3)} → ${fmt(-(b.nll_mean ?? 0), 3)}</b>`;
@@ -887,8 +956,11 @@ function renderPopCheckpoints() {
   for (const c of S.scorers) { const l = el('label'); const cb = el('input'); cb.type = 'checkbox'; cb.value = c.path; cb.checked = c.kind === 'checkpoint' && /tokens-0*(417533162|793316586|793917970|1535061369)/.test(c.path); l.append(cb, document.createTextNode(' ' + c.name)); l.title = c.path; box.appendChild(l); }
 }
 async function popRun() {
-  if (S.pop.running) return; S.pop.running = true; S.pop.stop = false;
+  if (S.pop.running) return;
   const picks = $$('#pop-checkpoints input:checked').map(i => i.value); const prompt = $('#pop-prompt').value; const K = +$('#pop-k').value || 3;
+  if (!picks.length) return fail('population', new Error('tick at least one checkpoint'));
+  if (!prompt.trim()) return fail('population', new Error('pick a prompt from the library or type one'));
+  S.pop.running = true; S.pop.stop = false;
   const cfg = { n: K, max_tokens: +$('#pop-max').value || 40, temperature: +$('#pop-temp').value, top_p: +$('#pop-topp').value, stop: ['\n\n'] };
   const grid = $('#pop-grid'); grid.innerHTML = ''; const statusBox = $('#pop-status');
   const doJudge = $('#pop-judge').checked, doHaunt = $('#pop-haunt').checked;
@@ -929,29 +1001,145 @@ async function refreshWeaveList() {
 }
 async function saveWeave() {
   const name = $('#weave-name').value.trim() || S.weaveName; if (!name) { $('#weave-name').focus(); return status('give the weave a name', true); }
-  try { const j = await api('/api/weaves', { name, weave: S.weave }); S.weaveName = name; S.weave.metadata.name = name; $('#weave-name').value = name; toast(`saved ${j.name} (${j.nodes} nodes)`, 'ok'); refreshWeaveList(); }
+  try { const j = await api('/api/weaves', { name, weave: S.weave }); S.weaveName = name; S.weave.metadata.name = name; $('#weave-name').value = name; toast(`saved ${j.name} (${j.nodes} nodes)`, 'ok'); recordRecent('weaves', { name }); touch(); refreshWeaveList(); }
   catch (e) { fail('save', e); }
 }
 async function loadWeaveByName(name) {
-  try { const w = await api(`/api/weaves?name=${encodeURIComponent(name)}`); loadWeave(w, name); status(`loaded ${name}`); }
-  catch (e) { fail('load', e); }
+  try { const w = await api(`/api/weaves?name=${encodeURIComponent(name)}`); loadWeave(w, name); recordRecent('weaves', { name }); status(`loaded ${name}`); return true; }
+  catch (e) { fail('load', e); return false; }
 }
 async function deleteWeaveByName(name) {
   if (!name || !confirm(`delete saved weave "${name}"?`)) return;
   try { await api('/api/weaves/delete', { name }); toast(`deleted ${name}`, 'ok'); refreshWeaveList(); } catch (e) { fail('delete', e); }
 }
 
+// ------------------------------------------------------------------------------------------ prompt library
+// Served by /api/library: greetings on the bare frame, the twelve room prompts by kind, raw openings. Selecting an
+// item fills the pane's prompt and resets its sampler to the library defaults; "custom" leaves the box to the user.
+function libFallback() {
+  return { frame: FRAME, sampler: LIB_SAMPLER, items: [{ id: 'greet-0', group: 'greet h (bare frame)', kind: 'greet', title: SEED_LINE, prompt: `${FRAME}\n\n${SEED_LINE}\n\nh:` }] };
+}
+const libraryItem = id => S.library.items.find(it => it.id === id);
+const libraryByText = text => S.library.items.find(it => it.prompt === text);
+const seedItem = () => libraryItem('greet-0') || libFallback().items[0];
+const customPrompt = () => `${S.library.frame || FRAME}\n\nember: \n\nh:`;
+async function loadLibrary() {
+  try { S.library = await api('/api/library'); } catch (e) { S.library = libFallback(); fail('library', e); }
+  for (const id of ['start-prompt', 'loom-library', 'cmp-library', 'cf-library', 'pop-library']) fillLibrarySelect($('#' + id));
+  $('#cf-library').value = 'custom';
+  syncPromptBox(); syncLibrarySelect('cmp'); syncLibrarySelect('pop');
+}
+function fillLibrarySelect(sel) {
+  const prev = sel.value; sel.innerHTML = ''; const groups = new Map();
+  for (const it of S.library.items) {
+    if (!groups.has(it.group)) { const g = el('optgroup'); g.label = it.group; groups.set(it.group, g); }
+    const o = el('option', null, it.title); o.value = it.id; o.title = it.prompt; groups.get(it.group).appendChild(o);
+  }
+  for (const g of groups.values()) sel.appendChild(g);
+  const custom = el('option', null, 'custom (type your own)'); custom.value = 'custom'; sel.appendChild(custom);
+  sel.value = (prev && libraryItem(prev)) ? prev : (S.library.items[0]?.id || 'custom');
+}
+function syncLibrarySelect(prefix) { const sel = $(`#${prefix}-library`); if (sel.options.length) sel.value = libraryByText($(`#${prefix}-prompt`).value)?.id || 'custom'; }
+function setSampler(prefix, n) {
+  const sp = S.library.sampler || LIB_SAMPLER; const set = (id, v) => { const e = $(`#${prefix}-${id}`); if (e) e.value = v; };
+  if (n) set(prefix === 'cmp' ? 'k' : 'n', n);
+  set('temp', sp.temperature); set('topp', sp.top_p); set('max', sp.max_tokens); set('stop', JSON.stringify((sp.stop || ['\n\n'])[0]).slice(1, -1));
+}
+// The root node for a library item: reused when a root with that text exists, else inserted; made the selection.
+function setRootPrompt(it) {
+  let root = S.weave.roots.find(r => S.weave.nodes[r].contents.text === it.prompt);
+  mutate(`prompt: ${it.title}`, w => {
+    if (root) setActive(w, root, true);
+    else { const n = mkNode({ contents: { kind: 'prompt', text: it.prompt, tokens: null, created: now(), library: { id: it.id, kind: it.kind, title: it.title } }, active: true }); insert(w, n); root = n.id; }
+    S.collapsed.delete(root);
+  });
+  return root;
+}
+function applyLibrary(pane, id) {
+  const it = libraryItem(id);
+  if (pane === 'loom') {
+    if (it) { setRootPrompt(it); setSampler('loom', LIB_SAMPLER.n); }
+    else { const ta = $('#loom-prompt'); if (!ta.value.trim()) { ta.value = customPrompt(); onPromptInput(); } ta.focus(); }
+  } else if (pane === 'cmp' || pane === 'pop') {
+    const ta = $(`#${pane}-prompt`); ta.value = it ? it.prompt : (ta.value.trim() || customPrompt()); setSampler(pane); if (!it) ta.focus();
+  } else if (pane === 'cf') cfFromPrompt(it ? it.prompt : customPrompt(), '');
+}
+
+// ------------------------------------------------------------------------------------------ start pane
+// Three ways in. Each takes the line chosen on the start pane (or a library id).
+async function askH(id) {
+  const it = libraryItem(id) || libraryItem($('#start-prompt').value) || seedItem();
+  if (!S.probed && S.probe) await S.probe;
+  const srv = residentServer();
+  const root = setRootPrompt(it); setSampler('loom', LIB_SAMPLER.n);
+  if (srv) $('#loom-server').value = srv.url;
+  showTab('loom');
+  if (!srv) return fail('ask h', new Error('no live model server: start one and press "servers"'));
+  await expand(root, srv);
+}
+async function compareAll(id) {
+  const it = libraryItem(id) || libraryItem($('#start-prompt').value) || seedItem();
+  $('#cmp-prompt').value = it.prompt; $('#cmp-library').value = it.id; setSampler('cmp', 3);
+  showTab('compare');
+  if (!S.probed && S.probe) await S.probe;
+  await runCompare(liveServers());
+}
+// A loom opened on an empty weave seeds itself: the bare frame + "ember: hi h", four answers from the resident.
+async function seedLoom() {
+  if (S.seeding || S.weave.roots.length) return;
+  S.seeding = true;
+  try { await askH(seedItem().id); } finally { S.seeding = false; }
+}
+function readRecent() { try { return JSON.parse(localStorage.getItem(LS_RECENT) || '{}') || {}; } catch { return {}; } }
+function recordRecent(kind, entry) {
+  const r = readRecent(); const key = kind === 'weaves' ? 'name' : 'prompt';
+  r[kind] = [{ ...entry, time: now() }, ...(r[kind] || []).filter(x => x[key] !== entry[key])].slice(0, 10);
+  try { localStorage.setItem(LS_RECENT, JSON.stringify(r)); } catch { /* ignore */ }
+  renderRecent();
+}
+function promptTitle(text) {
+  const it = libraryByText(text); if (it) return `${it.kind} · ${it.title}`;
+  const turns = parseTurns(text).filter(t => t.kind === 'turn'); const last = turns[turns.length - 1];
+  return short(last ? `${last.name}: ${last.text}` : text, 60);
+}
+function renderRecent() {
+  const box = $('#start-recent'); box.innerHTML = ''; const r = readRecent();
+  const weaves = (r.weaves || []).slice(0, 3), compares = (r.compares || []).slice(0, 3);
+  if (!weaves.length && !compares.length) { box.appendChild(el('p', 'hint', 'Nothing yet: weaves you save or load and prompts you compare will be listed here.')); return; }
+  const section = (title, items, label, fn) => {
+    if (!items.length) return; box.appendChild(el('h4', null, title)); const ul = el('ul');
+    for (const it of items) { const li = el('li', null, label(it)); const when = el('span', 'when', ` · ${(it.time || '').slice(5, 16).replace('T', ' ')}`); li.appendChild(when); li.title = it.prompt || it.name; li.onclick = () => fn(it); ul.appendChild(li); }
+    box.appendChild(ul);
+  };
+  section('weaves', weaves, it => it.name, async it => { if (await loadWeaveByName(it.name)) showTab('loom'); });
+  section('compare prompts', compares, it => `${promptTitle(it.prompt)} · ${(it.servers || []).map(modelShort).join(' vs ')}`, it => { $('#cmp-prompt').value = it.prompt; syncLibrarySelect('cmp'); showTab('compare'); });
+}
+function renderPaneList(ul) {
+  ul.innerHTML = '';
+  for (const [tab, name, blurb] of PANES) { const li = el('li'); li.appendChild(el('b', null, name)); li.appendChild(el('i', null, blurb)); li.title = `open ${name}`; li.onclick = () => { if ($('#help').open) $('#help').close(); showTab(tab); }; ul.appendChild(li); }
+}
+function renderStart() {
+  const res = residentServer(); const live = liveServers(); const d = S.obs.dates[0];
+  const probing = !S.probed ? ' (probing the model servers…)' : '';
+  $('#start-ask-desc').textContent = res ? `Send the chosen line to the resident h (${res.model} on ${res.url.replace('http://127.0.0.1', '')}) and read four answers as a tree you can grow.` : `Send the chosen line to the resident h and read four answers as a tree you can grow${probing || ' — no model server is up now: start one and press "servers"'}.`;
+  $('#start-compare-desc').textContent = live.length ? `The same line to every model that is up (${live.map(s => modelShort(s.model)).join(', ')}), three samples each, side by side.` : `The same line to every model that is up, three samples each, side by side${probing || ' — none is up now'}.`;
+  $('#start-replay-desc').textContent = d ? `Read the Discord room through the proxy's ledger: ${d.records} records on ${d.date}, each with the prompt h saw, the candidates it tried, and the one it said.` : 'Read the Discord room through the proxy\'s ledger: the prompt h saw, the candidates it tried, and the one it said.';
+  $('#start-ask').disabled = S.probed && !res; $('#start-compare').disabled = S.probed && !live.length;
+  renderRecent();
+}
+
 // ------------------------------------------------------------------------------------------ tabs + wiring
 function showTab(name) {
   $$('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
   $$('.tab').forEach(t => t.classList.toggle('on', t.id === 'tab-' + name));
+  if (name === 'start') renderStart();
   if (name === 'provenance') renderProvenance();
   if (name === 'observatory' && !S.obs.day) loadObsDates();
   if (name === 'counterfactual') renderCf();
   if (name === 'roomstate') rsRefresh();
-  if (name === 'population') { if (!$('#pop-checkpoints').children.length) renderPopCheckpoints(); if (!$('#pop-prompt').value) $('#pop-prompt').value = DEFAULT_PROMPT; }
+  if (name === 'population') { if (!$('#pop-checkpoints').children.length) renderPopCheckpoints(); if (!$('#pop-prompt').value) { $('#pop-prompt').value = DEFAULT_PROMPT; syncLibrarySelect('pop'); } }
   if (name === 'labels') loadLabels();
-  if (name === 'loom') $('#tree-wrap').focus({ preventScroll: true });
+  if (name === 'loom') { $('#tree-wrap').focus({ preventScroll: true }); if (!S.weave.roots.length) seedLoom(); }
 }
 async function loadScorers() {
   try { const j = await api('/api/scorers'); S.scorers = j.checkpoints; S.judge = j.judge; if (j.worker) status('scorer: ' + j.worker, true); fillScorers($('#cf-scorer')); }
@@ -961,9 +1149,17 @@ function wire() {
   $$('.tabs button').forEach(b => b.onclick = () => showTab(b.dataset.tab));
   $('#servers-refresh').onclick = refreshServers;
   $('#help-btn').onclick = () => $('#help').showModal();
+  renderPaneList($('#help-panes')); renderPaneList($('#start-panes'));
+  $('#start-ask').onclick = () => askH($('#start-prompt').value);
+  $('#start-compare').onclick = () => compareAll($('#start-prompt').value);
+  $('#start-replay').onclick = replayRoom;
+  $('#loom-library').onchange = e => applyLibrary('loom', e.target.value);
+  $('#cmp-library').onchange = e => applyLibrary('cmp', e.target.value);
+  $('#cf-library').onchange = e => applyLibrary('cf', e.target.value);
+  $('#pop-library').onchange = e => applyLibrary('pop', e.target.value);
   $('#loom-prompt').oninput = onPromptInput;
   $('#loom-frame').onclick = () => { const ta = $('#loom-prompt'); ta.value = ta.value.trim() ? ta.value : DEFAULT_PROMPT; onPromptInput(); };
-  $('#loom-expand-root').onclick = () => { const w = S.weave; if (!w.active) return status('no active node', true); expand(w.active); };
+  $('#loom-expand-root').onclick = () => { const w = S.weave; if (!w.active) return status('nothing selected: click a node, or pick a library prompt', true); expand(w.active); };
   $('#weave-save').onclick = saveWeave;
   $('#weave-load').onclick = () => { const v = $('#weave-list').value; if (v) loadWeaveByName(v); };
   $('#weave-delete').onclick = () => deleteWeaveByName($('#weave-list').value);
@@ -978,9 +1174,12 @@ function wire() {
   $$('input[name=prov-scope]').forEach(r => r.onchange = renderProvenance);
   $('#obs-date').onchange = e => loadObsDay(e.target.value);
   $('#obs-reload').onclick = () => loadObsDates();
-  $('#cmp-run').onclick = runCompare;
-  $('#cmp-frame').onclick = () => { $('#cmp-prompt').value = DEFAULT_PROMPT; };
-  $('#cmp-from-loom').onclick = () => { const w = S.weave; if (w.active) $('#cmp-prompt').value = pathText(w, w.active); };
+  $('#cmp-run').onclick = runCompareAB;
+  $('#cmp-run-all').onclick = () => runCompare(liveServers());
+  $('#cmp-frame').onclick = () => { $('#cmp-prompt').value = DEFAULT_PROMPT; syncLibrarySelect('cmp'); };
+  $('#cmp-from-loom').onclick = () => { const w = S.weave; if (w.active) { $('#cmp-prompt').value = pathText(w, w.active); syncLibrarySelect('cmp'); } };
+  $('#cmp-prompt').oninput = () => syncLibrarySelect('cmp');
+  $('#pop-prompt').oninput = () => syncLibrarySelect('pop');
   $('#label-submit').onclick = submitLabel; $('#label-cancel').onclick = () => $('#label-dialog').close();
   $('#labels-reload').onclick = loadLabels; $('#pairs-open').onclick = openPairs;
   $('#cf-from-loom').onclick = () => { const w = S.weave; if (w.active) cfFromNode(w.active); };
@@ -991,8 +1190,8 @@ function wire() {
   $('#rs-refresh').onclick = rsRefresh; $('#rs-room-create').onclick = rsCreate; $('#rs-room-open').onclick = rsOpen; $('#rs-room-delete').onclick = rsDelete;
   $('#rs-event-send').onclick = rsEvent; $('#rs-candidates').onclick = rsCandidates; $('#rs-silence').onclick = rsSilence; $('#rs-snapshot').onclick = rsSnapshot;
   $('#pop-run').onclick = popRun; $('#pop-stop').onclick = () => { S.pop.stop = true; };
-  $('#pop-frame').onclick = () => { $('#pop-prompt').value = DEFAULT_PROMPT; };
-  $('#pop-from-loom').onclick = () => { const w = S.weave; if (w.active) $('#pop-prompt').value = pathText(w, w.active); };
+  $('#pop-frame').onclick = () => { $('#pop-prompt').value = DEFAULT_PROMPT; syncLibrarySelect('pop'); };
+  $('#pop-from-loom').onclick = () => { const w = S.weave; if (w.active) { $('#pop-prompt').value = pathText(w, w.active); syncLibrarySelect('pop'); } };
   $('#pop-all').onclick = () => $$('#pop-checkpoints input').forEach(i => { i.checked = true; });
   $('#pop-none').onclick = () => $$('#pop-checkpoints input').forEach(i => { i.checked = false; });
   $$('.legend .tok').forEach(s => { s.style.background = lpColor(+s.dataset.lp); });
@@ -1006,8 +1205,11 @@ async function init() {
   try { restored = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch { /* ignore */ }
   if (restored?.weave?.nodes) loadWeave(restored.weave, restored.name, { tidy: false }); else loadWeave(newWeave(''), '');
   $('#cmp-prompt').value = DEFAULT_PROMPT;
-  await Promise.all([refreshServers(), refreshWeaveList(), loadScorers()]);
-  touch(true);
-  status(`ready · explorer ${S.version.explorer || ''} · press ? for keys`);
+  // Land on the loom only when a named (saved or loaded) weave was open; otherwise on Start here.
+  showTab(S.weaveName && S.weave.roots.length ? 'loom' : 'start');
+  S.probe = refreshServers();
+  await Promise.all([S.probe, refreshWeaveList(), loadScorers(), loadLibrary(), loadObsDates({ day: false })]);
+  touch(true); renderStart();
+  status(`ready · explorer ${S.version.explorer || ''} · ? for help`);
 }
 init();

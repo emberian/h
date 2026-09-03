@@ -10,41 +10,46 @@
 <header>
   <h1>h explorer</h1>
   <nav class="tabs">
-    <button data-tab="loom" class="on" title="1">Loom</button>
-    <button data-tab="provenance" title="2">Provenance</button>
-    <button data-tab="observatory" title="3">Observatory</button>
-    <button data-tab="compare" title="4">Compare</button>
-    <button data-tab="counterfactual" title="5">Counterfactual</button>
-    <button data-tab="roomstate" title="6">Room state</button>
-    <button data-tab="population" title="7">Population</button>
-    <button data-tab="labels" title="8">Labels</button>
+    <button data-tab="start" class="on" title="1">Start here</button>
+    <button data-tab="loom" title="2">Loom</button>
+    <button data-tab="provenance" title="3">Provenance</button>
+    <button data-tab="observatory" title="4">Observatory</button>
+    <button data-tab="compare" title="5">Compare</button>
+    <button data-tab="counterfactual" title="6">Counterfactual</button>
+    <button data-tab="roomstate" title="7">Room state</button>
+    <button data-tab="population" title="8">Population</button>
+    <button data-tab="labels" title="9">Labels</button>
   </nav>
   <span id="status" class="status"></span>
   <span id="servers-status" class="servers"></span>
   <button id="servers-refresh" title="re-probe the model servers">servers</button>
-  <button id="help-btn" title="keyboard shortcuts (?)">?</button>
+  <button id="help-btn" title="what each pane does, and the keys (?)">? help</button>
 </header>
 
 <div id="toasts" class="toasts"></div>
 
 <dialog id="help">
+  <h3>what each pane does</h3>
+  <ul id="help-panes" class="panes"></ul>
+  <p class="hint">Every action has a button: the selected node in the loom carries its own row (expand, bookmark, edit, note, label, split, haunt, delete) and arrows to move. The keys below are shortcuts for the same things; they are off while typing in a field.</p>
   <h3>keys</h3>
   <table class="keys">
     <tr><td>← →</td><td>previous / next sibling</td></tr>
     <tr><td>↑ ↓</td><td>parent / first child</td></tr>
-    <tr><td>Enter</td><td>expand the active node (N samples, sampler panel)</td></tr>
+    <tr><td>Enter</td><td>expand the selected node (N samples from the sampler's server)</td></tr>
     <tr><td>e</td><td>edit text</td></tr>
     <tr><td>n</td><td>edit note</td></tr>
     <tr><td>l</td><td>label (failure taxonomy / KEEP)</td></tr>
     <tr><td>b</td><td>bookmark</td></tr>
-    <tr><td>x</td><td>deactivate (tip moves to parent)</td></tr>
+    <tr><td>x</td><td>deactivate (selection moves to the parent)</td></tr>
     <tr><td>c</td><td>collapse / uncollapse children</td></tr>
-    <tr><td>h</td><td>provenance-scan the active node</td></tr>
-    <tr><td>Delete / Backspace</td><td>delete the active node and its subtree</td></tr>
+    <tr><td>h</td><td>provenance-scan the selected node</td></tr>
+    <tr><td>Delete / Backspace</td><td>delete the selected node and its subtree</td></tr>
     <tr><td>⌘/Ctrl Z · ⇧⌘Z</td><td>undo · redo</td></tr>
     <tr><td>⌘/Ctrl S</td><td>save the weave</td></tr>
-    <tr><td>⌘/Ctrl ⇧ C</td><td>copy the active path as a transcript</td></tr>
-    <tr><td>1 … 8</td><td>switch tab</td></tr>
+    <tr><td>⌘/Ctrl ⇧ C</td><td>copy the selected path as a transcript</td></tr>
+    <tr><td>1 … 9</td><td>switch tab</td></tr>
+    <tr><td>?</td><td>this help</td></tr>
     <tr><td>Esc</td><td>cancel edit / split, close dialogs</td></tr>
   </table>
   <form method="dialog"><button>close</button></form>
@@ -60,15 +65,43 @@
 </dialog>
 
 <main>
+<!-- ================================================================== start -->
+<section id="tab-start" class="tab on">
+  <div class="panel start-wrap">
+    <h2>Start here</h2>
+    <p class="lede">h is a small language model that lives in a library of scanned books and sits in a Discord room, answering when spoken to, briefly, in the words of what it has read. This explorer is a workbench for reading h closely rather than chatting with it: every sampled token is shaded by its probability, any answer can be traced back to the books, alternative rooms can be scored against each other, and the room's real decisions can be replayed. Pick a line for h below, then choose a way in.</p>
+    <div class="start-prompt">
+      <label>line for h <select id="start-prompt"></select></label>
+      <span class="hint">the same library of prompts is in the loom, compare and counterfactual panes</span>
+    </div>
+    <div class="start-actions">
+      <button class="start-card" id="start-ask"><b>Ask h</b><span id="start-ask-desc">Send the chosen line to the resident h and read four answers as a tree you can grow.</span></button>
+      <button class="start-card" id="start-compare"><b>Compare the models</b><span id="start-compare-desc">The same line to every model that is up, three samples each, side by side.</span></button>
+      <button class="start-card" id="start-replay"><b>Replay the room</b><span id="start-replay-desc">Read the Discord room through the proxy's ledger: the prompt h saw, the candidates it tried, and the one it said.</span></button>
+    </div>
+    <div class="start-cols">
+      <div>
+        <h3>what each pane does</h3>
+        <ul id="start-panes" class="panes"></ul>
+        <p class="hint">The <b>? help</b> button at the top right brings this list back from any pane, with the keys.</p>
+      </div>
+      <div>
+        <h3>recent</h3>
+        <div id="start-recent" class="recent"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ================================================================== loom -->
-<section id="tab-loom" class="tab on">
+<section id="tab-loom" class="tab">
   <aside class="panel controls">
     <details open>
       <summary>sampler</summary>
       <label>server <select id="loom-server"></select></label>
       <div class="grid2">
         <label>N <input id="loom-n" type="number" value="4" min="1" max="64"></label>
-        <label>max_tokens <input id="loom-max" type="number" value="40" min="1" max="2048"></label>
+        <label>max_tokens <input id="loom-max" type="number" value="64" min="1" max="2048"></label>
         <label>temperature <input id="loom-temp" type="number" value="0.7" min="0" step="0.05"></label>
         <label>top_p <input id="loom-topp" type="number" value="0.9" min="0" max="1" step="0.05"></label>
       </div>
@@ -76,10 +109,11 @@
     </details>
     <details open>
       <summary>prompt (root node)</summary>
+      <label>library <select id="loom-library" title="pick a prompt: it becomes the root of the tree and resets the sampler"></select></label>
       <textarea id="loom-prompt" rows="8" spellcheck="false" placeholder="frame, blank line, turns as 'name: text', ending with h:"></textarea>
       <div class="row">
         <button id="loom-frame" title="insert the bare room frame">frame</button>
-        <button id="loom-expand-root" title="sample N continuations of the active node (Enter)">expand active</button>
+        <button id="loom-expand-root" class="primary" title="sample N continuations of the selected node (Enter)">expand selected</button>
       </div>
     </details>
     <details open>
@@ -97,7 +131,7 @@
       <div class="row">
         <button id="undo-btn" title="⌘Z">undo</button>
         <button id="redo-btn" title="⇧⌘Z">redo</button>
-        <button id="copy-transcript" title="copy the active path as text (⌘⇧C)">copy transcript</button>
+        <button id="copy-transcript" title="copy the selected path as text (⌘⇧C)">copy transcript</button>
         <button id="copy-json" title="copy the weave JSON">copy json</button>
       </div>
       <div id="weave-info" class="hint"></div>
@@ -112,7 +146,7 @@
         <button id="haunt-all" title="provenance-scan every node in one call">scan all nodes</button>
         <button id="collapse-all">collapse all</button>
         <button id="expand-all">uncollapse</button>
-        <button id="collapse-deep" title="collapse everything below depth 2 except the active path">tidy</button>
+        <button id="collapse-deep" title="collapse everything below depth 2 except the selected path">tidy</button>
       </div>
       <div class="legend">
         <span class="tok" data-lp="0">p≈1</span>
@@ -130,7 +164,7 @@
   </div>
 
   <aside class="panel reading-wrap">
-    <h3>active path <span id="reading-stats" class="hint"></span></h3>
+    <h3>selected path <span id="reading-stats" class="hint"></span></h3>
     <div id="reading" class="reading"></div>
     <h3>node <span class="hint">repro · note · labels</span></h3>
     <div id="node-info" class="node-info"></div>
@@ -142,10 +176,10 @@
   <aside class="panel controls">
     <details open>
       <summary>scan</summary>
-      <label><input type="radio" name="prov-scope" value="node" checked> active node text</label>
-      <label><input type="radio" name="prov-scope" value="path"> whole active path</label>
+      <label><input type="radio" name="prov-scope" value="node" checked> selected node text</label>
+      <label><input type="radio" name="prov-scope" value="path"> whole selected path</label>
       <div class="row">
-        <button id="prov-scan">scan</button>
+        <button id="prov-scan" class="primary">scan</button>
         <button id="prov-scan-all">scan all nodes</button>
       </div>
       <p class="hint">exact token-sequence matches against the training corpus (hghost-haunt). results are cached per text.</p>
@@ -186,29 +220,29 @@
   <aside class="panel controls">
     <details open>
       <summary>prompt</summary>
+      <label>library <select id="cmp-library" title="pick a prompt: it fills the box and resets the sampler"></select></label>
       <textarea id="cmp-prompt" rows="9" spellcheck="false"></textarea>
-      <div class="row"><button id="cmp-frame">frame</button><button id="cmp-from-loom" title="use the loom's active path">from loom</button></div>
+      <div class="row"><button id="cmp-frame">frame</button><button id="cmp-from-loom" title="use the loom's selected path">from loom</button></div>
     </details>
     <details open>
       <summary>servers</summary>
       <label>A <select id="cmp-a"></select></label>
       <label>B <select id="cmp-b"></select></label>
+      <div class="row"><button id="cmp-run" class="primary">run A vs B</button><button id="cmp-run-all" title="one column per server that is up">run all up servers</button></div>
     </details>
     <details open>
       <summary>sampler</summary>
       <div class="grid2">
-        <label>K <input id="cmp-k" type="number" value="4" min="1" max="64"></label>
-        <label>max_tokens <input id="cmp-max" type="number" value="40" min="1" max="2048"></label>
+        <label>K <input id="cmp-k" type="number" value="3" min="1" max="64"></label>
+        <label>max_tokens <input id="cmp-max" type="number" value="64" min="1" max="2048"></label>
         <label>temperature <input id="cmp-temp" type="number" value="0.7" min="0" step="0.05"></label>
         <label>top_p <input id="cmp-topp" type="number" value="0.9" min="0" max="1" step="0.05"></label>
       </div>
       <label>stop <input id="cmp-stop" value="\n\n"></label>
-      <div class="row"><button id="cmp-run">run</button></div>
     </details>
   </aside>
-  <div class="panel compare">
-    <div class="col"><h3 id="cmp-a-title">A</h3><div id="cmp-a-stats" class="hint"></div><div id="cmp-a-out"></div></div>
-    <div class="col"><h3 id="cmp-b-title">B</h3><div id="cmp-b-stats" class="hint"></div><div id="cmp-b-out"></div></div>
+  <div class="panel compare" id="cmp-cols">
+    <p class="hint">Pick a prompt from the library or type one, then run A vs B, or run all up servers for one column per model.</p>
   </div>
 </section>
 
@@ -217,9 +251,10 @@
   <aside class="panel controls">
     <details open>
       <summary>source</summary>
-      <div class="row"><button id="cf-from-loom" title="take the active path: the room turns become editable, the active node's text becomes the fixed reply">from loom</button></div>
+      <label>library <select id="cf-library" title="pick a prompt: its turns become the editable room"></select></label>
+      <div class="row"><button id="cf-from-loom" title="take the selected path: the room turns become editable, the selected node's text becomes the fixed reply">from loom</button></div>
       <label>scorer <select id="cf-scorer"></select></label>
-      <label>reply (fixed text) <textarea id="cf-reply" rows="3" spellcheck="false"></textarea></label>
+      <label>reply (fixed text) <textarea id="cf-reply" rows="3" spellcheck="false" placeholder="the reply to score under both contexts"></textarea></label>
       <div class="row">
         <button id="cf-score" class="primary" title="score the fixed reply under the true and the edited context">score both</button>
         <button id="cf-rerun" title="sample continuations from the edited context with the loom sampler">re-run continuation</button>
@@ -239,7 +274,7 @@
     <h3>per-token deltas <span class="hint">(logprob and rank of each reply token: true → edited)</span></h3>
     <div id="cf-tokens"></div>
     <h3>continuations from the edited context</h3>
-    <div id="cf-rerun-out"></div>
+    <div id="cf-rerun-out"><p class="hint">none yet: "re-run continuation" samples from the edited context with the loom sampler.</p></div>
   </div>
 </section>
 
@@ -272,9 +307,9 @@
     </details>
   </aside>
   <div class="panel rs">
-    <div id="rs-transcript" class="turns"></div>
+    <div id="rs-transcript" class="turns"><p class="hint">No room open: create one (it starts with the bare frame) or open one on the left, then type a visitor line and read it into the state.</p></div>
     <h3>candidates (branches of the committed state)</h3>
-    <div id="rs-candidates-out"></div>
+    <div id="rs-candidates-out"><p class="hint">none yet: "candidates" forks n continuations from the committed state; commit one or choose silence.</p></div>
     <h3>state per turn <span class="hint">mean per-layer SSM head norm (line = layer), token count, bytes</span></h3>
     <div id="rs-plot"></div>
     <div id="rs-state" class="summary"></div>
@@ -286,6 +321,7 @@
   <aside class="panel controls">
     <details open>
       <summary>prompt</summary>
+      <label>library <select id="pop-library" title="pick a prompt: it fills the box and resets the sampler"></select></label>
       <textarea id="pop-prompt" rows="8" spellcheck="false"></textarea>
       <div class="row"><button id="pop-frame">frame</button><button id="pop-from-loom">from loom</button></div>
     </details>
@@ -298,7 +334,7 @@
       <summary>run</summary>
       <div class="grid2">
         <label>K <input id="pop-k" type="number" value="3" min="1" max="16"></label>
-        <label>max_tokens <input id="pop-max" type="number" value="40" min="1" max="512"></label>
+        <label>max_tokens <input id="pop-max" type="number" value="64" min="1" max="512"></label>
         <label>temperature <input id="pop-temp" type="number" value="0.7" min="0" step="0.05"></label>
         <label>top_p <input id="pop-topp" type="number" value="0.9" min="0" max="1" step="0.05"></label>
       </div>
@@ -310,7 +346,7 @@
   </aside>
   <div class="panel">
     <div id="pop-status" class="hint"></div>
-    <div id="pop-grid" class="pop-grid"></div>
+    <div id="pop-grid" class="pop-grid"><p class="hint">Tick the checkpoints to sample, pick a prompt, then run: one cell per checkpoint, K samples each, with the judge's library-likeness and the longest corpus match.</p></div>
   </div>
 </section>
 
@@ -326,12 +362,12 @@
     <details open>
       <summary>pairwise sheets</summary>
       <select id="pairs-list"></select>
-      <div class="row"><button id="pairs-open">open</button></div>
+      <div class="row"><button id="pairs-open" class="primary">open</button></div>
       <p class="hint">blind A/B sheets written by hghost-roombank pairs; the key is never loaded here.</p>
     </details>
   </aside>
   <div class="panel">
-    <div id="pairs-view"></div>
+    <div id="pairs-view"><p class="hint">No sheet open: pick a pairwise sheet on the left and press open to judge blind A/B replies; labels from every pane collect below.</p></div>
     <h3>recent labels</h3>
     <div id="labels-recent"></div>
   </div>

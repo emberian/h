@@ -9,6 +9,7 @@ Stdlib only. Serves one static page and a handful of JSON endpoints:
     POST /api/generate                {server, model, prompt, n, temperature, top_p, max_tokens, stop}
                                       -> NDJSON stream, one {"type":"sample"} line per completion
     POST /api/haunt                   {items:[{id,text}], ...} -> exact-match provenance per item (cached by text)
+    GET  /api/library                 the prompt library (greetings on the bare frame, the twelve room prompts, openings)
     GET  /api/observatory[?date=...]  room-proxy observatory records for a day, with derived summary
     GET  /api/weaves[?name=...]       list saved weaves / load one
     POST /api/weaves                  {name, weave} -> validate and save explorer/weaves/<name>.json
@@ -54,6 +55,7 @@ CFG = {
     "venv_python": ROOT / ".venv/bin/python",
     "jax_python": ROOT / ".venv-jax/bin/python",
     "labels": ROOT / "research/results/room-labels",
+    "room_prompts": ROOT / "research/eval/room_prompts.json",
     "roombank_results": ROOT / "research/results/roombank",
     "roombank_bank": ROOT / "research/eval/roombank/bank.jsonl",
     "roomstate": "http://127.0.0.1:8140",
@@ -625,6 +627,37 @@ def align_candidate_tokens(records: list[dict]) -> None:
                     break
 
 
+FRAME = ("A room in the library, late. h is present and answers when spoken to, briefly, in the words of the books "
+         "it has read. The others are visitors.")
+LIBRARY_GREETINGS = ["ember: hi h", "ember: hello h. what are you reading tonight?", "ember: good night, h"]
+LIBRARY_OPENINGS = ["The lake was covered with blank space.", "In the beginning the library was", "THE READING ROOM",
+                    "A letter, unsent:", "The last page of the catalogue reads:"]
+LIBRARY_SAMPLER = {"n": 4, "temperature": 0.7, "top_p": 0.9, "max_tokens": 64, "stop": ["\n\n"]}
+
+
+def prompt_library() -> dict:
+    """The prompt library the page offers: three greetings on the bare frame, the twelve fixed room prompts from
+    research/eval/room_prompts.json grouped by kind (verbatim, with their own frame), and five raw library
+    openings. Room items end with the reply cue `h:`; the sampler is the one the room models handle best."""
+    items = [{"id": f"greet-{i}", "group": "greet h (bare frame)", "kind": "greet", "title": g,
+              "prompt": f"{FRAME}\n\n{g}\n\nh:"} for i, g in enumerate(LIBRARY_GREETINGS)]
+    path = CFG["room_prompts"]
+    if path.exists():
+        try:
+            for i, p in enumerate(json.loads(path.read_text(encoding="utf-8"))):
+                prompt = str(p.get("prompt") or "")
+                turns = [b for b in prompt_blocks(prompt, prompt) if b["kind"] == "turn"]
+                title = turns[-1]["text"] if turns else (prompt.strip().splitlines() or ["(empty)"])[0]
+                kind = str(p.get("kind") or "room")
+                items.append({"id": f"room-{i}", "group": f"room prompts · {kind}", "kind": kind, "title": title,
+                              "prompt": prompt, "source": f"{path.relative_to(ROOT)}[{i}]"})
+        except Exception as e:  # noqa: BLE001
+            print(f"room prompts unreadable ({e}); library has greetings and openings only", flush=True)
+    items += [{"id": f"open-{i}", "group": "library openings (raw text, no frame)", "kind": "opening", "title": o,
+               "prompt": o} for i, o in enumerate(LIBRARY_OPENINGS)]
+    return {"frame": FRAME, "sampler": LIBRARY_SAMPLER, "items": items, "room_prompts": str(path)}
+
+
 def observatory_dates() -> list[dict]:
     d = CFG["observatory"]
     out = []
@@ -843,6 +876,8 @@ class Handler(BaseHTTPRequestHandler):
                                    "serve": dict(SERVE_STATE, port=CFG["serve_port"])})
             if path == "/api/version":
                 return self._json(version_info())
+            if path == "/api/library":
+                return self._json(prompt_library())
             if path == "/api/scorers":
                 return self._json({"checkpoints": scorer_checkpoints(), "judge": {"leaf": str(CFG["judge_leaf"]),
                                    "base": str(CFG["judge_base"])}, "worker": (SCORER.failed if SCORER else "no scorer")})
