@@ -746,3 +746,7 @@ New main line, h first:
 - 17:23: replay arm blends audited: alpha 0.8 mean 0.546 (-1.8 vs base; LAMBADA ppl 13.5 vs 13.3; ARC-c -6), alpha 0.9
   0.533 (-3.0). Un-blended replay 0.525, e2-v4 0.504. Replay + interpolation recover 4.4 of 6.2 points. Behaviour checks
   on the 0.8 blend running (hbox, EOS probe, room read, bank).
+- 17:24: EOS after two exchanges: replay arm 0.093 (e2-v4 0.000), replay blend 0.9 0.18, blend 0.8 0.275. Replay text (EOS-
+  terminated documents) re-teaches a little "the room ends"; blending toward the base amplifies it. Harmless for
+  single-turn replies (the stop is the blank line), a cost for multi-turn belief. Room read + bank of the 0.8 blend
+  pending before any switch.
