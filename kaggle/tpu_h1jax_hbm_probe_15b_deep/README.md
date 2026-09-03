@@ -37,15 +37,15 @@ HGHOST_CORPUS_DIR=artifacts/roommix-15b/corpus-v1.3-room-15b \
 HGHOST_OUTPUT=/tmp/h1jax-gate-15b HGHOST_GATE_SHAPES=1x64r HGHOST_GATE_STEPS=1 \
 HGHOST_GATE_WARMUP=1 HGHOST_GATE_SYNC_STEPS=1 HGHOST_PROFILE_STEPS=0 HGHOST_BENCH_ITERS=1 \
 HGHOST_SANITY_STEPS=1 HGHOST_EVAL_SEQUENCES=2 \
-PYTHONPATH=jax_training .venv-jax/bin/python kaggle/tpu_h1jax_profile_gate_15b_deep/run.py
+PYTHONPATH=jax_training .venv-jax/bin/python kaggle/tpu_h1jax_hbm_probe_15b_deep/run.py
 ```
 
 Launch (private kernel; the room corpus is private because its stream detokenizes to text):
 
 ```sh
-uvx --from kaggle kaggle kernels push -p kaggle/tpu_h1jax_profile_gate_15b_deep
-uvx --from kaggle kaggle kernels status emberian64/h-ghost-h1jax-profile-gate-15b-deep
-uvx --from kaggle kaggle kernels output emberian64/h-ghost-h1jax-profile-gate-15b-deep -p /tmp/h1jax-gate-15b-out --force
+uvx --from kaggle kaggle kernels push -p kaggle/tpu_h1jax_hbm_probe_15b_deep
+uvx --from kaggle kaggle kernels status emberian64/h-ghost-h1jax-hbm-probe-15b-deep
+uvx --from kaggle kaggle kernels output emberian64/h-ghost-h1jax-hbm-probe-15b-deep -p /tmp/h1jax-hbm-probe-15b-out --force
 ```
 
 Success marker: `TPU_H1JAX_PROFILE_GATE_OK`. The report is `h1jax-profile-gate-report.json`.

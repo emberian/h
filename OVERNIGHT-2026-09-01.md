@@ -709,3 +709,6 @@ New main line, h first:
 - 13:35: literature-sweep lane started (Kagi, ~30 queries, 7 themes: CPT without forgetting, merging/interpolation,
   reward-free voice shaping, RL for small models, multi-party dialogue, data quality, hybrid-Mamba fine-tuning) ->
   research/literature-chain-2026-09-03.md with three concrete method chains for our compute.
+- 13:42: parsimony closeout: deleted three superseded scripts (after_room05b.sh, make_room_kernel.sh, make_room_kernel_05b.sh)
+  after a blind defend; kept the 1.5B gate dir (its exact defaults are the only record of two cancelled runs); fixed the
+  HBM probe README, which still pointed at the gate's directory and kernel id.
