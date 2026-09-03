@@ -654,3 +654,5 @@ New main line, h first:
   Hamlet deflected but the Python request answered with code. Qwen QLoRA on the Mac: mlx-lm loads the model (gen 8.3
   tok/s, 15.5 GB) but training hits Metal limits (64 layers: live-buffer cap; 32 layers: command buffer killed for
   impacting interactivity); last try 16 layers / seq 1024 running.
+- 10:24: killed the idle PaddleOCR-VL MLX server on :8111 (running since 09-01, holding GPU memory) at ember's note; retrying
+  the 16-layer QLoRA test with the GPU freer. Earlier 16-layer attempt also died on Metal "impacting interactivity".
