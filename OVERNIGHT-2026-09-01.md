@@ -698,3 +698,8 @@ New main line, h first:
   12:32) only handled the JSON shape, so every bot request failed at the proxy (the two observatory records were my
   tests). Proxy now accepts stream=true (samples whole, returns one SSE chunk + [DONE]). The room has been effectively
   dark since the proxy went in, except for direct-server periods.
+- 13:10: J-lens lane started (research/jlens): mean Jacobian of the final residual w.r.t. a middle-layer residual composed with
+  the unembedding, averaged over ~200 library/room contexts; readout ("on its mind, not said") at the h: position;
+  an injection test (lens vs unembedding vs random directions for capital recall); sparse J-space fraction. 90M base vs
+  leaf, then 0.5B base vs e2-v4. Pre-registered (ember): the workspace is assembled by preference post-training; base
+  and CPT models should show little or none.
