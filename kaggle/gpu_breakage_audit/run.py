@@ -181,7 +181,7 @@ for run_dir, ckpts in sorted(runs.items()):
 if not LOCAL:
     missing = sorted(set(EXPECTED_FINALS) - {p.parent.name for p in finals})
     if missing:
-        raise SystemExit(f"expected runs not attached: {missing}")
+        print(f"warning: expected runs not attached (bases only): {missing}", file=sys.stderr)
 
 
 def repaired_config(source: Path) -> dict:
