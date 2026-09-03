@@ -1,0 +1,7 @@
+{
+  "title": "H Ghost GPU training code",
+  "id": "emberian64/hghost-gpu-code",
+  "subtitle": "PyTorch continued-pretraining and QLoRA scripts for the rented GPU day",
+  "description": "Versioned copies of gpu/cpt_torch.py (single-GPU continued pretraining of Falcon-H1 on uint16 token streams) and gpu/qlora_unsloth.py (QLoRA library adapter for Qwen3.5-family hybrids) from the h ghost repository, attached to the Kaggle T4 test kernels so the tested code is the code that runs on the rented H100. Code only (Apache-2.0); no weights, corpus text, or credentials.",
+  "licenses": [{"name": "apache-2.0"}]
+}

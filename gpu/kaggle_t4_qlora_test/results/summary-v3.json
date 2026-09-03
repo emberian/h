@@ -1,0 +1,75 @@
+{
+ "ok": false,
+ "problems": [
+  "qlora_unsloth.py exited 1"
+ ],
+ "returncode": 1,
+ "device": "Tesla T4",
+ "model": "Qwen/Qwen3.5-2B-Base",
+ "backend": "peft",
+ "compute_dtype": "float32",
+ "trainable_parameters": 10911744,
+ "parameters": 1206378304,
+ "lora_targets": 96,
+ "lora_target_kinds": {
+  "gate_proj": 24,
+  "up_proj": 24,
+  "down_proj": 24,
+  "q_proj": 6,
+  "k_proj": 6,
+  "v_proj": 6,
+  "o_proj": 6
+ },
+ "steps": 20,
+ "tokens": 163529,
+ "completed": false,
+ "train_loss_first": 3.01076477766037,
+ "train_loss_last": 3.004200780391693,
+ "validation": [
+  {
+   "step": 0,
+   "tokens": 0,
+   "loss": 2.9219179661261143,
+   "final": null
+  },
+  {
+   "step": 15,
+   "tokens": 122589,
+   "loss": 2.9157761059916187,
+   "final": null
+  },
+  {
+   "step": 22,
+   "tokens": 179905,
+   "loss": 2.9126736892976,
+   "final": false
+  }
+ ],
+ "tokens_per_second_median": 194.70780323176558,
+ "tokens_per_second_max": 195.03218260107656,
+ "peak_memory_gb": 4.58,
+ "load_seconds": 56.6,
+ "adapter_files": [
+  "README.md",
+  "adapter_config.json",
+  "adapter_model.safetensors",
+  "chat_template.jinja",
+  "tokenizer.json",
+  "tokenizer_config.json",
+  "trainer_state.json"
+ ],
+ "independent_reload": {
+  "loss": 2.9126736892976,
+  "tokens": 16376,
+  "delta_vs_trained": 0.0,
+  "adapter_bytes": 43672224
+ },
+ "merged": null,
+ "minutes": 18.9,
+ "versions": {
+  "torch": "2.10.0+cu128",
+  "transformers": "5.16.1",
+  "peft": "0.20.0",
+  "bitsandbytes": "0.50.2"
+ }
+}

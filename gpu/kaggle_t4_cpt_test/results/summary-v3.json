@@ -1,0 +1,60 @@
+{
+ "ok": true,
+ "problems": [],
+ "returncode": 0,
+ "device": "Tesla T4",
+ "fast_path": false,
+ "steps": 30,
+ "tokens": 491520,
+ "completed": false,
+ "budget_stop": true,
+ "train_loss_first": 3.2522891581058504,
+ "train_loss_last": 3.0431371688842774,
+ "validation": [
+  {
+   "step": 0,
+   "tokens": 0,
+   "loss": 3.8152153491973877,
+   "room_loss": 3.1098049879074097,
+   "final": null
+  },
+  {
+   "step": 30,
+   "tokens": 491520,
+   "loss": 3.8449423909187317,
+   "room_loss": 3.160585969686508,
+   "final": false
+  }
+ ],
+ "tokens_per_second_median": 336.96343657715687,
+ "tokens_per_second_max": 339.2760272952723,
+ "peak_memory_gb": 7.96,
+ "checkpoints": [
+  "tokens-000000491520"
+ ],
+ "reload_check": {
+  "event": "reload_check",
+  "elapsed_minutes": 27.352,
+  "path": "/kaggle/working/t4-cpt-test/run/tokens-000000491520",
+  "tokenizer_vocab": 32768,
+  "reloaded_loss": 3.8418968319892883,
+  "reloaded_windows": 16,
+  "reloaded_room_loss": 3.157191514968872,
+  "reloaded_room_windows": 16,
+  "delta": 0.0030455589294433594,
+  "ok": true
+ },
+ "independent_reload": {
+  "checkpoint": "/kaggle/working/t4-cpt-test/run/tokens-000000491520",
+  "loss_fp32": 3.8418788015842438,
+  "tokenizer_vocab": 32768,
+  "config_dtype": "bfloat16",
+  "safetensors_bytes": 215858816,
+  "delta_vs_trained": -0.003063589334487915
+ },
+ "minutes": 28.7,
+ "versions": {
+  "torch": "2.10.0+cu128",
+  "transformers": "4.57.6"
+ }
+}

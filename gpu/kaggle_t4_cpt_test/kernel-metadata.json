@@ -1,0 +1,19 @@
+{
+  "id": "emberian64/h-ghost-t4-cpt-test",
+  "title": "H Ghost T4 CPT test",
+  "code_file": "run.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "dataset_sources": [
+    "emberian64/hghost-gpu-code",
+    "emberian64/hghost-falcon-h1-90m-base-public",
+    "emberian64/hghost-curated-tokens-v1-5-replay"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}
