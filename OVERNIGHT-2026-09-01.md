@@ -630,3 +630,8 @@ New main line, h first:
   (introspection in some works) and small models are likely subject to the same dynamics. Recipe researched via Kagi and
   primary sources -> qwen/RECIPE.md; sent to the Qwen lane (r=16/alpha 16, all language-block projections, LR 5e-5 raw
   text, no chat template, seq 2048, book-level holdout).
+- 09:46: GRPO/mentalization evidence brief -> research/grpo-mentalization-evidence.md. Headlines: introspective awareness
+  is elicited by DPO-style post-training and not by SFT (2603.21396); Thinking-RFT beats SFT on ToM by 6-10% and
+  generalizes (2606.09092); but RL on <=3B models produces "reasoning collapse" on ToM (2504.01698); RLVR sharpens,
+  distillation expands (2504.13837); RL generalizes where SFT memorizes (2501.17161). Replay corpus v1.5 built
+  (478.9M tokens, 12.5% FineWeb-Edu), uploading; replay arm kernel generated.
