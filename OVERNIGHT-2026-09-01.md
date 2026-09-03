@@ -703,3 +703,6 @@ New main line, h first:
   an injection test (lens vs unembedding vs random directions for capital recall); sparse J-space fraction. 90M base vs
   leaf, then 0.5B base vs e2-v4. Pre-registered (ember): the workspace is assembled by preference post-training; base
   and CPT models should show little or none.
+- 13:33: the "1.5B is busted" screenshot was the explorer decoding every server's tokens with the 32K tokenizer; the
+  1.5B-deep and Qwen use different vocabularies. Explorer now decodes per served checkpoint (its own tokenizer.json)
+  and falls back to the server text when the vocabularies differ. Verified on :8127, :8128, :8124.

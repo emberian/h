@@ -162,6 +162,24 @@ class Encoder:
 
 
 DEC: Decoder | None = None
+_DECODERS: dict[str, "Decoder"] = {}
+
+
+def decoder_for(checkpoint_path) -> "Decoder | None":
+    """The decoder for a served checkpoint (its own tokenizer.json), falling back to the project default.
+    The 1.5B-deep and the Qwen models use different vocabularies from the 91M/0.5B."""
+    if not checkpoint_path:
+        return DEC
+    tok = Path(str(checkpoint_path)) / "tokenizer.json"
+    if not tok.exists():
+        return DEC
+    key = str(tok.resolve())
+    if key not in _DECODERS:
+        try:
+            _DECODERS[key] = Decoder(tok)
+        except Exception:  # noqa: BLE001
+            return DEC
+    return _DECODERS[key]
 ENC: Encoder | None = None
 
 
@@ -1029,9 +1047,16 @@ class Handler(BaseHTTPRequestHandler):
                 content = ((choice.get("logprobs") or {}).get("content") or [])
                 ids = [int(t["id"]) for t in content]
                 lps = [t.get("logprob") for t in content]
-                texts = DEC.decode(ids) if DEC else [""] * len(ids)
+                dec = decoder_for(srv.get("path"))
+                texts = dec.decode(ids) if dec else [""] * len(ids)
+                server_text = choice.get("text", "")
+                joined = "".join(texts)
+                if dec and server_text and joined.strip() != server_text.strip() and not joined.startswith(server_text[:8]):
+                    # our decoder does not know this model's vocabulary: trust the server's text, one span
+                    valid_lp = [lp for lp in lps if isinstance(lp, (int, float))]
+                    texts = [server_text]; ids = ids[:1]; lps = [sum(valid_lp)] if valid_lp else [None]
                 tokens = [{"id": tid, "text": tx, "logprob": lp} for tid, tx, lp in zip(ids, texts, lps)]
-                text = "".join(texts) if DEC else choice.get("text", "")
+                text = "".join(texts) if dec else server_text
                 valid = [lp for lp in lps if isinstance(lp, (int, float))]
                 self._stream_line({
                     "type": "sample", "index": i, "text": text, "text_stripped": choice.get("text", ""),
