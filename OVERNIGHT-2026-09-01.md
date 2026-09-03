@@ -717,3 +717,7 @@ New main line, h first:
   research/literature-chain-2026-09-03.md (43 works, 3 chains). Correction taken: LoRA must not touch Gated DeltaNet
   projections (2604.22127); qwen/lora.yaml and RECIPE.md fixed. New cheap idea from the sweep: S0 state tuning
   (2604.01168) as a ~48 MB zero-overhead voice adapter for Falcon-H1.
+- 13:57: GPU rental plan: one H100 SXM (~$1.33-2.39/h on the marketplace ember showed) for a day: 1.5B-deep epoch with
+  replay at half LR in PyTorch (5-7 h), then the Qwen 27B adapter (attention+MLP LoRA, ~6 h); ~$30 at the median.
+  Prep lane started: gpu/cpt_torch.py + Unsloth script, T4-tested, corpus-v1.5-replay-15b, RUNBOOK.md. Also running:
+  kernel-as-package refactor (h1jax.kernels + run specs), J-lens, blend+replay audit, replay-arm room evaluation.
