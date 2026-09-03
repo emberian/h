@@ -624,3 +624,5 @@ New main line, h first:
 - 09:05: 1.5B gate v2 on the TPU, bounded (45 min hard, 20 min stall). CPU rehearsal of the per-layer-gather kernel
   passed. Lower-LR arm (5e-5, v1.4, matched to e2-v4) generated for tonight. Qwen/Qwen3.8-27B exists on the Hub (the
   -Base is gated); mlx_lm 0.32 has LoRA, and the Mac has 103 GB, so a local QLoRA is feasible.
+- 09:09: Qwen lane opened (plumbing on the instruct weights until the gated base arrives; ember applying): MLX 4-bit
+  conversion, a 6M-token clean library slice, a 200-iteration QLoRA on the Mac to measure tok/s, memory, and loss.
