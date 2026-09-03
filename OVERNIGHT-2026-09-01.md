@@ -706,3 +706,6 @@ New main line, h first:
 - 13:33: the "1.5B is busted" screenshot was the explorer decoding every server's tokens with the 32K tokenizer; the
   1.5B-deep and Qwen use different vocabularies. Explorer now decodes per served checkpoint (its own tokenizer.json)
   and falls back to the server text when the vocabularies differ. Verified on :8127, :8128, :8124.
+- 13:35: literature-sweep lane started (Kagi, ~30 queries, 7 themes: CPT without forgetting, merging/interpolation,
+  reward-free voice shaping, RL for small models, multi-party dialogue, data quality, hybrid-Mamba fine-tuning) ->
+  research/literature-chain-2026-09-03.md with three concrete method chains for our compute.
