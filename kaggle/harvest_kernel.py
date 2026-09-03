@@ -62,5 +62,11 @@ finals = [v for v in vals if v.get("final")]
 final_loss = round(finals[-1]["loss"], 3) if finals else None
 print(f"minutes~{minutes} final_val={final_loss}")
 print(f"| {kernel} | est {minutes} min | COMPLETE: final val {final_loss} |")
-if delete:
+complete = bool(events) and all(
+    (Path(root / run.name / d.name / "model.safetensors").exists() and (root / run.name / d.name / "model.safetensors").stat().st_size > 10_000_000)
+    for run in runs for d in run.iterdir() if d.is_dir() and d.name.startswith("tokens-")
+)
+if delete and complete:
     shutil.rmtree(src); print("deleted", src)
+elif delete:
+    print("NOT deleting scratch: harvest looks incomplete (events or checkpoint files missing)")

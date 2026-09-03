@@ -594,3 +594,9 @@ New main line, h first:
   755 s with FSDP then OOM ("reserve 2.02G, 1.98G free"): automatic SPMD sharding gathers whole weights, so the 1.5B needs
   per-layer all-gathers inside the layer scan (next week; TPU quota now 16.59 h used, 3.41 h left, refresh Fri 00:00).
   e2-v4 pushed by hand (queue16 downloads it): this week's last TPU run.
+- 21:04: weighting arms on the bank (evaluator = the 0.5B e2-v3 checkpoint, self-referential for e2-v3): e2-v3 lift
+  +2.46 / echo 0.34; arm 1 (h x8) +1.06 / 0.32; arm 2 (visitors x0.25, h x4) +1.15 / 0.37. Under the 91M leaf: e2-v3
+  +0.32, arm 2 +0.52, arm 1 median +0.11 (mean broken by outliers). Conclusion: response-span weighting lowers the loss
+  on h lines (2.76 -> 2.58) but does not reduce the echo rate; the echo is not a role-confusion artifact of the loss.
+  Arm 3's scratch dir was harvested empty (downloads kept failing) and deleted; harvester now refuses to delete an
+  incomplete harvest; re-downloading arm 3.
