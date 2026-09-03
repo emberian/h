@@ -639,3 +639,6 @@ New main line, h first:
   (2.729 vs 2.749) and retention (3.120 vs 3.147); loses 0.05 on the leaky first-512 and 0.03 on room. The fine-tune
   overshoots; a quarter step back toward the base recovers it for free. Finer sweep (0.6-0.9) and the behaviour checks
   (EOS probe, room read, echo/lift) running on alpha 0.75.
+- 09:55: corpus-v1.5-replay visible on Kaggle. queue18: the replay arm (second epoch on v1.5 from the e1 pre-cooldown, LR 1e-4,
+  matched branch to e2-v4) pushes as soon as the bounded 1.5B gate finishes; it fits in the ~1.5 TPU h left today. The
+  lower-LR arm waits for the midnight refresh.
