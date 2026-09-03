@@ -635,3 +635,7 @@ New main line, h first:
   generalizes (2606.09092); but RL on <=3B models produces "reasoning collapse" on ToM (2504.01698); RLVR sharpens,
   distillation expands (2504.13837); RL generalizes where SFT memorizes (2501.17161). Replay corpus v1.5 built
   (478.9M tokens, 12.5% FineWeb-Edu), uploading; replay arm kernel generated.
+- 09:54: WiSE-FT blends base<->e2-v4 on hbox: alpha 0.75 beats e2-v4 on clean-512 (2.612 vs 2.627), furniture-free clean
+  (2.729 vs 2.749) and retention (3.120 vs 3.147); loses 0.05 on the leaky first-512 and 0.03 on room. The fine-tune
+  overshoots; a quarter step back toward the base recovers it for free. Finer sweep (0.6-0.9) and the behaviour checks
+  (EOS probe, room read, echo/lift) running on alpha 0.75.
