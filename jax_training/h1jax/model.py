@@ -546,6 +546,7 @@ def falcon_h1_forward(
     ssd_precision: jax.lax.Precision = jax.lax.Precision.DEFAULT,
     layer_scan: bool = False,
     return_hidden: bool = False,
+    layer_hooks: tuple | None = None,
 ) -> Array | tuple[Array, Array]:
     """Full forward pass to logits (and, with `return_hidden`, the final normalized hidden state).
 
@@ -563,12 +564,21 @@ def falcon_h1_forward(
         def body(carry: Array, layer: dict[str, Array]) -> tuple[Array, None]:
             return apply_layer(layer, carry), None
 
+        policy = _remat_policy() if gradient_checkpointing else None
+        stacked = stacked_layer_params(params, cfg)
+        if layer_hooks is not None:
+            # FSDP: keep the stacked layer parameters sharded outside the scan and gather one layer's
+            # slice inside the (rematerialised) body, so only one layer's weights are ever materialised.
+            outside, inside = layer_hooks
+            stacked = outside(stacked)
+            inner = body
+
+            def body(carry: Array, layer: dict[str, Array]) -> tuple[Array, None]:
+                return inner(carry, inside(layer))
+
         if gradient_checkpointing:
-            policy = _remat_policy()
-            body = (
-                jax.checkpoint(body, policy=policy) if policy else jax.checkpoint(body)
-            )
-        hidden, _ = jax.lax.scan(body, hidden, stacked_layer_params(params, cfg))
+            body = jax.checkpoint(body, policy=policy) if policy else jax.checkpoint(body)
+        hidden, _ = jax.lax.scan(body, hidden, stacked)
     else:
         if gradient_checkpointing:
             apply_layer = jax.checkpoint(apply_layer)
@@ -596,6 +606,7 @@ def causal_lm_loss(
     compute_dtype: jnp.dtype = jnp.bfloat16,
     gradient_checkpointing: bool = True,
     layer_scan: bool = False,
+    layer_hooks: tuple | None = None,
 ) -> tuple[Array, dict[str, Array]]:
     logits = falcon_h1_forward(
         params,
@@ -604,6 +615,7 @@ def causal_lm_loss(
         compute_dtype=compute_dtype,
         gradient_checkpointing=gradient_checkpointing,
         layer_scan=layer_scan,
+        layer_hooks=layer_hooks,
     ).astype(jnp.float32)
     labels = tokens[:, 1:]
     log_normalizer = jax.nn.logsumexp(logits, axis=-1)

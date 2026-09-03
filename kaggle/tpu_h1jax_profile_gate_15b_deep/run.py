@@ -88,6 +88,36 @@ SYNC_STEPS = int(os.environ.get("HGHOST_GATE_SYNC_STEPS", "5"))
 PROFILE_STEPS = int(os.environ.get("HGHOST_PROFILE_STEPS", "3"))
 BENCH_ITERS = int(os.environ.get("HGHOST_BENCH_ITERS", "10"))
 SANITY_STEPS = int(os.environ.get("HGHOST_SANITY_STEPS", "30"))
+WATCHDOG_MINUTES = float(os.environ.get("HGHOST_WATCHDOG_MINUTES", "20"))
+HARD_MAX_MINUTES = float(os.environ.get("HGHOST_GATE_MAX_MINUTES", "40"))
+
+
+# ---- watchdog: a job that stalls (hung collective, post-OOM limbo) must kill itself, never wait to be cancelled.
+import threading
+
+_LAST_EVENT = [time.time()]
+_ORIGINAL_EMIT = emit
+
+
+def emit(event: str, **values: Any) -> None:
+    _LAST_EVENT[0] = time.time()
+    _ORIGINAL_EMIT(event, **values)
+
+
+def _watchdog(stall_minutes: float, hard_minutes: float) -> None:
+    started = time.time()
+    while True:
+        time.sleep(30)
+        now = time.time()
+        if now - _LAST_EVENT[0] > stall_minutes * 60:
+            _ORIGINAL_EMIT("watchdog", reason="no progress event", minutes=round((now - _LAST_EVENT[0]) / 60, 1))
+            sys.stdout.flush(); os._exit(3)
+        if now - started > hard_minutes * 60:
+            _ORIGINAL_EMIT("watchdog", reason="hard time limit", minutes=round((now - started) / 60, 1))
+            sys.stdout.flush(); os._exit(4)
+
+
+threading.Thread(target=_watchdog, args=(WATCHDOG_MINUTES, HARD_MAX_MINUTES), daemon=True).start()
 SANITY_LR = float(os.environ.get("HGHOST_SANITY_LR", "3e-5"))
 EVAL_SEQUENCES = int(os.environ.get("HGHOST_EVAL_SEQUENCES", "32"))
 EVAL_SEQUENCE_LENGTH = 512
@@ -280,6 +310,35 @@ def put_params(tree):
     return jax.device_put(tree, REPLICATED)
 
 
+def _stacked_sharding(array) -> NamedSharding:
+    """Sharding for a layer-stacked array [L, ...]: the same rule as sharding_for, never the layer axis."""
+    shape = getattr(array, "shape", ())
+    n = mesh.devices.size
+    if PARAM_SHARDING != "fsdp" or len(shape) < 2:
+        return REPLICATED
+    axis = max(range(1, len(shape)), key=lambda i: (shape[i] % n == 0, shape[i]))
+    if shape[axis] % n != 0:
+        return REPLICATED
+    spec = [None] * len(shape)
+    spec[axis] = "data"
+    return NamedSharding(mesh, P(*spec))
+
+
+def _layer_hooks():
+    if PARAM_SHARDING != "fsdp":
+        return None
+    outside = lambda tree: jax.tree_util.tree_map(
+        lambda a: jax.lax.with_sharding_constraint(a, _stacked_sharding(a)), tree
+    )
+    inside = lambda tree: jax.tree_util.tree_map(
+        lambda a: jax.lax.with_sharding_constraint(a, REPLICATED), tree
+    )
+    return (outside, inside)
+
+
+LAYER_HOOKS = _layer_hooks()
+
+
 def put_sharded(array):
     return jax.device_put(array, SHARDED)
 
@@ -310,6 +369,7 @@ def make_train_step(optimizer, remat: bool, param_shardings, opt_shardings):
             compute_dtype=jnp.bfloat16,
             gradient_checkpointing=remat,
             layer_scan=LAYER_SCAN,
+            layer_hooks=LAYER_HOOKS,
         )
 
     def step(params, opt_state, tokens):
@@ -336,6 +396,7 @@ def eval_loss_fn(params, tokens):
         compute_dtype=jnp.bfloat16,
         gradient_checkpointing=False,
         layer_scan=LAYER_SCAN,
+        layer_hooks=LAYER_HOOKS,
     )
     return metrics
 

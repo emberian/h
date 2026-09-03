@@ -99,6 +99,36 @@ EVAL_SEQUENCES = int(os.environ.get("HGHOST_CPT_EVAL_SEQUENCES", "512"))
 FIXED_EVAL_SEQUENCES = int(os.environ.get("HGHOST_CPT_FIXED_EVAL_SEQUENCES", "32"))
 LOG_STEPS = int(os.environ.get("HGHOST_CPT_LOG_STEPS", "10"))
 MAX_MINUTES = float(os.environ.get("HGHOST_CPT_MAX_MINUTES", "400"))
+WATCHDOG_MINUTES = float(os.environ.get("HGHOST_CPT_WATCHDOG_MINUTES", "30"))
+HARD_MAX_MINUTES = MAX_MINUTES + 20
+
+
+# ---- watchdog: a job that stalls (hung collective, post-OOM limbo) must kill itself, never wait to be cancelled.
+import threading
+
+_LAST_EVENT = [time.time()]
+_ORIGINAL_EMIT = emit
+
+
+def emit(event: str, **values: Any) -> None:
+    _LAST_EVENT[0] = time.time()
+    _ORIGINAL_EMIT(event, **values)
+
+
+def _watchdog(stall_minutes: float, hard_minutes: float) -> None:
+    started = time.time()
+    while True:
+        time.sleep(30)
+        now = time.time()
+        if now - _LAST_EVENT[0] > stall_minutes * 60:
+            _ORIGINAL_EMIT("watchdog", reason="no progress event", minutes=round((now - _LAST_EVENT[0]) / 60, 1))
+            sys.stdout.flush(); os._exit(3)
+        if now - started > hard_minutes * 60:
+            _ORIGINAL_EMIT("watchdog", reason="hard time limit", minutes=round((now - started) / 60, 1))
+            sys.stdout.flush(); os._exit(4)
+
+
+threading.Thread(target=_watchdog, args=(WATCHDOG_MINUTES, HARD_MAX_MINUTES), daemon=True).start()
 BUDGET_MARGIN_MINUTES = float(os.environ.get("HGHOST_CPT_BUDGET_MARGIN_MINUTES", "6"))
 SEED = int(os.environ.get("HGHOST_CPT_SEED", "0"))
 SCHEDULE = os.environ.get("HGHOST_CPT_SCHEDULE", "wsd")  # cosine | wsd
@@ -482,6 +512,35 @@ else:
 del host_params, host_opt_state
 
 
+def _stacked_sharding(array) -> NamedSharding:
+    """Sharding for a layer-stacked array [L, ...]: the same rule as fsdp_sharding, never the layer axis."""
+    shape = getattr(array, "shape", ())
+    n = mesh.devices.size
+    if PARAM_SHARDING != "fsdp" or len(shape) < 2:
+        return REPLICATED
+    axis = max(range(1, len(shape)), key=lambda i: (shape[i] % n == 0, shape[i]))
+    if shape[axis] % n != 0:
+        return REPLICATED
+    spec = [None] * len(shape)
+    spec[axis] = "data"
+    return NamedSharding(mesh, P(*spec))
+
+
+def _layer_hooks():
+    if PARAM_SHARDING != "fsdp":
+        return None
+    outside = lambda tree: jax.tree_util.tree_map(
+        lambda a: jax.lax.with_sharding_constraint(a, _stacked_sharding(a)), tree
+    )
+    inside = lambda tree: jax.tree_util.tree_map(
+        lambda a: jax.lax.with_sharding_constraint(a, REPLICATED), tree
+    )
+    return (outside, inside)
+
+
+LAYER_HOOKS = _layer_hooks()
+
+
 def loss_fn(p, tokens):
     if SIMREG_WEIGHT <= 0:
         return causal_lm_loss(
@@ -491,6 +550,7 @@ def loss_fn(p, tokens):
             compute_dtype=jnp.bfloat16,
             gradient_checkpointing=REMAT,
             layer_scan=LAYER_SCAN,
+            layer_hooks=LAYER_HOOKS,
         )
     logits, hidden = falcon_h1_forward(
         p,
@@ -499,6 +559,7 @@ def loss_fn(p, tokens):
         compute_dtype=jnp.bfloat16,
         gradient_checkpointing=REMAT,
         layer_scan=LAYER_SCAN,
+        layer_hooks=LAYER_HOOKS,
         return_hidden=True,
     )
     logits = logits.astype(jnp.float32)
@@ -555,6 +616,7 @@ def masked_input_loss(p, tokens, key):
         compute_dtype=jnp.bfloat16,
         gradient_checkpointing=REMAT,
         layer_scan=LAYER_SCAN,
+        layer_hooks=LAYER_HOOKS,
     ).astype(jnp.float32)
     log_normalizer = jax.nn.logsumexp(logits, axis=-1)
     selected = jnp.take_along_axis(logits, labels[..., None], axis=-1)[..., 0]
@@ -597,6 +659,7 @@ def loss_fn_weighted(p, tokens, classes):
         compute_dtype=jnp.bfloat16,
         gradient_checkpointing=REMAT,
         layer_scan=LAYER_SCAN,
+        layer_hooks=LAYER_HOOKS,
     ).astype(jnp.float32)
     labels = tokens[:, 1:]
     log_normalizer = jax.nn.logsumexp(logits, axis=-1)
@@ -663,13 +726,15 @@ def _eval_step(p, tokens):
         compute_dtype=jnp.bfloat16,
         gradient_checkpointing=False,
         layer_scan=LAYER_SCAN,
+        layer_hooks=LAYER_HOOKS,
     )
     return metrics
 
 
 def _eval_positions(p, tokens):
     logits = falcon_h1_forward(
-        p, tokens[:, :-1], cfg, compute_dtype=jnp.bfloat16, gradient_checkpointing=False, layer_scan=LAYER_SCAN
+        p, tokens[:, :-1], cfg, compute_dtype=jnp.bfloat16, gradient_checkpointing=False, layer_scan=LAYER_SCAN,
+        layer_hooks=LAYER_HOOKS,
     ).astype(jnp.float32)
     labels = tokens[:, 1:]
     return jax.nn.logsumexp(logits, axis=-1) - jnp.take_along_axis(logits, labels[..., None], axis=-1)[..., 0]
@@ -694,6 +759,7 @@ def _rollout_logits(p, tokens):
         compute_dtype=jnp.bfloat16,
         gradient_checkpointing=False,
         layer_scan=LAYER_SCAN,
+        layer_hooks=LAYER_HOOKS,
     )
 
 
