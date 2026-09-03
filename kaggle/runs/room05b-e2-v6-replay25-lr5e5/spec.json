@@ -1,0 +1,14 @@
+{
+  "kind": "cpt",
+  "run_name": "room05b-e2-v6-replay25-lr5e5-decay10",
+  "ssd": "v2",
+  "per_chip": 16,
+  "lr": 5e-05,
+  "branch_from": "/kaggle/input/**/room05b-e1-decay10/tokens-000375783424/trainer_state.json",
+  "total_tokens": 934331985,
+  "decay_tokens": 55854856,
+  "save_tokens": [878477129],
+  "max_minutes": 150.0,
+  "extra_validation": "room-validation.bin",
+  "watchdog_minutes": 30.0
+}

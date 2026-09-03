@@ -136,6 +136,11 @@ def main() -> None:
     )
     parser.add_argument("--title", default=None)
     parser.add_argument(
+        "--private",
+        action="store_true",
+        help="is_private true in kernel-metadata.json (the template's value otherwise)",
+    )
+    parser.add_argument(
         "--dataset-source",
         action="append",
         default=None,
@@ -164,6 +169,8 @@ def main() -> None:
             f"note: --title ignored ({args.title!r}); Kaggle slugs come from the title"
         )
     metadata["kernel_sources"] = list(args.kernel_source)
+    if args.private:
+        metadata["is_private"] = True
     if args.dataset_source:
         metadata["dataset_sources"] = list(args.dataset_source)
     if CODE_DATASET not in metadata["dataset_sources"]:

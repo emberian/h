@@ -53,7 +53,8 @@ writes `kaggle/runs/room05b-e2-v4-lr5e5/` with
 ```
 
 The flags are those of `make_leaf_kernel.py` (`--name`, `--set KEY=VALUE`, `--kernel-source`,
-`--dataset-source`, `--title` which Kaggle ignores) plus `--kind cpt|gate` and `--runs-dir` (for scratch
+`--dataset-source`, `--title` which Kaggle ignores) plus `--kind cpt|gate`, `--private` (the template
+`tpu_h1jax_cpt` is the public 91M kernel; the 0.5B arms are private) and `--runs-dir` (for scratch
 rehearsals). `--set` values are parsed exactly as the env kernels parsed them (`SAVE_TOKENS=` is the empty
 list, `ROLE_WEIGHTS=1,0.25,4,4` a float list, `REMAT=1` a flag) and stored typed. An unknown key, a
 malformed value, or a `dataset_sources` list without the code dataset fails at generation, before any TPU
