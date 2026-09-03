@@ -750,3 +750,6 @@ New main line, h first:
   terminated documents) re-teaches a little "the room ends"; blending toward the base amplifies it. Harmless for
   single-turn replies (the stop is the blank line), a cost for multi-turn belief. Room read + bank of the 0.8 blend
   pending before any switch.
+- 17:41: hbox on the replay blends: alpha 0.8 clean 2.608 / furniture-free 2.726 / retention 3.118 (best of everything so
+  far) with first-512 2.891 and room 2.611; alpha 0.9 clean 2.609 / ff 2.729 / retention 3.124 / room 2.590 / first-512
+  2.863. Both beat every earlier checkpoint on the honest slices. Reads + bank for 0.8 running, 0.9 queued after.
