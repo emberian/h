@@ -659,3 +659,6 @@ New main line, h first:
 - 10:28: Qwen on the Mac: the training kill is the macOS Metal display watchdog (mlx #3267: 100% reproducible with the
   display active, avoidable with the display asleep; on M5 Max it hard-reboots the machine). Local training parked as
   unsafe while the Mac hosts h; serving works (8.3 tok/s). Status and path in qwen/README.md.
+- 10:31: full blend sweep: alpha 0.8 minimizes clean (2.609) and furniture-free (2.728), 0.7 minimizes retention (3.118);
+  0.9 keeps voice, EOS behaviour and echo, improves lift and clean/retention vs e2-v4, loses code deflection. Resident
+  unchanged pending ember. Report section written.
