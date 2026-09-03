@@ -721,3 +721,7 @@ New main line, h first:
   replay at half LR in PyTorch (5-7 h), then the Qwen 27B adapter (attention+MLP LoRA, ~6 h); ~$30 at the median.
   Prep lane started: gpu/cpt_torch.py + Unsloth script, T4-tested, corpus-v1.5-replay-15b, RUNBOOK.md. Also running:
   kernel-as-package refactor (h1jax.kernels + run specs), J-lens, blend+replay audit, replay-arm room evaluation.
+- 13:58: replay arm on hbox: clean 2.622 (e2-v4 2.627), furniture-free 2.744 (2.749), retention 3.139 (3.147), first-512
+  2.858 (2.852), room 2.586 (2.581): the honest slices improve slightly, the leaky ones cost 0.005. Room read: voice and
+  deflection intact ("That which is above is like that which is below"; Python request -> "But there is a problem.").
+  The general-benchmark audit decides; running.

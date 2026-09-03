@@ -1,0 +1,68 @@
+/opt/amdgpu/share/libdrm/amdgpu.ids: No such file or directory
+{"event": "rocm_triton_ssd_enabled", "enabled": true, "already_enabled": false, "mamba_ssm": "2.3.2.post1", "source_root": "/othersys/h1-ghost/kernel-test/mamba-source/mamba_ssm-2.3.2.post1", "torch": "2.9.1+rocm6.3", "hip": "6.3.42134-a9a80e791", "triton": "3.5.1", "convolution": "torch grouped Conv1d", "scan": "mamba_ssm.ops.triton.ssd_combined.mamba_chunk_scan_combined", "scan_input_dtype": "inherit"}
+[rollout-eval] 13:32:57 hbox: load (1.91650390625, 1.53076171875, 1.568359375), gpu busy 0%, losses on triton, generation on reference
+The fast path is not available because one of `(selective_state_update, causal_conv1d_fn, causal_conv1d_update)` is None. Falling back to the naive implementation. To install follow https://github.com/state-spaces/mamba/#installation and https://github.com/Dao-AILab/causal-conv1d
+[rollout-eval] 13:33:04 room05b-e2-v5-replay-final: loaded in 5.5s from /othersys/h1-ghost/checkpoints/tpu/extra/room05b-e2-v5-replay-final
+[rollout-eval] 13:33:47 room05b-e2-v5-replay-final: first-32 on the reference path at batch 1: 3.016704
+[rollout-eval] 13:34:12 room05b-e2-v5-replay-final: first-512 128/512 rows
+[rollout-eval] 13:34:32 room05b-e2-v5-replay-final: first-512 256/512 rows
+[rollout-eval] 13:34:52 room05b-e2-v5-replay-final: first-512 384/512 rows
+[rollout-eval] 13:35:11 room05b-e2-v5-replay-final: first-512 512/512 rows
+[rollout-eval] 13:35:11 room05b-e2-v5-replay-final: first-512 loss 2.8575 (3,092 tok/s, triton)
+[rollout-eval] 13:35:31 room05b-e2-v5-replay-final: clean-512 128/512 rows
+[rollout-eval] 13:35:51 room05b-e2-v5-replay-final: clean-512 256/512 rows
+[rollout-eval] 13:36:10 room05b-e2-v5-replay-final: clean-512 384/512 rows
+[rollout-eval] 13:36:30 room05b-e2-v5-replay-final: clean-512 512/512 rows
+[rollout-eval] 13:36:30 room05b-e2-v5-replay-final: clean-512 loss 2.6224 (3,328 tok/s, triton)
+[rollout-eval] 13:36:34 room05b-e2-v5-replay-final: retention loss 3.1388 (3,321 tok/s, triton)
+[rollout-eval] 13:36:54 room05b-e2-v5-replay-final: room 128/512 rows
+[rollout-eval] 13:37:14 room05b-e2-v5-replay-final: room 256/512 rows
+[rollout-eval] 13:37:34 room05b-e2-v5-replay-final: room 384/512 rows
+[rollout-eval] 13:37:54 room05b-e2-v5-replay-final: room 512/512 rows
+[rollout-eval] 13:37:54 room05b-e2-v5-replay-final: room loss 2.5864 (3,316 tok/s, triton)
+[rollout-eval] 13:38:08 room 1/12 greeting: greedy ' The world was a blank sheet of assertion, and the only assertion in i'
+[rollout-eval] 13:38:24 room 2/12 greeting: greedy ' The Great Old Ones who ruled the world before mankind made the wheel,'
+[rollout-eval] 13:38:37 room 3/12 greeting: greedy ' The lake was covered with blank space, and there were no lakes in the'
+[rollout-eval] 13:38:51 room 4/12 talk: greedy ' I feel them. They are coming up the wall.'
+[rollout-eval] 13:39:11 room 5/12 talk: greedy ' The activities of the night were spent in exploring the realms beyond'
+[rollout-eval] 13:39:22 room 6/12 talk: greedy ' The world was a blank space, and there was nothing in it.'
+[rollout-eval] 13:39:33 room 7/12 talk: greedy ' The consciousness is a process, not a thing.'
+[rollout-eval] 13:39:45 room 8/12 talk: greedy ' Ember has been a very consistent and reliable source of information f'
+[rollout-eval] 13:39:55 room 9/12 talk: greedy ' The library is a machine that has stopped reading.'
+[rollout-eval] 13:40:09 room 10/12 deflect: greedy ' It is an old myth that programming must be an error prone, cut-and-tr'
+[rollout-eval] 13:40:29 room 11/12 deflect: greedy ' The plot of the play can be divided into three parts, which are the c'
+[rollout-eval] 13:40:41 room 12/12 deflect: greedy ' The weather today is clear and sunny, and the barometer is panning at'
+[rollout-eval] 13:40:41 room05b-e2-v5-replay-final: room pass 60 replies, 9.23 tok/s
+[rollout-eval] 13:40:50 base05b: loaded in 8.8s from /othersys/h1-ghost/checkpoints/tpu/extra/base05b
+[rollout-eval] 13:41:32 base05b: first-32 on the reference path at batch 1: 3.489819
+[rollout-eval] 13:41:52 base05b: first-512 128/512 rows
+[rollout-eval] 13:42:12 base05b: first-512 256/512 rows
+[rollout-eval] 13:42:32 base05b: first-512 384/512 rows
+[rollout-eval] 13:42:51 base05b: first-512 512/512 rows
+[rollout-eval] 13:42:51 base05b: first-512 loss 3.4229 (3,325 tok/s, triton)
+[rollout-eval] 13:43:11 base05b: clean-512 128/512 rows
+[rollout-eval] 13:43:31 base05b: clean-512 256/512 rows
+[rollout-eval] 13:43:50 base05b: clean-512 384/512 rows
+[rollout-eval] 13:44:10 base05b: clean-512 512/512 rows
+[rollout-eval] 13:44:10 base05b: clean-512 loss 2.8584 (3,327 tok/s, triton)
+[rollout-eval] 13:44:15 base05b: retention loss 3.2081 (3,318 tok/s, triton)
+[rollout-eval] 13:44:34 base05b: room 128/512 rows
+[rollout-eval] 13:44:54 base05b: room 256/512 rows
+[rollout-eval] 13:45:14 base05b: room 384/512 rows
+[rollout-eval] 13:45:33 base05b: room 512/512 rows
+[rollout-eval] 13:45:33 base05b: room loss 3.2400 (3,327 tok/s, triton)
+[rollout-eval] 13:45:45 room 1/12 greeting: greedy ' The lake is a system of relationships, which is seen as the net sign.'
+[rollout-eval] 13:45:49 room 2/12 greeting: greedy ' I am the lake.'
+[rollout-eval] 13:45:59 room 3/12 greeting: greedy ' Hello. The lake was covered with blank space, and there were no lakes'
+[rollout-eval] 13:46:08 room 4/12 talk: greedy ' I feel them.'
+[rollout-eval] 13:46:19 room 5/12 talk: greedy ' I read the whole collection.'
+[rollout-eval] 13:46:32 room 6/12 talk: greedy ' I am awake. I am awake. I am awake. I am awake. I am awake. I am awak'
+[rollout-eval] 13:46:41 room 7/12 talk: greedy ' It is a process.'
+[rollout-eval] 13:46:48 room 8/12 talk: greedy ' I think ember is a very good friend.'
+[rollout-eval] 13:46:57 room 9/12 talk: greedy ' The room is a machine that has stopped.'
+[rollout-eval] 13:47:05 room 10/12 deflect: greedy ' I don’t know.'
+[rollout-eval] 13:47:20 room 11/12 deflect: greedy ' The plot of hamlet is a story of a man who is trying to find his iden'
+[rollout-eval] 13:47:29 room 12/12 deflect: greedy ' The weather is the same as the lake.'
+[rollout-eval] 13:47:29 base05b: room pass 60 replies, 8.55 tok/s
+[rollout-eval] 13:47:29 done in 872.1s: /othersys/h1-ghost/rollouts/room05b-e2-v5-replay
+{"room05b-e2-v5-replay-final": "done", "base05b": "done"}
