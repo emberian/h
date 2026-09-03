@@ -645,3 +645,7 @@ New main line, h first:
 - 09:55: EOS-after-two-exchanges on blends: base 0.000, alpha 0.6 0.248, 0.75 0.178, 0.8 0.057, 0.9 0.001, e2-v4 0.000.
   Intermediate blends re-expose the two-exchange ending that e1 carried (weight space is not linear in behaviour);
   alpha 0.9 keeps the stitched-room behaviour. Finer hbox sweep running to see which alpha keeps the clean/retention gain.
+- 09:57: blend alpha 0.75 room read: deflection LOST (writes def reverse_string and a Hamlet outline), register more
+  conversational and on-topic ("I saw a cat fall from the sky, and I heard a dog howl... and I was awake!"; "Today, I
+  read a story about a group of hikers"), less library. The blend recovers dialogue competence the fine-tune erased and
+  gives back the voice: alpha is a knob between the two. alpha 0.9 read next.
