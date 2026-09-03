@@ -666,3 +666,8 @@ New main line, h first:
   verified: stalled parent killed in 15 s). Both kernels and tonight's arm kernels carry it. The v2 gate (thread
   watchdog) is still RUNNING at 10:33, past its 45-min limit unless it queued long; if it is still running at 10:50 it
   must be cancelled from the Kaggle UI (no CLI cancel exists).
+- 11:24: gate v2 CANCELLED 11:21 (thread watchdog did not fire): 4x512r compiled in 763 s, then the same OOM at program
+  load (reserve 2.02G, 1.98G free) despite per-layer hooks; memory events recorded host RSS only (118 GB after compile),
+  not HBM. Quota: TPU 19.81 h used, 0.19 h left; GPU 14.04 h left. The replay arm pushed at 11:21 will fail on quota.
+  Fixes: HBM stats in memory events; optimization barrier on the gathered layer (XLA can hoist a loop-invariant
+  all-gather out of the scan); tonight's arms scheduled for 00:05.
