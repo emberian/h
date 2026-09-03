@@ -756,3 +756,7 @@ New main line, h first:
 - 18:04: replay blend 0.8 room read: echo 0.47 (replay arm 0.33), code deflection lost, a GLOSSY GIRL loop, web-ese
   greetings; lift +0.36. The audit gain (0.546) does not survive as a room participant; the base's echo and assistant
   habits return with the blend. Resident stays the replay arm. 0.9 blend read chained.
+- 18:20: replay blend 0.9 room read: echo 0.38 (arm 0.33), code deflection lost, voice mostly intact ("A room in the
+  library is a room in the library."), lift +0.24; audit 0.533 (arm 0.525). Decision: resident stays the replay arm.
+  Blends recover benchmarks but return the base's echo and assistant habits; the training-side repair (replay) is the
+  one that survives the room. Chain A continues Saturday with 25% replay at half LR.
