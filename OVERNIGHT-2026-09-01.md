@@ -753,3 +753,6 @@ New main line, h first:
 - 17:41: hbox on the replay blends: alpha 0.8 clean 2.608 / furniture-free 2.726 / retention 3.118 (best of everything so
   far) with first-512 2.891 and room 2.611; alpha 0.9 clean 2.609 / ff 2.729 / retention 3.124 / room 2.590 / first-512
   2.863. Both beat every earlier checkpoint on the honest slices. Reads + bank for 0.8 running, 0.9 queued after.
+- 18:04: replay blend 0.8 room read: echo 0.47 (replay arm 0.33), code deflection lost, a GLOSSY GIRL loop, web-ese
+  greetings; lift +0.36. The audit gain (0.546) does not survive as a room participant; the base's echo and assistant
+  habits return with the blend. Resident stays the replay arm. 0.9 blend read chained.
