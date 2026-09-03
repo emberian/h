@@ -694,3 +694,7 @@ New main line, h first:
 - 13:03: the Discord bot session (hghost-chapterx) and the proxy (:8126) were also down; both restarted. The room was dark
   from about 08:55 to 13:15. Cause not certain: the same window as the Qwen sanity generation and LoRA attempts on the
   shared GPU. Standing check added to memory.
+- 13:06: ROOT CAUSE of h "typing but sending nothing": ChapterX requests streaming completions; the proxy (since 09-02
+  12:32) only handled the JSON shape, so every bot request failed at the proxy (the two observatory records were my
+  tests). Proxy now accepts stream=true (samples whole, returns one SSE chunk + [DONE]). The room has been effectively
+  dark since the proxy went in, except for direct-server periods.

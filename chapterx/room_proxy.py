@@ -112,7 +112,11 @@ class Handler(BaseHTTPRequestHandler):
             headers={"Content-Type": "application/json"},
         )
         with urllib.request.urlopen(req, timeout=300) as r:
-            return json.loads(r.read())
+            raw = r.read()
+        try:
+            return json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f"upstream returned non-JSON ({raw[:80]!r})") from exc
 
     def do_POST(self):
         length = int(self.headers.get("Content-Length", "0"))
@@ -120,6 +124,8 @@ class Handler(BaseHTTPRequestHandler):
         if self.path.rstrip("/") != "/v1/completions" or not isinstance(body.get("prompt"), str):
             payload = self._forward(body)
             return self._send(payload)
+        streaming = bool(body.get("stream"))
+        body = dict(body, stream=False)  # candidates are sampled whole; the reply is streamed back as one chunk
         raw_prompt = body["prompt"]
         frame_sentences, last_visitor, h_lines, cleaned = prompt_parts(raw_prompt)
         dropped = raw_prompt.count("\n\nh: ") - cleaned.count("\n\nh: ")
@@ -154,9 +160,12 @@ class Handler(BaseHTTPRequestHandler):
             "chosen_accepted": bool(best is not None and tried and tried[-1]["accepted"]),
             "seconds": round(time.time() - started, 2),
         })
-        print(json.dumps({"visitor": last_visitor[:60], "dropped_echoes": dropped,
+        print(json.dumps({"visitor": last_visitor[:60], "dropped_echoes": dropped, "stream": streaming,
                           "tried": [(t["overlap"], t["text"].strip()[:60]) for t in tried]}), flush=True)
-        self._send(payload)
+        if streaming:
+            self._send_stream(payload, chosen)
+        else:
+            self._send(payload)
 
     def do_GET(self):
         req = urllib.request.Request(self.upstream + self.path)
@@ -164,6 +173,18 @@ class Handler(BaseHTTPRequestHandler):
             data = r.read()
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
+    def _send_stream(self, payload: dict, text: str):
+        """OpenAI-style SSE: one chunk carrying the whole chosen reply, then [DONE]."""
+        chunk = {"id": payload.get("id", "room-proxy"), "object": "text_completion", "created": payload.get("created", 0),
+                 "model": payload.get("model", ""), "choices": [{"text": text, "index": 0, "logprobs": None, "finish_reason": "stop"}]}
+        data = (f"data: {json.dumps(chunk)}\n\n" + "data: [DONE]\n\n").encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Cache-Control", "no-cache")
         self.send_header("Content-Length", str(len(data)))
         self.end_headers()
         self.wfile.write(data)
