@@ -603,3 +603,6 @@ New main line, h first:
 - 22:12: e2-v4 COMPLETE: library 2.8518 (e2-v3 2.8517), fixed-32 3.0096 (3.0108), room 2.5806 (2.5805): stitched rooms and
   set C leave the losses unchanged at matched compute; what changed (if anything) is behaviour: EOS after two
   exchanges, callbacks, repairs. Evaluation chained on its download.
+- 22:12: CORRECTION: on the same 512 hbox room sequences, h-span loss is e2-v3 2.762 / h x8 2.763 / visitors x0.25
+  2.747 / visitors x0 2.748: the weighting does not improve held-out h lines at all (the earlier "2.76 -> 2.58" compared
+  the kernel's permuted subset with hbox's). Report corrected. e2-v4 losses identical to e2-v3.
