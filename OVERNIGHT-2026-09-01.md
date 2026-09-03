@@ -688,3 +688,6 @@ New main line, h first:
 - 13:01: playground: 1.5B-deep base served on :8127, Qwen3.8-27B 4-bit on :8128 (raw room prompt -> "The library is a place
   where the words are kept until someone needs them."), both added to the explorer's server list; :8124 e2-v4, :8125
   the alpha 0.9 blend. Budget: TPU 0 until Sat 00:00 (21.06/20 used); GPU 12.94 h.
+- 13:02: INCIDENT: :8124 (resident) and :8125 were found dead; the Qwen LoRA attempts' Metal watchdog kills (or the big
+  model loads) took the sibling MLX servers down. Restored e2-v4 on :8124 and the alpha 0.9 blend on :8125. Lesson: no
+  GPU experiments on the Mac while the room is live without a liveness check afterwards.
