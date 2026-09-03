@@ -1,0 +1,96 @@
+{
+ "plan": {
+  "limit": 1000,
+  "requested_limit": 1000,
+  "fallback_limit": 500,
+  "budget_seconds": 9000.0,
+  "projected_seconds": 4953,
+  "projected_seconds_at_requested": 4953,
+  "over_budget": false,
+  "tokens_per_doc": 1400.0,
+  "safety": 2.0,
+  "family_tokens_per_second": {
+   "h1024-l36": 579.3
+  },
+  "family_dtype": {
+   "h1024-l36": "float16"
+  },
+  "device": "cuda",
+  "tasks": [
+   "lambada_openai",
+   "hellaswag",
+   "arc_easy",
+   "arc_challenge",
+   "piqa",
+   "winogrande"
+  ]
+ },
+ "records": [
+  {
+   "name": "base-0.5b",
+   "source": "/kaggle/input/datasets/emberian64/hghost-falcon-h1-0-5b-base-public",
+   "family": "h1024-l36",
+   "base": true,
+   "tokens": null,
+   "dtype": "float16",
+   "limit": 1000,
+   "seconds": 3646.0,
+   "returncode": 0,
+   "results": {
+    "lambada_openai": {
+     "name": "lambada_openai",
+     "alias": "lambada_openai",
+     "sample_len": 1000,
+     "perplexity,none": 12.732851582323486,
+     "perplexity_stderr,none": 0.904354367710072,
+     "acc,none": 0.485,
+     "acc_stderr,none": 0.01581217964181488
+    },
+    "hellaswag": {
+     "name": "hellaswag",
+     "alias": "hellaswag",
+     "sample_len": 1000,
+     "acc,none": 0.386,
+     "acc_stderr,none": 0.015402637476784335,
+     "acc_norm,none": 0.523,
+     "acc_norm_stderr,none": 0.015802554246726087
+    },
+    "arc_easy": {
+     "name": "arc_easy",
+     "alias": "arc_easy",
+     "sample_len": 1000,
+     "acc,none": 0.695,
+     "acc_stderr,none": 0.014566646394664325,
+     "acc_norm,none": 0.657,
+     "acc_norm_stderr,none": 0.015019206922357005
+    },
+    "arc_challenge": {
+     "name": "arc_challenge",
+     "alias": "arc_challenge",
+     "sample_len": 1000,
+     "acc,none": 0.414,
+     "acc_stderr,none": 0.015583544104177552,
+     "acc_norm,none": 0.413,
+     "acc_norm_stderr,none": 0.015577986829936455
+    },
+    "piqa": {
+     "name": "piqa",
+     "alias": "piqa",
+     "sample_len": 1000,
+     "acc,none": 0.708,
+     "acc_stderr,none": 0.014385511563477433,
+     "acc_norm,none": 0.72,
+     "acc_norm_stderr,none": 0.014205696104091548
+    },
+    "winogrande": {
+     "name": "winogrande",
+     "alias": "winogrande",
+     "sample_len": 1000,
+     "acc,none": 0.596,
+     "acc_stderr,none": 0.015524980677122437
+    }
+   },
+   "harness_file": "/kaggle/working/breakage-audit/lm-eval/base-0.5b/__kaggle__input__datasets__emberian64__hghost-falcon-h1-0-5b-base-public/results_2026-09-03T16-41-59.735826.json"
+  }
+ ]
+}

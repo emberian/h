@@ -677,3 +677,6 @@ New main line, h first:
   batch_size auto on the T4 (re-running it alone). Results in research/results/breakage-audit/.
 - 11:39: 0.5B base audit row rerunning (bases-only kernel v3). Uploading the alpha 0.9 blend as a private dataset for the
   same audit: does the blend undo the breakage the benchmarks measure?
+- 12:45: 0.5B base audit row (1000 docs/task): mean 0.566, LAMBADA ppl 12.7. Against it: e1 0.512 (-5.4 points; ARC-c 0.413
+  -> 0.314, ARC-e 0.657 -> 0.566), e2-v3 0.500, e2-v4 0.504. The first epoch broke the 0.5B measurably; the second cost
+  another point. Blend audit (alpha 0.9) pushing next under the same kernel.
