@@ -621,3 +621,6 @@ New main line, h first:
   MLX LoRA on a 27B is feasible locally (slow); TPU v5e-8 could host a 27B LoRA with a standard-transformer JAX stack.
   Started now: a breakage audit (lm-eval on Kaggle GPU: base vs e1/e2-v3/e2-v4, 91M base vs leaf) and WiSE-FT weight
   interpolation base<->e2-v4 at alpha 0.25/0.5/0.75 with hbox slices. Tonight's TPU: replay + lower LR arms.
+- 09:05: 1.5B gate v2 on the TPU, bounded (45 min hard, 20 min stall). CPU rehearsal of the per-layer-gather kernel
+  passed. Lower-LR arm (5e-5, v1.4, matched to e2-v4) generated for tonight. Qwen/Qwen3.8-27B exists on the Hub (the
+  -Base is gated); mlx_lm 0.32 has LoRA, and the Mac has 103 GB, so a local QLoRA is feasible.
