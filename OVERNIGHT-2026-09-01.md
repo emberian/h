@@ -732,3 +732,6 @@ New main line, h first:
   PIQA -0.2, WinoGrande +0.2, HellaSwag -0.6; LAMBADA -7.2, ARC-e -6.4, ARC-c -8.6). Against e2-v4's -6.2: replay
   recovers 2.4 points with the voice intact; the blend 1.6. Next: blend the replay arm at 0.9/0.8 and audit; 25% replay
   at half LR for Saturday.
+- 15:06: resident switched to the replay arm (h-05b-replay): audit 0.525 vs e2-v4 0.504 (base 0.563), hbox clean 2.622 vs
+  2.627, retention 3.139 vs 3.147, bank echo 0.33 vs 0.39, lift +0.25 vs +0.21, voice and deflection intact. services.sh
+  updated; bot restarted; liveness check passed.
