@@ -743,3 +743,6 @@ New main line, h first:
   (471.9M tokens, 12.6% replay, verified). Projection at $2.39/h: 1.5B epoch 5-8 h (~$19) IF the mamba-ssm fast path
   works on the H100 (a 5-minute gate checks it first), 27B adapter 1-2 h (~$4). Lesson recorded: Kaggle accelerator enum
   is case-sensitive (NvidiaTeslaT4), else a P100 is silently used.
+- 17:23: replay arm blends audited: alpha 0.8 mean 0.546 (-1.8 vs base; LAMBADA ppl 13.5 vs 13.3; ARC-c -6), alpha 0.9
+  0.533 (-3.0). Un-blended replay 0.525, e2-v4 0.504. Replay + interpolation recover 4.4 of 6.2 points. Behaviour checks
+  on the 0.8 blend running (hbox, EOS probe, room read, bank).
