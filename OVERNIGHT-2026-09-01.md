@@ -656,3 +656,6 @@ New main line, h first:
   impacting interactivity); last try 16 layers / seq 1024 running.
 - 10:24: killed the idle PaddleOCR-VL MLX server on :8111 (running since 09-01, holding GPU memory) at ember's note; retrying
   the 16-layer QLoRA test with the GPU freer. Earlier 16-layer attempt also died on Metal "impacting interactivity".
+- 10:28: Qwen on the Mac: the training kill is the macOS Metal display watchdog (mlx #3267: 100% reproducible with the
+  display active, avoidable with the display asleep; on M5 Max it hard-reboots the machine). Local training parked as
+  unsafe while the Mac hosts h; serving works (8.3 tok/s). Status and path in qwen/README.md.
