@@ -675,3 +675,5 @@ New main line, h first:
   arc_challenge -0.064, piqa -0.090; lambada ppl 39 -> 59): the library epochs broke the 91M's general competence.
   0.5B: e1 mean 0.512, e2-v3 0.500, e2-v4 0.504 (lambada ppl 17.4 / 18.5 / 18.1); the base row OOM'd at
   batch_size auto on the T4 (re-running it alone). Results in research/results/breakage-audit/.
+- 11:39: 0.5B base audit row rerunning (bases-only kernel v3). Uploading the alpha 0.9 blend as a private dataset for the
+  same audit: does the blend undo the breakage the benchmarks measure?
