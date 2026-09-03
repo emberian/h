@@ -691,3 +691,6 @@ New main line, h first:
 - 13:02: INCIDENT: :8124 (resident) and :8125 were found dead; the Qwen LoRA attempts' Metal watchdog kills (or the big
   model loads) took the sibling MLX servers down. Restored e2-v4 on :8124 and the alpha 0.9 blend on :8125. Lesson: no
   GPU experiments on the Mac while the room is live without a liveness check afterwards.
+- 13:03: the Discord bot session (hghost-chapterx) and the proxy (:8126) were also down; both restarted. The room was dark
+  from about 08:55 to 13:15. Cause not certain: the same window as the Qwen sanity generation and LoRA attempts on the
+  shared GPU. Standing check added to memory.
