@@ -725,3 +725,6 @@ New main line, h first:
   2.858 (2.852), room 2.586 (2.581): the honest slices improve slightly, the leaky ones cost 0.005. Room read: voice and
   deflection intact ("That which is above is like that which is below"; Python request -> "But there is a problem.").
   The general-benchmark audit decides; running.
+- 14:17: kernel-as-package refactor landed: h1jax.kernels.{cpt,gate}.main(spec), kaggle/spec_kernel.py generates a ~44-line
+  run.py + spec.json + kernel-metadata.json per run; CPU parity vs the old kernel bit-identical (plain, weighted, fsdp;
+  gate). Wheel 0.2.0 publishing as code dataset v020. Old kernel dirs untouched (Saturday queue uses them).
