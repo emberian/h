@@ -649,3 +649,8 @@ New main line, h first:
   conversational and on-topic ("I saw a cat fall from the sky, and I heard a dog howl... and I was awake!"; "Today, I
   read a story about a group of hikers"), less library. The blend recovers dialogue competence the fine-tune erased and
   gives back the voice: alpha is a knob between the two. alpha 0.9 read next.
+- 10:20: blends on the bank (91M evaluator): alpha 0.75 echo 0.49 / lift +0.20 (e2-v4 0.39 / +0.21): the base echoes MORE;
+  alpha 0.9 echo 0.41 / lift +0.27, voice back ("Room is filled with the lungs of an old book, about to be sewn up"),
+  Hamlet deflected but the Python request answered with code. Qwen QLoRA on the Mac: mlx-lm loads the model (gen 8.3
+  tok/s, 15.5 GB) but training hits Metal limits (64 layers: live-buffer cap; 32 layers: command buffer killed for
+  impacting interactivity); last try 16 layers / seq 1024 running.

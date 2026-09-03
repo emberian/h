@@ -1,0 +1,18 @@
+# Qwen3.8-27B library adapter (see qwen/RECIPE.md): r=16, alpha=16 -> scale 1.0, dropout 0, all language-block projections.
+lora_parameters:
+  rank: 16
+  scale: 1.0
+  dropout: 0.0
+  keys:
+    - self_attn.q_proj
+    - self_attn.k_proj
+    - self_attn.v_proj
+    - self_attn.o_proj
+    - linear_attn.in_proj_qkv
+    - linear_attn.in_proj_z
+    - linear_attn.in_proj_a
+    - linear_attn.in_proj_b
+    - linear_attn.out_proj
+    - mlp.gate_proj
+    - mlp.up_proj
+    - mlp.down_proj
