@@ -15,8 +15,9 @@ unsloth/Qwen3.8-27B-unsloth-bnb-4bit on CUDA.
 
 Recipe (raw-text continued pretraining through an adapter):
 - Objective: plain causal LM on raw library text, no chat template ever rendered, EOS between documents.
-- LoRA r=16, alpha=16, dropout 0, all linear projections in the language blocks (attention q/k/v/o, Gated DeltaNet projections,
-  MLP gate/up/down); vision layers frozen. On CUDA with memory, add lm_head and embed_tokens with an embedding LR 2-10x smaller
+- LoRA r=16, alpha=16, dropout 0, attention q/k/v/o and MLP gate/up/down ONLY; vision layers frozen. Do NOT adapt the Gated
+  DeltaNet projections: in sequential GDN hybrids that costs -14.8 pp GSM8K and catastrophic forgetting (arXiv 2604.22127;
+  found in the 2026-09-03 literature sweep, correcting the earlier version of this recipe). On CUDA with memory, add lm_head and embed_tokens with an embedding LR 2-10x smaller
   (Unsloth: 5e-6 against 5e-5).
 - LR 5e-5 (Unsloth's continued-pretraining setting; 2e-4 is their instruction-SFT setting), warmup ~3% (>= 10 steps), decay to 10%.
 - Sequence 2048, batch 1 x grad-accum 4, gradient checkpointing.

@@ -712,3 +712,8 @@ New main line, h first:
 - 13:42: parsimony closeout: deleted three superseded scripts (after_room05b.sh, make_room_kernel.sh, make_room_kernel_05b.sh)
   after a blind defend; kept the 1.5B gate dir (its exact defaults are the only record of two cancelled runs); fixed the
   HBM probe README, which still pointed at the gate's directory and kernel id.
+- 13:46: chapterx/services.sh: one declaration of the room's seven services with start/status/check (real completions)/watch
+  (5-minute liveness loop that restarts what died and logs alarms); watch loop running. Literature sweep landed:
+  research/literature-chain-2026-09-03.md (43 works, 3 chains). Correction taken: LoRA must not touch Gated DeltaNet
+  projections (2604.22127); qwen/lora.yaml and RECIPE.md fixed. New cheap idea from the sweep: S0 state tuning
+  (2604.01168) as a ~48 MB zero-overhead voice adapter for Falcon-H1.
