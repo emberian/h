@@ -614,3 +614,10 @@ New main line, h first:
   deferring. Now: per-layer FSDP gathers inside the h1jax layer scan (layer_hooks: stacked params stay sharded outside,
   each layer gathered inside the rematerialised body); watchdog thread in both kernels (no progress event for N min ->
   exit 3; hard limit -> exit 4). Rehearsing on CPU; then a bounded 1.5B gate today (~30 TPU min of the 2.3 h left).
+- 09:00: CPT kernel with per-layer gathers rehearsed (fsdp, 8 simulated devices): losses match replicated within 4e-3,
+  checkpoints save. Watchdog verified: with a 1-second stall limit the process exits 3 with a "watchdog" event.
+- 09:04: ember (from a dream): we may be *breaking* the model; consider very different curricula; and a Qwen3.8-27B
+  fine-tune. Resources: hbox GPU is an RX 6700 class (12 GB): no 27B there; the Mac has 103 GB unified memory, so an
+  MLX LoRA on a 27B is feasible locally (slow); TPU v5e-8 could host a 27B LoRA with a standard-transformer JAX stack.
+  Started now: a breakage audit (lm-eval on Kaggle GPU: base vs e1/e2-v3/e2-v4, 91M base vs leaf) and WiSE-FT weight
+  interpolation base<->e2-v4 at alpha 0.25/0.5/0.75 with hbox slices. Tonight's TPU: replay + lower LR arms.
