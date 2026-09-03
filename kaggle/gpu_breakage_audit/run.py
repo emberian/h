@@ -53,7 +53,7 @@ TOKENS_PER_DOC = float(os.environ.get("HGHOST_AUDIT_TOKENS_PER_DOC", "1400"))
 SAFETY = float(os.environ.get("HGHOST_AUDIT_SAFETY", "2.0"))
 LOAD_OVERHEAD_S = 120.0
 SKIP_SHA = os.environ.get("HGHOST_AUDIT_SKIP_SHA") == "1"
-CHECKPOINT_GLOB = os.environ.get("HGHOST_AUDIT_CHECKPOINT_GLOB", "/kaggle/input/**/no-such-run/tokens-*/config.json")
+CHECKPOINT_GLOB = os.environ.get("HGHOST_AUDIT_CHECKPOINT_GLOB", "/kaggle/input/**/tokens-*/config.json")
 MANIFEST_GLOB = os.environ.get("HGHOST_AUDIT_MANIFEST_GLOB", "/kaggle/input/**/hghost-falcon-h1-0-5b-base-public/preflight-manifest.json")
 # Run dir -> the final checkpoint we expect there (the ledger's cooled checkpoints). Anything else
 # attached is a mistake we would rather learn about before spending GPU hours.
