@@ -1,0 +1,28 @@
+{
+ "limit": 500,
+ "requested_limit": 1000,
+ "fallback_limit": 500,
+ "budget_seconds": 9000.0,
+ "projected_seconds": 11781,
+ "projected_seconds_at_requested": 22843,
+ "over_budget": true,
+ "tokens_per_doc": 1400.0,
+ "safety": 2.0,
+ "family_tokens_per_second": {
+  "h1024-l36": 588.9,
+  "h512-l24": 1804.0
+ },
+ "family_dtype": {
+  "h1024-l36": "float16",
+  "h512-l24": "float16"
+ },
+ "device": "cuda",
+ "tasks": [
+  "lambada_openai",
+  "hellaswag",
+  "arc_easy",
+  "arc_challenge",
+  "piqa",
+  "winogrande"
+ ]
+}

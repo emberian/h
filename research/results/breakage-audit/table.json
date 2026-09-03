@@ -1,0 +1,374 @@
+{
+ "plan": {
+  "limit": 500,
+  "requested_limit": 1000,
+  "fallback_limit": 500,
+  "budget_seconds": 9000.0,
+  "projected_seconds": 11781,
+  "projected_seconds_at_requested": 22843,
+  "over_budget": true,
+  "tokens_per_doc": 1400.0,
+  "safety": 2.0,
+  "family_tokens_per_second": {
+   "h1024-l36": 588.9,
+   "h512-l24": 1804.0
+  },
+  "family_dtype": {
+   "h1024-l36": "float16",
+   "h512-l24": "float16"
+  },
+  "device": "cuda",
+  "tasks": [
+   "lambada_openai",
+   "hellaswag",
+   "arc_easy",
+   "arc_challenge",
+   "piqa",
+   "winogrande"
+  ]
+ },
+ "records": [
+  {
+   "name": "base-0.5b",
+   "source": "/kaggle/input/datasets/emberian64/hghost-falcon-h1-0-5b-base-public",
+   "family": "h1024-l36",
+   "base": true,
+   "tokens": null,
+   "dtype": "float16",
+   "limit": 500,
+   "seconds": 102.4,
+   "returncode": 1,
+   "results": null
+  },
+  {
+   "name": "room05b-e1-decay10",
+   "source": "/kaggle/input/notebooks/emberian64/h-ghost-h1jax-room05b-e1/room05b-e1-decay10/tokens-000417533162",
+   "family": "h1024-l36",
+   "base": false,
+   "tokens": 417533162,
+   "dtype": "float16",
+   "limit": 500,
+   "seconds": 1867.1,
+   "returncode": 0,
+   "results": {
+    "lambada_openai": {
+     "name": "lambada_openai",
+     "alias": "lambada_openai",
+     "sample_len": 500,
+     "perplexity,none": 17.369082752870746,
+     "perplexity_stderr,none": 1.8031622328677792,
+     "acc,none": 0.424,
+     "acc_stderr,none": 0.022122993778135334
+    },
+    "hellaswag": {
+     "name": "hellaswag",
+     "alias": "hellaswag",
+     "sample_len": 500,
+     "acc,none": 0.398,
+     "acc_stderr,none": 0.021912377885779953,
+     "acc_norm,none": 0.506,
+     "acc_norm_stderr,none": 0.022381462412439424
+    },
+    "arc_easy": {
+     "name": "arc_easy",
+     "alias": "arc_easy",
+     "sample_len": 500,
+     "acc,none": 0.638,
+     "acc_stderr,none": 0.02151366252758236,
+     "acc_norm,none": 0.566,
+     "acc_norm_stderr,none": 0.02218721580302901
+    },
+    "arc_challenge": {
+     "name": "arc_challenge",
+     "alias": "arc_challenge",
+     "sample_len": 500,
+     "acc,none": 0.302,
+     "acc_stderr,none": 0.02055326917420912,
+     "acc_norm,none": 0.314,
+     "acc_norm_stderr,none": 0.020776701920308973
+    },
+    "piqa": {
+     "name": "piqa",
+     "alias": "piqa",
+     "sample_len": 500,
+     "acc,none": 0.698,
+     "acc_stderr,none": 0.020553269174209122,
+     "acc_norm,none": 0.702,
+     "acc_norm_stderr,none": 0.020475118092988954
+    },
+    "winogrande": {
+     "name": "winogrande",
+     "alias": "winogrande",
+     "sample_len": 500,
+     "acc,none": 0.558,
+     "acc_stderr,none": 0.022231970696321192
+    }
+   },
+   "harness_file": "/kaggle/working/breakage-audit/lm-eval/room05b-e1-decay10/__kaggle__working__breakage-audit__checkpoints__room05b-e1-decay10/results_2026-09-03T14-04-42.987930.json"
+  },
+  {
+   "name": "room05b-e2-v3-decay10",
+   "source": "/kaggle/input/notebooks/emberian64/h-ghost-h1jax-room05b-e2-v3/room05b-e2-v3-decay10/tokens-000793917970",
+   "family": "h1024-l36",
+   "base": false,
+   "tokens": 793917970,
+   "dtype": "float16",
+   "limit": 500,
+   "seconds": 1867.7,
+   "returncode": 0,
+   "results": {
+    "lambada_openai": {
+     "name": "lambada_openai",
+     "alias": "lambada_openai",
+     "sample_len": 500,
+     "perplexity,none": 18.51749635261282,
+     "perplexity_stderr,none": 1.975828130894399,
+     "acc,none": 0.412,
+     "acc_stderr,none": 0.02203367799374094
+    },
+    "hellaswag": {
+     "name": "hellaswag",
+     "alias": "hellaswag",
+     "sample_len": 500,
+     "acc,none": 0.398,
+     "acc_stderr,none": 0.021912377885779953,
+     "acc_norm,none": 0.498,
+     "acc_norm_stderr,none": 0.022382894986483586
+    },
+    "arc_easy": {
+     "name": "arc_easy",
+     "alias": "arc_easy",
+     "sample_len": 500,
+     "acc,none": 0.612,
+     "acc_stderr,none": 0.021814300984787705,
+     "acc_norm,none": 0.546,
+     "acc_norm_stderr,none": 0.02228814759117707
+    },
+    "arc_challenge": {
+     "name": "arc_challenge",
+     "alias": "arc_challenge",
+     "sample_len": 500,
+     "acc,none": 0.316,
+     "acc_stderr,none": 0.020812359515855822,
+     "acc_norm,none": 0.31,
+     "acc_norm_stderr,none": 0.020704041021724684
+    },
+    "piqa": {
+     "name": "piqa",
+     "alias": "piqa",
+     "sample_len": 500,
+     "acc,none": 0.68,
+     "acc_stderr,none": 0.02088234048876172,
+     "acc_norm,none": 0.692,
+     "acc_norm_stderr,none": 0.020667032987466052
+    },
+    "winogrande": {
+     "name": "winogrande",
+     "alias": "winogrande",
+     "sample_len": 500,
+     "acc,none": 0.54,
+     "acc_stderr,none": 0.022311333245289593
+    }
+   },
+   "harness_file": "/kaggle/working/breakage-audit/lm-eval/room05b-e2-v3-decay10/__kaggle__working__breakage-audit__checkpoints__room05b-e2-v3-decay10/results_2026-09-03T14-35-50.697001.json"
+  },
+  {
+   "name": "room05b-e2-v4-decay10",
+   "source": "/kaggle/input/notebooks/emberian64/h-ghost-h1jax-room05b-e2-v4/room05b-e2-v4-decay10/tokens-000794693880",
+   "family": "h1024-l36",
+   "base": false,
+   "tokens": 794693880,
+   "dtype": "float16",
+   "limit": 500,
+   "seconds": 1871.6,
+   "returncode": 0,
+   "results": {
+    "lambada_openai": {
+     "name": "lambada_openai",
+     "alias": "lambada_openai",
+     "sample_len": 500,
+     "perplexity,none": 18.137856650745146,
+     "perplexity_stderr,none": 1.8797353973109234,
+     "acc,none": 0.428,
+     "acc_stderr,none": 0.022149790663861947
+    },
+    "hellaswag": {
+     "name": "hellaswag",
+     "alias": "hellaswag",
+     "sample_len": 500,
+     "acc,none": 0.392,
+     "acc_stderr,none": 0.02185468495561119,
+     "acc_norm,none": 0.502,
+     "acc_norm_stderr,none": 0.022382894986483586
+    },
+    "arc_easy": {
+     "name": "arc_easy",
+     "alias": "arc_easy",
+     "sample_len": 500,
+     "acc,none": 0.626,
+     "acc_stderr,none": 0.021660710347204473,
+     "acc_norm,none": 0.548,
+     "acc_norm_stderr,none": 0.02227969410784354
+    },
+    "arc_challenge": {
+     "name": "arc_challenge",
+     "alias": "arc_challenge",
+     "sample_len": 500,
+     "acc,none": 0.306,
+     "acc_stderr,none": 0.020629569998345414,
+     "acc_norm,none": 0.306,
+     "acc_norm_stderr,none": 0.020629569998345414
+    },
+    "piqa": {
+     "name": "piqa",
+     "alias": "piqa",
+     "sample_len": 500,
+     "acc,none": 0.674,
+     "acc_stderr,none": 0.020984009562393675,
+     "acc_norm,none": 0.692,
+     "acc_norm_stderr,none": 0.020667032987466052
+    },
+    "winogrande": {
+     "name": "winogrande",
+     "alias": "winogrande",
+     "sample_len": 500,
+     "acc,none": 0.548,
+     "acc_stderr,none": 0.02227969410784354
+    }
+   },
+   "harness_file": "/kaggle/working/breakage-audit/lm-eval/room05b-e2-v4-decay10/__kaggle__working__breakage-audit__checkpoints__room05b-e2-v4-decay10/results_2026-09-03T15-07-02.315516.json"
+  },
+  {
+   "name": "base-tiny-90m",
+   "source": "/kaggle/input/datasets/emberian64/hghost-falcon-h1-90m-base-public",
+   "family": "h512-l24",
+   "base": true,
+   "tokens": null,
+   "dtype": "float16",
+   "limit": 500,
+   "seconds": 671.9,
+   "returncode": 0,
+   "results": {
+    "lambada_openai": {
+     "name": "lambada_openai",
+     "alias": "lambada_openai",
+     "sample_len": 500,
+     "perplexity,none": 39.31865233429413,
+     "perplexity_stderr,none": 5.13736602090183,
+     "acc,none": 0.358,
+     "acc_stderr,none": 0.021461434862859133
+    },
+    "hellaswag": {
+     "name": "hellaswag",
+     "alias": "hellaswag",
+     "sample_len": 500,
+     "acc,none": 0.364,
+     "acc_stderr,none": 0.021539170637317653,
+     "acc_norm,none": 0.448,
+     "acc_norm_stderr,none": 0.022261697292270087
+    },
+    "arc_easy": {
+     "name": "arc_easy",
+     "alias": "arc_easy",
+     "sample_len": 500,
+     "acc,none": 0.52,
+     "acc_stderr,none": 0.022365160424231326,
+     "acc_norm,none": 0.484,
+     "acc_norm_stderr,none": 0.022371610982580396
+    },
+    "arc_challenge": {
+     "name": "arc_challenge",
+     "alias": "arc_challenge",
+     "sample_len": 500,
+     "acc,none": 0.234,
+     "acc_stderr,none": 0.018952741564893755,
+     "acc_norm,none": 0.274,
+     "acc_norm_stderr,none": 0.019966103540279518
+    },
+    "piqa": {
+     "name": "piqa",
+     "alias": "piqa",
+     "sample_len": 500,
+     "acc,none": 0.684,
+     "acc_stderr,none": 0.020812359515855822,
+     "acc_norm,none": 0.67,
+     "acc_norm_stderr,none": 0.021049612166134782
+    },
+    "winogrande": {
+     "name": "winogrande",
+     "alias": "winogrande",
+     "sample_len": 500,
+     "acc,none": 0.53,
+     "acc_stderr,none": 0.0223427481925028
+    }
+   },
+   "harness_file": "/kaggle/working/breakage-audit/lm-eval/base-tiny-90m/__kaggle__input__datasets__emberian64__hghost-falcon-h1-90m-base-public/results_2026-09-03T15-18-14.207041.json"
+  },
+  {
+   "name": "leaf-s1-e4-decay10",
+   "source": "/kaggle/input/notebooks/emberian64/h-ghost-h1jax-leaf-s1-e4/leaf-s1-e4-decay10/tokens-001535061369",
+   "family": "h512-l24",
+   "base": false,
+   "tokens": 1535061369,
+   "dtype": "float16",
+   "limit": 500,
+   "seconds": 676.5,
+   "returncode": 0,
+   "results": {
+    "lambada_openai": {
+     "name": "lambada_openai",
+     "alias": "lambada_openai",
+     "sample_len": 500,
+     "perplexity,none": 59.07922823520648,
+     "perplexity_stderr,none": 8.324499415962006,
+     "acc,none": 0.3,
+     "acc_stderr,none": 0.020514426225627987
+    },
+    "hellaswag": {
+     "name": "hellaswag",
+     "alias": "hellaswag",
+     "sample_len": 500,
+     "acc,none": 0.354,
+     "acc_stderr,none": 0.02140758204791649,
+     "acc_norm,none": 0.406,
+     "acc_norm_stderr,none": 0.021983962090086417
+    },
+    "arc_easy": {
+     "name": "arc_easy",
+     "alias": "arc_easy",
+     "sample_len": 500,
+     "acc,none": 0.448,
+     "acc_stderr,none": 0.022261697292270087,
+     "acc_norm,none": 0.414,
+     "acc_norm_stderr,none": 0.022049497969827858
+    },
+    "arc_challenge": {
+     "name": "arc_challenge",
+     "alias": "arc_challenge",
+     "sample_len": 500,
+     "acc,none": 0.198,
+     "acc_stderr,none": 0.017838958963847292,
+     "acc_norm,none": 0.21,
+     "acc_norm_stderr,none": 0.01823362086530592
+    },
+    "piqa": {
+     "name": "piqa",
+     "alias": "piqa",
+     "sample_len": 500,
+     "acc,none": 0.608,
+     "acc_stderr,none": 0.02185468495561119,
+     "acc_norm,none": 0.58,
+     "acc_norm_stderr,none": 0.02209471322976179
+    },
+    "winogrande": {
+     "name": "winogrande",
+     "alias": "winogrande",
+     "sample_len": 500,
+     "acc,none": 0.514,
+     "acc_stderr,none": 0.022374298166353144
+    }
+   },
+   "harness_file": "/kaggle/working/breakage-audit/lm-eval/leaf-s1-e4-decay10/__kaggle__working__breakage-audit__checkpoints__leaf-s1-e4-decay10/results_2026-09-03T15-29-30.741084.json"
+  }
+ ]
+}

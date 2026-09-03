@@ -671,3 +671,7 @@ New main line, h first:
   not HBM. Quota: TPU 19.81 h used, 0.19 h left; GPU 14.04 h left. The replay arm pushed at 11:21 will fail on quota.
   Fixes: HBM stats in memory events; optimization barrier on the gathered layer (XLA can hoist a loop-invariant
   all-gather out of the scan); tonight's arms scheduled for 00:05.
+- 11:33: breakage audit (lm-eval, T4, 500 docs/task): 91M leaf vs base mean -0.057 (lambada -0.058, arc_easy -0.070,
+  arc_challenge -0.064, piqa -0.090; lambada ppl 39 -> 59): the library epochs broke the 91M's general competence.
+  0.5B: e1 mean 0.512, e2-v3 0.500, e2-v4 0.504 (lambada ppl 17.4 / 18.5 / 18.1); the base row OOM'd at
+  batch_size auto on the T4 (re-running it alone). Results in research/results/breakage-audit/.
