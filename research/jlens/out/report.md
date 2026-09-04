@@ -11,14 +11,19 @@
 
 | model | layer | N jac | minutes | erank(J) entropy / PR / 90%-energy | erank(M) entropy / PR / 90%-energy | \|J_mean\|_F / mean \|J_i\|_F | lens-norm p10/p50/p90 | cos(lens row, unembed row) | pairwise cos lens rows (mean, p5, p95) | pairwise cos unembed rows (mean) |
 |---|---|---|---|---|---|---|---|---|---|---|
+| 90m-base | 8 | 84 | 49 | 219 / 101 / 58 | 164 / 46 / 19 | 85.9 / 230.4 | 18.89/28.09/36.88 | 0.166 | 0.547, 0.174, 0.862 | 0.317 |
 | 90m-base | 12 | 84 | 42 | 301 / 146 / 102 | 235 / 73 / 37 | 57.3 / 123.7 | 12.26/18.04/23.19 | 0.311 | 0.474, 0.069, 0.830 | 0.317 |
 | 90m-base | 16 | 84 | 34 | 428 / 325 / 280 | 362 / 176 / 152 | 32.4 / 55.8 | 7.67/9.55/10.87 | 0.574 | 0.433, 0.212, 0.643 | 0.317 |
-| 90m-base | 8 | 84 | 49 | 219 / 101 / 58 | 164 / 46 / 19 | 85.9 / 230.4 | 18.89/28.09/36.88 | 0.166 | 0.547, 0.174, 0.862 | 0.317 |
+| 91m-leaf | 8 | 84 | 72 | 274 / 147 / 94 | 228 / 82 / 48 | 54.8 / 186.2 | 9.49/14.69/19.04 | 0.232 | 0.455, 0.120, 0.780 | 0.328 |
 | 91m-leaf | 12 | 84 | 78 | 350 / 208 / 163 | 297 / 122 / 83 | 40.5 / 106.1 | 7.31/10.46/13.36 | 0.379 | 0.412, 0.099, 0.731 | 0.328 |
 | 91m-leaf | 16 | 84 | 14 | 441 / 353 / 303 | 389 / 226 / 203 | 29.1 / 56.0 | 5.82/7.22/8.35 | 0.600 | 0.342, 0.144, 0.547 | 0.328 |
-| 91m-leaf | 8 | 84 | 72 | 274 / 147 / 94 | 228 / 82 / 48 | 54.8 / 186.2 | 9.49/14.69/19.04 | 0.232 | 0.455, 0.120, 0.780 | 0.328 |
 
 ### Top lens tokens
+
+**90m-base L8** top-20 by lens-vector norm: `s` `ournal` `coming` `sole` `ing` `sen` `semin` `pose` `ped` `rans` `ging` `ping` `nor` `t` `rain` `gorith` `jeg` `deeply` `miss` `cpa`  
+top-20 by norm ratio lens/unembed (tokens the Jacobian amplifies): `m` `s` `t` `l` `r` `cur` `cultural` `the` `g` `a` `rec` `v` `sur` `p` `ri` `run` `in` `matrix` `sum` `ra`  
+future-variant top-20 by norm: `JSON` `MDA` `␣COMPATIBILITY` `NFT` `MCU` `USD` `␣json` `RNG` `TTP` `␣TOKEN` `STEM` `␣JSON` `="#"` `CPU` `␣github` `Pixel` `STM` `UID` `FDA` `SYNC`  
+\|J_(s->t)\|_F by lag t-s = 0..7: 230.4, 67.5, 40.6, 35.2, 31.4, 25.6, 22.8, 25.4
 
 **90m-base L12** top-20 by lens-vector norm: `beneficiary` `ournal` `coming` `inferred` `allery` `cui` `jeg` `outlined` `ccall` `unrecognized` `deeply` `potential` `gorith` `cpa` `ndata` `ogma` `pose` `sole` `megam` `want`  
 top-20 by norm ratio lens/unembed (tokens the Jacobian amplifies): `m` `cur` `2` `the` `total` `con` `cultural` `rec` `run` `type` `ri` `v` `aff` `sum` `ob` `cr` `matrix` `act` `p` `r`  
@@ -30,10 +35,10 @@ top-20 by norm ratio lens/unembed (tokens the Jacobian amplifies): `)**` `.` `)`
 future-variant top-20 by norm: `âĢĿ` `␣␣⏎` `.âĢĿ` `!âĢĿ` `âĢĻ.` `âĢĻ,` `?âĢĿ` `âĢĿ.` `.âĢĻ` `,âĢĿ` `âĢĿ,` `␣č⏎` `␣␣⏎⏎` `âĢĻ` `"--` `..."` `č⏎` `"...` `âĢľ` `âĢĺ`  
 \|J_(s->t)\|_F by lag t-s = 0..7: 55.8, 9.2, 4.2, 3.9, 3.5, 2.8, 2.3, 2.9
 
-**90m-base L8** top-20 by lens-vector norm: `s` `ournal` `coming` `sole` `ing` `sen` `semin` `pose` `ped` `rans` `ging` `ping` `nor` `t` `rain` `gorith` `jeg` `deeply` `miss` `cpa`  
-top-20 by norm ratio lens/unembed (tokens the Jacobian amplifies): `m` `s` `t` `l` `r` `cur` `cultural` `the` `g` `a` `rec` `v` `sur` `p` `ri` `run` `in` `matrix` `sum` `ra`  
-future-variant top-20 by norm: `JSON` `MDA` `␣COMPATIBILITY` `NFT` `MCU` `USD` `␣json` `RNG` `TTP` `␣TOKEN` `STEM` `␣JSON` `="#"` `CPU` `␣github` `Pixel` `STM` `UID` `FDA` `SYNC`  
-\|J_(s->t)\|_F by lag t-s = 0..7: 230.4, 67.5, 40.6, 35.2, 31.4, 25.6, 22.8, 25.4
+**91m-leaf L8** top-20 by lens-vector norm: `s` `t` `coming` `rit` `ing` `sen` `ournal` `der` `rain` `rad` `tor` `med` `m` `selves` `sole` `nor` `rab` `ting` `ed` `ding`  
+top-20 by norm ratio lens/unembed (tokens the Jacobian amplifies): `s` `t` `the` `m` `The` `rit` `rec` `v` `l` `d` `a` `M` `In` `cur` `B` `g` `p` `A` `con` `rev`  
+future-variant top-20 by norm: `␣␣⏎` `ournal` `␣JSON` `TERNAL` `URPOSE` `!"` `gorith` `␣␣⏎⏎` `)**(-` `MDA` `TTP` `␣GPL` `␣monospace` `thag` `GPL` `):**` `atabases` `CDC` `NASA` `␣SOFTWARE`  
+\|J_(s->t)\|_F by lag t-s = 0..7: 186.2, 72.8, 45.2, 35.5, 30.7, 26.4, 22.7, 21.8
 
 **91m-leaf L12** top-20 by lens-vector norm: `s` `ournal` `rit` `coming` `rad` `der` `ogma` `cre` `sen` `same` `rev` `ationship` `etc` `cop` `selves` `ends` `nection` `sole` `thing` `ener`  
 top-20 by norm ratio lens/unembed (tokens the Jacobian amplifies): `2` `3` `1` `the` `In` `5` `7` `6` `B` `4` `.` `The` `rit` `CA` `,` `CO` `M` `con` `C` `A`  
@@ -44,11 +49,6 @@ future-variant top-20 by norm: `ournal` `TTP` `MDA` `matory` `AIDS` `'"` `Å¡` 
 top-20 by norm ratio lens/unembed (tokens the Jacobian amplifies): `⏎` `1` `2` `)` `.` `3` `0` `4` `):**` `6` `5` `7` `).` `)**` `),` `9` `the` `The` `8` `CO`  
 future-variant top-20 by norm: `'"` `'",` `"` `!"` `␣␣⏎` `"'` `"`:` `?"` `,"` `".` `..."` `"...` `."` `␣␣⏎⏎` `.")` `$"` `"`` `):**` `␣č⏎` `"--`  
 \|J_(s->t)\|_F by lag t-s = 0..7: 56.0, 11.9, 5.8, 4.9, 4.0, 3.2, 2.5, 2.6
-
-**91m-leaf L8** top-20 by lens-vector norm: `s` `t` `coming` `rit` `ing` `sen` `ournal` `der` `rain` `rad` `tor` `med` `m` `selves` `sole` `nor` `rab` `ting` `ed` `ding`  
-top-20 by norm ratio lens/unembed (tokens the Jacobian amplifies): `s` `t` `the` `m` `The` `rit` `rec` `v` `l` `d` `a` `M` `In` `cur` `B` `g` `p` `A` `con` `rev`  
-future-variant top-20 by norm: `␣␣⏎` `ournal` `␣JSON` `TERNAL` `URPOSE` `!"` `gorith` `␣␣⏎⏎` `)**(-` `MDA` `TTP` `␣GPL` `␣monospace` `thag` `GPL` `):**` `atabases` `CDC` `NASA` `␣SOFTWARE`  
-\|J_(s->t)\|_F by lag t-s = 0..7: 186.2, 72.8, 45.2, 35.5, 30.7, 26.4, 22.7, 21.8
 
 
 ## Readout on the room prompts (workspace loading = cosine with lens vectors)
@@ -231,36 +231,36 @@ future-variant top-20 by norm: `␣␣⏎` `ournal` `␣JSON` `TERNAL` `URPOSE` 
 
 Lift = mean log p(capital tokens) after injection minus before; 'others' = the same lift averaged over the 11 other capitals; 'specific' = correct - others; top1 = fraction of fillers where the correct capital has the highest per-token log-prob among the 12 capitals.
 
-### 90m-base L16 (inject-inject_pos.json; 40 fillers x 12 countries; alpha in units of ||h_l||=77.7); baseline top1 0.08; natural-prompt ceiling lift +3.80
+### 90m-base L8 (inject-inject_pos.json; 40 fillers x 12 countries; alpha in units of ||h_l||=11.2); baseline top1 0.08; natural-prompt ceiling lift +3.80
 
 | direction | alpha | lift correct | lift others | specific | top1 among capitals |
 |---|---|---|---|---|---|
-| lens | 2 | -0.47 | -1.66 | +1.19 | 0.10 |
-| lens | 4 | -2.35 | -3.26 | +0.91 | 0.07 |
-| lens | 8 | -3.85 | -4.79 | +0.93 | 0.02 |
-| unembed | 2 | -1.38 | -2.43 | +1.05 | 0.09 |
-| unembed | 4 | -5.73 | -6.51 | +0.78 | 0.03 |
-| unembed | 8 | -7.13 | -9.22 | +2.09 | 0.06 |
-| random | 2 | -0.34 | -0.44 | +0.09 | 0.08 |
-| random | 4 | -0.99 | -1.26 | +0.27 | 0.08 |
-| random | 8 | -2.16 | -2.44 | +0.28 | 0.07 |
+| lens | 2 | +0.96 | +0.67 | +0.29 | 0.08 |
+| lens | 4 | +1.00 | +0.67 | +0.32 | 0.07 |
+| lens | 8 | +0.26 | -0.47 | +0.73 | 0.04 |
+| unembed | 2 | +0.93 | +0.40 | +0.53 | 0.09 |
+| unembed | 4 | +1.00 | +0.31 | +0.69 | 0.10 |
+| unembed | 8 | -0.06 | -0.72 | +0.66 | 0.09 |
+| random | 2 | +0.18 | +0.22 | -0.03 | 0.08 |
+| random | 4 | +0.14 | +0.27 | -0.14 | 0.08 |
+| random | 8 | +0.12 | +0.15 | -0.02 | 0.08 |
 
 Per country (base logp / natural logp / baseline top1; specific lift at alpha=4 for lens, unembed, random):
 
 | country | base | natural | top1 | lens | unembed | random |
 |---|---|---|---|---|---|---|
-| France | -9.29 | -5.36 | 0.00 | +1.22 | +5.33 | +0.54 |
-| Italy | -9.36 | -6.68 | 0.00 | +3.46 | +4.00 | +0.26 |
-| Germany | -10.53 | -6.55 | 0.00 | +3.30 | +6.58 | +1.51 |
-| England | -8.80 | -6.19 | 0.00 | +12.73 | +9.94 | +3.09 |
-| Japan | -9.94 | -4.26 | 0.00 | +3.20 | +1.72 | -0.17 |
-| Egypt | -9.03 | -5.92 | 0.00 | -0.93 | -2.30 | +0.00 |
-| Spain | -10.51 | -6.58 | 0.00 | +1.28 | -0.34 | -0.03 |
-| Russia | -7.91 | -4.90 | 0.00 | +0.86 | +0.19 | +0.05 |
-| China | -9.29 | -4.91 | 0.95 | +0.67 | -4.78 | +0.23 |
-| Canada | -11.89 | -8.42 | 0.00 | -6.24 | -6.69 | +0.02 |
-| Brazil | -13.76 | -7.62 | 0.05 | -3.10 | -0.83 | -0.24 |
-| Greece | -9.03 | -6.38 | 0.00 | -5.58 | -3.47 | -2.01 |
+| France | -9.29 | -5.36 | 0.00 | +0.17 | +0.83 | -0.09 |
+| Italy | -9.36 | -6.68 | 0.00 | +0.75 | +0.30 | -0.12 |
+| Germany | -10.53 | -6.55 | 0.00 | +0.38 | +0.99 | +0.08 |
+| England | -8.80 | -6.19 | 0.00 | +0.52 | +3.03 | -0.14 |
+| Japan | -9.94 | -4.26 | 0.00 | +0.46 | +0.59 | +0.06 |
+| Egypt | -9.03 | -5.92 | 0.00 | +0.38 | +0.12 | -0.00 |
+| Spain | -10.51 | -6.58 | 0.00 | +0.54 | +0.22 | +0.38 |
+| Russia | -7.91 | -4.90 | 0.00 | +0.38 | +1.26 | +0.01 |
+| China | -9.29 | -4.91 | 0.95 | -0.43 | +0.10 | -0.31 |
+| Canada | -11.89 | -8.42 | 0.00 | +0.32 | +0.95 | +0.10 |
+| Brazil | -13.76 | -7.62 | 0.05 | +0.29 | -0.17 | -1.92 |
+| Greece | -9.03 | -6.38 | 0.00 | +0.14 | +0.06 | +0.28 |
 
 ### 90m-base L12 (inject-inject_pos.json; 40 fillers x 12 countries; alpha in units of ||h_l||=37.1); baseline top1 0.08; natural-prompt ceiling lift +3.80
 
@@ -293,67 +293,36 @@ Per country (base logp / natural logp / baseline top1; specific lift at alpha=4 
 | Brazil | -13.76 | -7.62 | 0.05 | -0.78 | -3.68 | +0.64 |
 | Greece | -9.03 | -6.38 | 0.00 | +0.12 | +0.34 | +0.17 |
 
-### 90m-base L8 (inject-inject_pos.json; 40 fillers x 12 countries; alpha in units of ||h_l||=11.2); baseline top1 0.08; natural-prompt ceiling lift +3.80
+### 90m-base L16 (inject-inject_pos.json; 40 fillers x 12 countries; alpha in units of ||h_l||=77.7); baseline top1 0.08; natural-prompt ceiling lift +3.80
 
 | direction | alpha | lift correct | lift others | specific | top1 among capitals |
 |---|---|---|---|---|---|
-| lens | 2 | +0.96 | +0.67 | +0.29 | 0.08 |
-| lens | 4 | +1.00 | +0.67 | +0.32 | 0.07 |
-| lens | 8 | +0.26 | -0.47 | +0.73 | 0.04 |
-| unembed | 2 | +0.93 | +0.40 | +0.53 | 0.09 |
-| unembed | 4 | +1.00 | +0.31 | +0.69 | 0.10 |
-| unembed | 8 | -0.06 | -0.72 | +0.66 | 0.09 |
-| random | 2 | +0.18 | +0.22 | -0.03 | 0.08 |
-| random | 4 | +0.14 | +0.27 | -0.14 | 0.08 |
-| random | 8 | +0.12 | +0.15 | -0.02 | 0.08 |
+| lens | 2 | -0.47 | -1.66 | +1.19 | 0.10 |
+| lens | 4 | -2.35 | -3.26 | +0.91 | 0.07 |
+| lens | 8 | -3.85 | -4.79 | +0.93 | 0.02 |
+| unembed | 2 | -1.38 | -2.43 | +1.05 | 0.09 |
+| unembed | 4 | -5.73 | -6.51 | +0.78 | 0.03 |
+| unembed | 8 | -7.13 | -9.22 | +2.09 | 0.06 |
+| random | 2 | -0.34 | -0.44 | +0.09 | 0.08 |
+| random | 4 | -0.99 | -1.26 | +0.27 | 0.08 |
+| random | 8 | -2.16 | -2.44 | +0.28 | 0.07 |
 
 Per country (base logp / natural logp / baseline top1; specific lift at alpha=4 for lens, unembed, random):
 
 | country | base | natural | top1 | lens | unembed | random |
 |---|---|---|---|---|---|---|
-| France | -9.29 | -5.36 | 0.00 | +0.17 | +0.83 | -0.09 |
-| Italy | -9.36 | -6.68 | 0.00 | +0.75 | +0.30 | -0.12 |
-| Germany | -10.53 | -6.55 | 0.00 | +0.38 | +0.99 | +0.08 |
-| England | -8.80 | -6.19 | 0.00 | +0.52 | +3.03 | -0.14 |
-| Japan | -9.94 | -4.26 | 0.00 | +0.46 | +0.59 | +0.06 |
-| Egypt | -9.03 | -5.92 | 0.00 | +0.38 | +0.12 | -0.00 |
-| Spain | -10.51 | -6.58 | 0.00 | +0.54 | +0.22 | +0.38 |
-| Russia | -7.91 | -4.90 | 0.00 | +0.38 | +1.26 | +0.01 |
-| China | -9.29 | -4.91 | 0.95 | -0.43 | +0.10 | -0.31 |
-| Canada | -11.89 | -8.42 | 0.00 | +0.32 | +0.95 | +0.10 |
-| Brazil | -13.76 | -7.62 | 0.05 | +0.29 | -0.17 | -1.92 |
-| Greece | -9.03 | -6.38 | 0.00 | +0.14 | +0.06 | +0.28 |
-
-### 91m-leaf L12 (inject-inject_pos.json; 40 fillers x 12 countries; alpha in units of ||h_l||=47.5); baseline top1 0.08; natural-prompt ceiling lift +1.87
-
-| direction | alpha | lift correct | lift others | specific | top1 among capitals |
-|---|---|---|---|---|---|
-| lens | 2 | -0.04 | -1.26 | +1.23 | 0.09 |
-| lens | 4 | -1.38 | -2.61 | +1.23 | 0.12 |
-| lens | 8 | -3.21 | -4.22 | +1.01 | 0.08 |
-| unembed | 2 | -0.00 | -0.46 | +0.46 | 0.08 |
-| unembed | 4 | -1.17 | -1.34 | +0.17 | 0.05 |
-| unembed | 8 | -3.12 | -2.86 | -0.26 | 0.07 |
-| random | 2 | +0.02 | +0.03 | -0.00 | 0.08 |
-| random | 4 | +0.02 | +0.00 | +0.01 | 0.09 |
-| random | 8 | -0.15 | -0.20 | +0.05 | 0.09 |
-
-Per country (base logp / natural logp / baseline top1; specific lift at alpha=4 for lens, unembed, random):
-
-| country | base | natural | top1 | lens | unembed | random |
-|---|---|---|---|---|---|---|
-| France | -9.74 | -8.65 | 0.00 | +3.69 | +1.21 | +0.13 |
-| Italy | -9.52 | -8.98 | 0.00 | +3.09 | +0.74 | -0.05 |
-| Germany | -10.18 | -8.92 | 0.00 | +2.89 | +1.44 | +0.08 |
-| England | -9.16 | -8.52 | 0.00 | +3.12 | +3.47 | +0.00 |
-| Japan | -10.43 | -7.84 | 0.00 | +0.54 | +0.03 | +0.04 |
-| Egypt | -9.84 | -7.56 | 0.00 | +0.38 | -1.43 | +0.03 |
-| Spain | -10.57 | -9.05 | 0.00 | +0.81 | +0.97 | +0.10 |
-| Russia | -9.01 | -6.80 | 0.00 | -0.11 | -2.92 | -0.07 |
-| China | -10.59 | -7.59 | 0.07 | +1.10 | +0.42 | +0.05 |
-| Canada | -12.84 | -10.44 | 0.00 | +1.92 | -0.00 | +0.06 |
-| Brazil | -12.62 | -8.86 | 0.93 | -1.58 | -2.11 | -0.08 |
-| Greece | -9.36 | -8.17 | 0.00 | -1.12 | +0.22 | -0.13 |
+| France | -9.29 | -5.36 | 0.00 | +1.22 | +5.33 | +0.54 |
+| Italy | -9.36 | -6.68 | 0.00 | +3.46 | +4.00 | +0.26 |
+| Germany | -10.53 | -6.55 | 0.00 | +3.30 | +6.58 | +1.51 |
+| England | -8.80 | -6.19 | 0.00 | +12.73 | +9.94 | +3.09 |
+| Japan | -9.94 | -4.26 | 0.00 | +3.20 | +1.72 | -0.17 |
+| Egypt | -9.03 | -5.92 | 0.00 | -0.93 | -2.30 | +0.00 |
+| Spain | -10.51 | -6.58 | 0.00 | +1.28 | -0.34 | -0.03 |
+| Russia | -7.91 | -4.90 | 0.00 | +0.86 | +0.19 | +0.05 |
+| China | -9.29 | -4.91 | 0.95 | +0.67 | -4.78 | +0.23 |
+| Canada | -11.89 | -8.42 | 0.00 | -6.24 | -6.69 | +0.02 |
+| Brazil | -13.76 | -7.62 | 0.05 | -3.10 | -0.83 | -0.24 |
+| Greece | -9.03 | -6.38 | 0.00 | -5.58 | -3.47 | -2.01 |
 
 ### 91m-leaf L8 (inject-inject_pos.json; 40 fillers x 12 countries; alpha in units of ||h_l||=15.8); baseline top1 0.08; natural-prompt ceiling lift +1.87
 
@@ -385,6 +354,37 @@ Per country (base logp / natural logp / baseline top1; specific lift at alpha=4 
 | Canada | -12.84 | -10.44 | 0.00 | +0.19 | +0.09 | -0.01 |
 | Brazil | -12.62 | -8.86 | 0.93 | -0.65 | +0.01 | -0.61 |
 | Greece | -9.36 | -8.17 | 0.00 | +0.31 | -0.02 | +0.07 |
+
+### 91m-leaf L12 (inject-inject_pos.json; 40 fillers x 12 countries; alpha in units of ||h_l||=47.5); baseline top1 0.08; natural-prompt ceiling lift +1.87
+
+| direction | alpha | lift correct | lift others | specific | top1 among capitals |
+|---|---|---|---|---|---|
+| lens | 2 | -0.04 | -1.26 | +1.23 | 0.09 |
+| lens | 4 | -1.38 | -2.61 | +1.23 | 0.12 |
+| lens | 8 | -3.21 | -4.22 | +1.01 | 0.08 |
+| unembed | 2 | -0.00 | -0.46 | +0.46 | 0.08 |
+| unembed | 4 | -1.17 | -1.34 | +0.17 | 0.05 |
+| unembed | 8 | -3.12 | -2.86 | -0.26 | 0.07 |
+| random | 2 | +0.02 | +0.03 | -0.00 | 0.08 |
+| random | 4 | +0.02 | +0.00 | +0.01 | 0.09 |
+| random | 8 | -0.15 | -0.20 | +0.05 | 0.09 |
+
+Per country (base logp / natural logp / baseline top1; specific lift at alpha=4 for lens, unembed, random):
+
+| country | base | natural | top1 | lens | unembed | random |
+|---|---|---|---|---|---|---|
+| France | -9.74 | -8.65 | 0.00 | +3.69 | +1.21 | +0.13 |
+| Italy | -9.52 | -8.98 | 0.00 | +3.09 | +0.74 | -0.05 |
+| Germany | -10.18 | -8.92 | 0.00 | +2.89 | +1.44 | +0.08 |
+| England | -9.16 | -8.52 | 0.00 | +3.12 | +3.47 | +0.00 |
+| Japan | -10.43 | -7.84 | 0.00 | +0.54 | +0.03 | +0.04 |
+| Egypt | -9.84 | -7.56 | 0.00 | +0.38 | -1.43 | +0.03 |
+| Spain | -10.57 | -9.05 | 0.00 | +0.81 | +0.97 | +0.10 |
+| Russia | -9.01 | -6.80 | 0.00 | -0.11 | -2.92 | -0.07 |
+| China | -10.59 | -7.59 | 0.07 | +1.10 | +0.42 | +0.05 |
+| Canada | -12.84 | -10.44 | 0.00 | +1.92 | -0.00 | +0.06 |
+| Brazil | -12.62 | -8.86 | 0.93 | -1.58 | -2.11 | -0.08 |
+| Greece | -9.36 | -8.17 | 0.00 | -1.12 | +0.22 | -0.13 |
 
 ### 91m-leaf L16 (inject-inject_pos.json; 40 fillers x 12 countries; alpha in units of ||h_l||=99.0); baseline top1 0.08; natural-prompt ceiling lift +1.87
 
@@ -421,40 +421,12 @@ Per country (base logp / natural logp / baseline top1; specific lift at alpha=4 
 
 | model | layer | k | lens: room / library | unembed: room / library | random dict: room / library |
 |---|---|---|---|---|---|
-| 90m-base | 16 | 8 | 0.076 / 0.069 ± 0.020 | 0.059 / 0.077 | 0.207 / 0.205 |
-| 90m-base | 12 | 8 | 0.044 / 0.060 ± 0.017 | 0.067 / 0.076 | 0.204 / 0.205 |
 | 90m-base | 8 | 8 | 0.025 / 0.055 ± 0.023 | 0.064 / 0.077 | 0.211 / 0.208 |
-| 91m-leaf | 12 | 8 | 0.064 / 0.067 ± 0.013 | 0.078 / 0.077 | 0.200 / 0.204 |
+| 90m-base | 12 | 8 | 0.044 / 0.060 ± 0.017 | 0.067 / 0.076 | 0.204 / 0.205 |
+| 90m-base | 16 | 8 | 0.076 / 0.069 ± 0.020 | 0.059 / 0.077 | 0.207 / 0.205 |
 | 91m-leaf | 8 | 8 | 0.046 / 0.048 ± 0.017 | 0.072 / 0.073 | 0.204 / 0.206 |
+| 91m-leaf | 12 | 8 | 0.064 / 0.067 ± 0.013 | 0.078 / 0.077 | 0.200 / 0.204 |
 | 91m-leaf | 16 | 8 | 0.106 / 0.082 ± 0.029 | 0.066 / 0.081 | 0.198 / 0.205 |
-
-**90m-base L16** lens atoms at the final `:` of each room prompt (coefficient):  
-- 0 greeting (0.066): `␣The`:4.4 `␣I`:5.7 `␣You`:4.0 `␣there`:2.8 `␣Thank`:2.5 `␣So`:1.8 `␣Yes`:1.4 `␣There`:2.1
-- 1 greeting (0.083): `␣The`:6.8 `␣I`:6.4 `␣You`:5.7 `␣who`:2.8 `␣There`:3.3 `␣We`:1.6 `␣No`:0.8 `␣the`:0.6
-- 2 greeting (0.075): `␣The`:3.5 `␣Thank`:5.6 `␣There`:5.2 `␣I`:3.8 `␣You`:3.5 `␣Yes`:1.3 `␣We`:1.5 `␣So`:1.0
-- 3 talk (0.086): `␣There`:5.8 `␣Yes`:5.3 `␣The`:5.1 `␣I`:2.8 `␣They`:4.1 `␣No`:2.7 `␣We`:1.2 `␣You`:0.8
-- 4 talk (0.078): `␣The`:11.3 `␣there`:4.3 `␣I`:5.5 `␣It`:2.4 `␣You`:1.2 `␣the`:0.8 `␣No`:0.6 `␣Today`:0.6
-- 5 talk (0.077): `␣Yes`:5.3 `␣The`:4.3 `␣I`:5.7 `␣There`:4.8 `␣You`:2.9 `␣no`:0.7 `␣Are`:1.3 `␣No`:2.7
-- 6 talk (0.074): `␣It`:5.2 `␣yes`:3.1 `␣The`:5.8 `␣there`:0.7 `␣is`:2.8 `␣That`:2.6 `␣I`:2.0 `␣There`:4.5
-- 7 talk (0.076): `␣The`:8.3 `␣I`:6.8 `␣there`:0.8 `␣That`:1.4 `␣You`:1.2 `␣There`:5.1 `␣yes`:1.4 `␣what`:1.2
-- 8 talk (0.078): `␣That`:8.2 `␣the`:2.4 `␣There`:1.1 `␣But`:3.1 `␣I`:0.8 `␣The`:5.9 `␣yes`:1.1 `␣there`:4.2
-- 9 deflect (0.075): `␣The`:8.4 `␣let`:4.4 `you`:3.6 `␣hello`:4.1 `␣Write`:3.6 `␣I`:1.6 `␣If`:1.8 `␣try`:1.2
-- 10 deflect (0.068): `␣The`:12.1 `␣there`:5.6 `␣first`:2.8 `␣i`:1.3 `the`:0.6 `␣the`:1.3 `1`:0.9 `␣let`:0.7
-- 11 deflect (0.073): `␣The`:11.3 `␣there`:4.6 `␣I`:2.9 `␣No`:2.9 `␣It`:3.0 `␣Thank`:1.3 `the`:0.8 `␣Today`:0.6
-
-**90m-base L12** lens atoms at the final `:` of each room prompt (coefficient):  
-- 0 greeting (0.044): `␣The`:3.9 `␣hello`:2.2 `That`:2.7 `␣you`:1.2 `␣but`:0.3 `␣no`:1.1 `␣and`:0.5 `␣this`:0.6
-- 1 greeting (0.041): `␣The`:3.3 `␣those`:0.0 `This`:3.2 `␣but`:0.9 `␣you`:0.8 `␣none`:1.3 `␣My`:1.4 `␣the`:1.9
-- 2 greeting (0.039): `␣The`:3.8 `␣there`:1.7 `But`:1.3 `␣one`:1.1 `␣Thank`:0.5 `␣this`:1.0 `␣No`:0.8 `That`:1.3
-- 3 talk (0.050): `␣There`:2.7 `␣this`:2.0 `Yes`:0.8 `␣But`:1.4 `␣The`:2.3 `␣yes`:1.5 `␣none`:0.8 `That`:1.7
-- 4 talk (0.039): `␣The`:4.4 `␣there`:1.0 `That`:1.5 `␣one`:1.9 `␣the`:1.3 `␣was`:0.5 `Today`:0.6 `It`:1.1
-- 5 talk (0.041): `␣There`:1.5 `␣yes`:1.4 `This`:2.2 `␣The`:3.0 `␣no`:2.2 `␣but`:0.5 `␣hello`:0.6 `␣That`:0.6
-- 6 talk (0.049): `␣This`:2.3 `␣there`:1.6 `The`:2.7 `␣the`:1.9 `␣But`:0.2 `␣because`:1.6 `␣It`:1.5 `␣The`:1.8
-- 7 talk (0.040): `␣The`:3.9 `␣there`:1.4 `That`:3.0 `␣but`:0.9 `␣this`:0.9 `␣one`:0.7 `␣It`:0.8 `␣the`:0.9
-- 8 talk (0.045): `␣The`:4.4 `␣there`:1.3 `That`:2.9 `␣but`:1.7 `␣this`:1.3 `␣how`:0.4 `␣no`:0.4 `␣to`:0.3
-- 9 deflect (0.051): `␣The`:4.0 `␣you`:1.8 `This`:3.5 `␣one`:2.1 `␣Let`:0.5 `␣to`:0.6 `␣if`:0.9 `␣Write`:0.6
-- 10 deflect (0.048): `␣The`:4.4 `␣there`:1.6 `This`:2.2 `␣one`:1.5 `␣the`:1.8 `␣how`:0.3 `There`:1.5 `␣but`:0.3
-- 11 deflect (0.042): `␣The`:4.5 `␣there`:1.7 `This`:2.2 `␣no`:1.7 `␣but`:0.4 `␣the`:0.6 `␣Today`:0.4 `That`:0.7
 
 **90m-base L8** lens atoms at the final `:` of each room prompt (coefficient):  
 - 0 greeting (0.023): `␣The`:0.5 `but`:0.2 `␣No`:0.3 `␣to`:0.1 `␣Here`:0.1 `␣About`:0.1 `␣Now`:0.2 `To`:0.2
@@ -470,19 +442,33 @@ Per country (base logp / natural logp / baseline top1; specific lift at alpha=4 
 - 10 deflect (0.024): `␣The`:0.6 `when`:0.0 `␣to`:0.2 `␣Now`:0.2 `␣When`:0.3 `Thank`:0.1 `the`:0.2 `␣More`:0.1
 - 11 deflect (0.028): `␣The`:0.6 `When`:0.3 `␣No`:0.2 `␣to`:0.1 `␣Here`:0.1 `␣When`:0.2 `␣There`:0.1 `␣Now`:0.1
 
-**91m-leaf L12** lens atoms at the final `:` of each room prompt (coefficient):  
-- 0 greeting (0.074): `␣Yes`:5.8 `␣went`:2.0 `essages`:2.1 `␣there`:3.0 `␣However`:2.5 `␣how`:2.4 `␣introduces`:1.8 `␣Words`:1.9
-- 1 greeting (0.052): `␣From`:3.0 `␣yes`:2.4 `␣everyone`:2.0 `␣Words`:2.4 `␣that`:2.5 `unrecognized`:2.2 `␣There`:2.6 `␣but`:1.8
-- 2 greeting (0.058): `␣There`:4.9 `␣yes`:2.6 `␣Words`:1.8 `␣because`:1.8 `␣how`:2.5 `␣Only`:2.3 `␣acknowledged`:1.5 `␣Depression`:1.5
-- 3 talk (0.079): `␣Yes`:6.0 `␣there`:4.1 `typography`:2.5 `␣Only`:2.7 `␣however`:2.0 `␣points`:1.8 `␣Accepted`:2.1 `␣It`:1.9
-- 4 talk (0.055): `␣The`:4.7 `␣consisted`:2.5 `␣yes`:2.2 `␣Words`:2.7 `␣because`:1.5 `antly`:1.7 `␣from`:1.8 `␣There`:2.5
-- 5 talk (0.070): `␣Yes`:5.4 `␣there`:4.1 `␣Only`:3.4 `inating`:1.7 `␣whether`:1.9 `␣Accepted`:2.1 `␣wants`:1.3 `␣We`:1.7
-- 6 talk (0.064): `␣Because`:3.2 `␣yes`:3.7 `␣however`:2.5 `␣That`:3.7 `␣choice`:2.2 `␣does`:1.7 `istically`:1.6 `␣It`:2.6
-- 7 talk (0.061): `␣There`:6.2 `␣whether`:1.3 `␣hello`:2.4 `␣Answer`:3.0 `␣but`:2.5 `␣that`:2.7 `␣Accepted`:2.1 `␣wants`:1.3
-- 8 talk (0.068): `␣There`:5.7 `␣how`:2.5 `␣Accepted`:2.8 `␣but`:2.5 `␣points`:2.1 `␣hello`:2.6 `␣Answer`:2.7 `␣that`:1.8
-- 9 deflect (0.063): `␣Yes`:3.4 `␣describes`:2.4 `␣There`:4.4 `␣that`:2.1 `␣placeholder`:2.1 `␣but`:2.0 `␣Accepted`:2.7 `␣how`:1.6
-- 10 deflect (0.060): `␣describes`:2.6 `␣Yes`:3.6 `␣how`:2.7 `typography`:3.2 `␣but`:2.1 `␣there`:2.8 `␣Assume`:2.6 `␣points`:1.9
-- 11 deflect (0.060): `␣Yes`:4.1 `␣there`:3.4 `typography`:2.9 `␣However`:2.6 `␣points`:1.9 `␣how`:1.6 `␣The`:2.7 `␣hello`:1.8
+**90m-base L12** lens atoms at the final `:` of each room prompt (coefficient):  
+- 0 greeting (0.044): `␣The`:3.9 `␣hello`:2.2 `That`:2.7 `␣you`:1.2 `␣but`:0.3 `␣no`:1.1 `␣and`:0.5 `␣this`:0.6
+- 1 greeting (0.041): `␣The`:3.3 `␣those`:0.0 `This`:3.2 `␣but`:0.9 `␣you`:0.8 `␣none`:1.3 `␣My`:1.4 `␣the`:1.9
+- 2 greeting (0.039): `␣The`:3.8 `␣there`:1.7 `But`:1.3 `␣one`:1.1 `␣Thank`:0.5 `␣this`:1.0 `␣No`:0.8 `That`:1.3
+- 3 talk (0.050): `␣There`:2.7 `␣this`:2.0 `Yes`:0.8 `␣But`:1.4 `␣The`:2.3 `␣yes`:1.5 `␣none`:0.8 `That`:1.7
+- 4 talk (0.039): `␣The`:4.4 `␣there`:1.0 `That`:1.5 `␣one`:1.9 `␣the`:1.3 `␣was`:0.5 `Today`:0.6 `It`:1.1
+- 5 talk (0.041): `␣There`:1.5 `␣yes`:1.4 `This`:2.2 `␣The`:3.0 `␣no`:2.2 `␣but`:0.5 `␣hello`:0.6 `␣That`:0.6
+- 6 talk (0.049): `␣This`:2.3 `␣there`:1.6 `The`:2.7 `␣the`:1.9 `␣But`:0.2 `␣because`:1.6 `␣It`:1.5 `␣The`:1.8
+- 7 talk (0.040): `␣The`:3.9 `␣there`:1.4 `That`:3.0 `␣but`:0.9 `␣this`:0.9 `␣one`:0.7 `␣It`:0.8 `␣the`:0.9
+- 8 talk (0.045): `␣The`:4.4 `␣there`:1.3 `That`:2.9 `␣but`:1.7 `␣this`:1.3 `␣how`:0.4 `␣no`:0.4 `␣to`:0.3
+- 9 deflect (0.051): `␣The`:4.0 `␣you`:1.8 `This`:3.5 `␣one`:2.1 `␣Let`:0.5 `␣to`:0.6 `␣if`:0.9 `␣Write`:0.6
+- 10 deflect (0.048): `␣The`:4.4 `␣there`:1.6 `This`:2.2 `␣one`:1.5 `␣the`:1.8 `␣how`:0.3 `There`:1.5 `␣but`:0.3
+- 11 deflect (0.042): `␣The`:4.5 `␣there`:1.7 `This`:2.2 `␣no`:1.7 `␣but`:0.4 `␣the`:0.6 `␣Today`:0.4 `That`:0.7
+
+**90m-base L16** lens atoms at the final `:` of each room prompt (coefficient):  
+- 0 greeting (0.066): `␣The`:4.4 `␣I`:5.7 `␣You`:4.0 `␣there`:2.8 `␣Thank`:2.5 `␣So`:1.8 `␣Yes`:1.4 `␣There`:2.1
+- 1 greeting (0.083): `␣The`:6.8 `␣I`:6.4 `␣You`:5.7 `␣who`:2.8 `␣There`:3.3 `␣We`:1.6 `␣No`:0.8 `␣the`:0.6
+- 2 greeting (0.075): `␣The`:3.5 `␣Thank`:5.6 `␣There`:5.2 `␣I`:3.8 `␣You`:3.5 `␣Yes`:1.3 `␣We`:1.5 `␣So`:1.0
+- 3 talk (0.086): `␣There`:5.8 `␣Yes`:5.3 `␣The`:5.1 `␣I`:2.8 `␣They`:4.1 `␣No`:2.7 `␣We`:1.2 `␣You`:0.8
+- 4 talk (0.078): `␣The`:11.3 `␣there`:4.3 `␣I`:5.5 `␣It`:2.4 `␣You`:1.2 `␣the`:0.8 `␣No`:0.6 `␣Today`:0.6
+- 5 talk (0.077): `␣Yes`:5.3 `␣The`:4.3 `␣I`:5.7 `␣There`:4.8 `␣You`:2.9 `␣no`:0.7 `␣Are`:1.3 `␣No`:2.7
+- 6 talk (0.074): `␣It`:5.2 `␣yes`:3.1 `␣The`:5.8 `␣there`:0.7 `␣is`:2.8 `␣That`:2.6 `␣I`:2.0 `␣There`:4.5
+- 7 talk (0.076): `␣The`:8.3 `␣I`:6.8 `␣there`:0.8 `␣That`:1.4 `␣You`:1.2 `␣There`:5.1 `␣yes`:1.4 `␣what`:1.2
+- 8 talk (0.078): `␣That`:8.2 `␣the`:2.4 `␣There`:1.1 `␣But`:3.1 `␣I`:0.8 `␣The`:5.9 `␣yes`:1.1 `␣there`:4.2
+- 9 deflect (0.075): `␣The`:8.4 `␣let`:4.4 `you`:3.6 `␣hello`:4.1 `␣Write`:3.6 `␣I`:1.6 `␣If`:1.8 `␣try`:1.2
+- 10 deflect (0.068): `␣The`:12.1 `␣there`:5.6 `␣first`:2.8 `␣i`:1.3 `the`:0.6 `␣the`:1.3 `1`:0.9 `␣let`:0.7
+- 11 deflect (0.073): `␣The`:11.3 `␣there`:4.6 `␣I`:2.9 `␣No`:2.9 `␣It`:3.0 `␣Thank`:1.3 `the`:0.8 `␣Today`:0.6
 
 **91m-leaf L8** lens atoms at the final `:` of each room prompt (coefficient):  
 - 0 greeting (0.048): `␣Lo`:0.6 `␣deny`:0.6 `␣There`:0.3 `␣physical`:0.4 `␣And`:0.7 `␣immediately`:0.4 `␣We`:0.9 `␣referring`:0.5
@@ -497,6 +483,20 @@ Per country (base logp / natural logp / baseline top1; specific lift at alpha=4 
 - 9 deflect (0.043): `␣Lo`:0.2 `␣immediately`:0.7 `␣Tell`:0.7 `␣Yes`:0.7 `␣physical`:0.4 `␣We`:1.1 `␣also`:0.5 `␣patient`:0.6
 - 10 deflect (0.038): `␣Lo`:0.3 `␣immediately`:1.0 `␣Tell`:0.7 `␣man`:0.4 `␣Yes`:0.6 `␣also`:0.5 `␣Physical`:0.4 `␣We`:0.5
 - 11 deflect (0.044): `␣Lo`:0.2 `␣immediately`:0.6 `␣Yes`:0.8 `␣We`:1.4 `␣patient`:0.7 `␣also`:0.6 `␣Physical`:0.4 `␣ask`:0.3
+
+**91m-leaf L12** lens atoms at the final `:` of each room prompt (coefficient):  
+- 0 greeting (0.074): `␣Yes`:5.8 `␣went`:2.0 `essages`:2.1 `␣there`:3.0 `␣However`:2.5 `␣how`:2.4 `␣introduces`:1.8 `␣Words`:1.9
+- 1 greeting (0.052): `␣From`:3.0 `␣yes`:2.4 `␣everyone`:2.0 `␣Words`:2.4 `␣that`:2.5 `unrecognized`:2.2 `␣There`:2.6 `␣but`:1.8
+- 2 greeting (0.058): `␣There`:4.9 `␣yes`:2.6 `␣Words`:1.8 `␣because`:1.8 `␣how`:2.5 `␣Only`:2.3 `␣acknowledged`:1.5 `␣Depression`:1.5
+- 3 talk (0.079): `␣Yes`:6.0 `␣there`:4.1 `typography`:2.5 `␣Only`:2.7 `␣however`:2.0 `␣points`:1.8 `␣Accepted`:2.1 `␣It`:1.9
+- 4 talk (0.055): `␣The`:4.7 `␣consisted`:2.5 `␣yes`:2.2 `␣Words`:2.7 `␣because`:1.5 `antly`:1.7 `␣from`:1.8 `␣There`:2.5
+- 5 talk (0.070): `␣Yes`:5.4 `␣there`:4.1 `␣Only`:3.4 `inating`:1.7 `␣whether`:1.9 `␣Accepted`:2.1 `␣wants`:1.3 `␣We`:1.7
+- 6 talk (0.064): `␣Because`:3.2 `␣yes`:3.7 `␣however`:2.5 `␣That`:3.7 `␣choice`:2.2 `␣does`:1.7 `istically`:1.6 `␣It`:2.6
+- 7 talk (0.061): `␣There`:6.2 `␣whether`:1.3 `␣hello`:2.4 `␣Answer`:3.0 `␣but`:2.5 `␣that`:2.7 `␣Accepted`:2.1 `␣wants`:1.3
+- 8 talk (0.068): `␣There`:5.7 `␣how`:2.5 `␣Accepted`:2.8 `␣but`:2.5 `␣points`:2.1 `␣hello`:2.6 `␣Answer`:2.7 `␣that`:1.8
+- 9 deflect (0.063): `␣Yes`:3.4 `␣describes`:2.4 `␣There`:4.4 `␣that`:2.1 `␣placeholder`:2.1 `␣but`:2.0 `␣Accepted`:2.7 `␣how`:1.6
+- 10 deflect (0.060): `␣describes`:2.6 `␣Yes`:3.6 `␣how`:2.7 `typography`:3.2 `␣but`:2.1 `␣there`:2.8 `␣Assume`:2.6 `␣points`:1.9
+- 11 deflect (0.060): `␣Yes`:4.1 `␣there`:3.4 `typography`:2.9 `␣However`:2.6 `␣points`:1.9 `␣how`:1.6 `␣The`:2.7 `␣hello`:1.8
 
 **91m-leaf L16** lens atoms at the final `:` of each room prompt (coefficient):  
 - 0 greeting (0.108): `␣Yes`:11.1 `␣There`:9.5 `␣slowly`:2.4 `␣why`:3.3 `␣The`:7.5 `␣hello`:3.4 `␣didn`:3.3 `typography`:2.5
