@@ -769,3 +769,5 @@ New main line, h first:
   exception is the leaf at L16 and even there the effect is suppression of other capitals), J-space fraction 2-11%
   but a random dictionary explains 20%. The leaf differs only in loading answer-shaped openers. Pre-registered "little
   or none" for base/CPT models confirmed; the DPO half is untested (no such checkpoint). 0.5B pair overnight on hbox.
+- 21:21: ember: stop the 0.5B J-lens computation (the 91M answered the question; save electricity). Lane told to kill
+  the hbox chain and Mac followers, mark the 0.5B rows as not run, and close with the completed measurements only.
