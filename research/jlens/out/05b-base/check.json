@@ -1,0 +1,35 @@
+{
+  "model": "05b-base",
+  "T": 177,
+  "reconstruction": {
+    "18": {
+      "max_abs": 0.0,
+      "rel": 0.0
+    }
+  },
+  "finite_difference": {
+    "18": {
+      "seconds": 320.7022430896759,
+      "trials": [
+        {
+          "rel_err_hfinal": 0.0008051167242228985,
+          "cos_hfinal": 0.9999996423721313,
+          "rel_err_logits": 0.0036619924940168858
+        },
+        {
+          "rel_err_hfinal": 0.0007924903184175491,
+          "cos_hfinal": 0.9999997615814209,
+          "rel_err_logits": 0.004968391265720129
+        },
+        {
+          "rel_err_hfinal": 0.0007867221138440073,
+          "cos_hfinal": 0.9999998211860657,
+          "rel_err_logits": 0.0037719605024904013
+        }
+      ],
+      "frob": 54.49453353881836,
+      "h_norm": 83.98063659667969,
+      "max_grad_after_t": 0.0
+    }
+  }
+}
