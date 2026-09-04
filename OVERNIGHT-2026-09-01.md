@@ -763,3 +763,9 @@ New main line, h first:
 - 19:56: explorer v2: start-here pane (Ask h / Compare / Replay), prompt library (20 items from room_prompts.json), seeded loom,
   visible node actions, n-column compare, empties that say what to do; headless walk passes. Today's observatory has
   78 records: the room is alive.
+- 21:18: J-lens 91M result: lenses are well-behaved (full rank, finite-difference exact) but no workspace behaviour in base
+  or leaf: same-position lens vectors share a dominant component (cos 0.41-0.55), readouts at h: are sentence-openers
+  on every prompt, injection carries "a country was mentioned" not which one (top-1 capital stays at baseline; the one
+  exception is the leaf at L16 and even there the effect is suppression of other capitals), J-space fraction 2-11%
+  but a random dictionary explains 20%. The leaf differs only in loading answer-shaped openers. Pre-registered "little
+  or none" for base/CPT models confirmed; the DPO half is untested (no such checkpoint). 0.5B pair overnight on hbox.
