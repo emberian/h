@@ -28,6 +28,12 @@ runs/
 checkpoints/
 outputs/
 *.log
+# raw TPU run logs kept as evidence in research/results (cited by tpu-h1jax-gate.md;
+# research/plot_run.py derives the -loss.json/.png beside them)
+!/research/results/tpu-h1jax-gate/ssd-bench-v1.log
+!/research/results/tpu-h1jax-trunk/leaf-e1-decay10.log
+!/research/results/tpu-h1jax-trunk/leaf-e4-decay10.log
+!/research/results/tpu-h1jax-trunk/trunk-wsd-lr1e-4-seed0.log
 *.pid
 h.h
 
